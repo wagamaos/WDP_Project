@@ -1,0 +1,252 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Landed | Home</title>
+  <meta name="description" content="Your gamified campus companion. Track quests, earn XP, attend events and settle into student life.">
+  <link rel="stylesheet" href="../Css/app.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="app-shell">
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar" aria-label="Main navigation">
+      <a class="sidebar-logo" href="index.html" aria-label="Landed – home">
+        <span class="sidebar-logo-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
+        </span>
+        <span class="sidebar-logo-name">Landed</span>
+      </a>
+
+      <div class="sidebar-nav">
+        <a href="index.html" class="active" aria-current="page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
+          <span>Home</span>
+        </a>
+        <a href="forum.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Forum</span>
+        </a>
+        <a href="events.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Events</span>
+        </a>
+        <a href="rewards.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+          <span>Rewards</span>
+        </a>
+        <a href="profile.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Profile</span>
+        </a>
+        <a href="school.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          <span>School Tracker</span>
+        </a>
+        <a href="budget.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          <span>Budget Tracker</span>
+        </a>
+        <a href="onboarding.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span>Arrival Checklist</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- ===== MAIN CANVAS ===== -->
+    <main class="main-canvas" id="main">
+
+      <!-- Top bar: greeting + XP card -->
+      <div class="topbar">
+        <div class="topbar-greeting">
+          <h1>Good morning, Sarah!</h1>
+          <p>You are on a 5-day streak. Keep it going. 🔥</p>
+        </div>
+
+        <div class="xp-card" aria-label="XP progress">
+          <div class="xp-card-top">
+            <div class="xp-card-info">
+              <div class="xp-star-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+              <div>
+                <div class="xp-card-level">Level 4 · Explorer</div>
+                <div class="xp-card-title">80 XP to Navigator</div>
+              </div>
+            </div>
+            <div class="xp-card-pts">320/400</div>
+          </div>
+          <div class="xp-bar-track" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" aria-label="XP progress">
+            <div class="xp-bar-fill"></div>
+          </div>
+          <div class="xp-card-sub">Keep completing quests to level up!</div>
+        </div>
+      </div>
+
+      <!-- Stat cards row -->
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-chip gold">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.9l-1.5-.9C5.1 16.5 2 13.4 2 10a6 6 0 0 1 10-4.47A6 6 0 0 1 22 10c0 3.4-3.1 6.5-8.5 10l-1.5.9z"/></svg>
+          </div>
+          <div>
+            <div class="stat-num">5</div>
+            <div class="stat-label">Day Streak</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-chip">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+          </div>
+          <div>
+            <div class="stat-num">#5</div>
+            <div class="stat-label">Monthly Rank</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-chip mint">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div>
+            <div class="stat-num">3</div>
+            <div class="stat-label">Events Attended</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-chip">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h6l2 9 3-6 2 6 2-9h3"/></svg>
+          </div>
+          <div>
+            <div class="stat-num">2</div>
+            <div class="stat-label">Deadlines Soon</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two-column section -->
+      <div class="two-col">
+
+        <!-- Today's quests -->
+        <div class="card">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Today's quests
+            <span class="badge-count">· 1 of 3</span>
+          </div>
+
+          <ul class="quest-list" aria-label="Today's quests">
+            <li class="quest-item" id="quest-1">
+              <div class="quest-check done" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <span class="quest-label done-text">Check in on the forum</span>
+              <span class="xp-tag" aria-label="Reward: 10 XP">+10 XP</span>
+            </li>
+            <li class="quest-item" id="quest-2">
+              <button class="quest-check" id="quest-check-2" aria-label="Mark RSVP to an upcoming event as done"></button>
+              <span class="quest-label">RSVP to an upcoming event</span>
+              <span class="xp-tag" aria-label="Reward: 20 XP">+20 XP</span>
+            </li>
+            <li class="quest-item" id="quest-3">
+              <button class="quest-check" id="quest-check-3" aria-label="Mark Answer a newcomer's question as done"></button>
+              <span class="quest-label">Answer a newcomer's question</span>
+              <span class="xp-tag" aria-label="Reward: 30 XP">+30 XP</span>
+            </li>
+            <li class="quest-item" id="quest-bonus">
+              <div class="quest-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+              </div>
+              <span class="quest-label">Finish all three for a bonus</span>
+              <span class="pts-tag" aria-label="Bonus: 25 points">+25 pts</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Right column: events + badges -->
+        <div style="display:flex;flex-direction:column;gap:1.25rem;">
+
+          <!-- Upcoming events -->
+          <div class="card">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Upcoming events
+            </div>
+
+            <div aria-label="Upcoming events list">
+              <div class="event-item">
+                <div class="event-icon-wrap" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <div class="event-info">
+                  <div class="event-name">International Food Festival</div>
+                  <div class="event-meta">24 Oct · Student Union</div>
+                </div>
+                <span class="event-pts" aria-label="Earn 50 points">+50</span>
+              </div>
+              <div class="event-item">
+                <div class="event-icon-wrap" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                </div>
+                <div class="event-info">
+                  <div class="event-name">Study Skills Workshop</div>
+                  <div class="event-meta">27 Oct · Library</div>
+                </div>
+                <span class="event-pts" aria-label="Earn 30 points">+30</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Latest badges -->
+          <div class="card">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+              Latest badges
+            </div>
+            <div class="badges-grid" aria-label="Earned badges">
+              <div class="badge-item">
+                <div class="badge-hex earned-gold" role="img" aria-label="First Post badge (earned)">
+                  <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </div>
+                <span class="badge-label">First Post</span>
+              </div>
+              <div class="badge-item">
+                <div class="badge-hex earned" role="img" aria-label="Social badge (earned)">
+                  <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <span class="badge-label">Social</span>
+              </div>
+              <div class="badge-item">
+                <div class="badge-hex locked" role="img" aria-label="Helper badge (locked)">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <span class="badge-label locked-lbl">Helper</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /.two-col -->
+
+    </main>
+  </div><!-- /.app-shell -->
+
+  <script>
+    // Quest toggle interaction
+    document.querySelectorAll('.quest-check:not(.done)').forEach(btn => {
+      btn.addEventListener('click', function() {
+        this.classList.toggle('done');
+        const label = this.nextElementSibling;
+        label.classList.toggle('done-text');
+        const svg = this.querySelector('svg');
+        if (!svg) {
+          this.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" stroke="white" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

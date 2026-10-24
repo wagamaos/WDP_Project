@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Landed | Forum</title>
+  <meta name="description" content="Ask questions, share advice and get trusted answers from fellow students on the Landed forum.">
+  <link rel="stylesheet" href="../Css/app.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="app-shell">
+
+    <!-- ===== SIDEBAR ===== -->
+    <nav class="sidebar" aria-label="Main navigation">
+      <a class="sidebar-logo" href="index.html" aria-label="Landed – home">
+        <span class="sidebar-logo-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
+        </span>
+        <span class="sidebar-logo-name">Landed</span>
+      </a>
+
+      <div class="sidebar-nav">
+        <a href="index.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
+          <span>Home</span>
+        </a>
+        <a href="forum.html" class="active" aria-current="page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Forum</span>
+        </a>
+        <a href="events.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Events</span>
+        </a>
+        <a href="rewards.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+          <span>Rewards</span>
+        </a>
+        <a href="profile.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Profile</span>
+        </a>
+        <a href="school.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          <span>School Tracker</span>
+        </a>
+        <a href="budget.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          <span>Budget Tracker</span>
+        </a>
+        <a href="onboarding.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span>Arrival Checklist</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- ===== MAIN CANVAS ===== -->
+    <main class="main-canvas" id="main">
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Forum</h1>
+          <p class="page-sub">Ask questions, share advice, get trusted answers. Open to everyone.</p>
+        </div>
+        <button class="btn btn-royal" id="new-post-btn" aria-label="Create a new post">
+          <svg viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Post
+        </button>
+      </div>
+
+      <!-- Guest banner -->
+      <div class="forum-guest-banner" role="alert" aria-label="Guest browsing notice">
+        <div class="forum-guest-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="forum-guest-text">
+          <strong>You are browsing as a guest</strong>
+          <span>Log in to post, reply, and earn points for helpful answers.</span>
+        </div>
+        <div class="forum-guest-actions">
+          <a href="login.html" class="btn btn-gold btn-sm" id="forum-login-btn">Log in</a>
+          <a href="login.html" class="btn btn-outline btn-sm" id="forum-signup-btn" style="border-color:rgba(255,255,255,.4);color:#fff;">Sign up</a>
+        </div>
+      </div>
+
+      <!-- Forum body: posts + sidebar -->
+      <div class="forum-layout">
+
+        <!-- Posts column -->
+        <div>
+          <!-- Filter tabs -->
+          <div class="forum-filter-tabs" role="tablist" aria-label="Filter by category">
+            <button class="forum-tab active" id="tab-all" role="tab" aria-selected="true" data-category="all">All</button>
+            <button class="forum-tab" id="tab-housing" role="tab" aria-selected="false" data-category="Housing">Housing</button>
+            <button class="forum-tab" id="tab-visas" role="tab" aria-selected="false" data-category="Visas">Visas</button>
+            <button class="forum-tab" id="tab-money" role="tab" aria-selected="false" data-category="Money">Money</button>
+            <button class="forum-tab" id="tab-food" role="tab" aria-selected="false" data-category="Food">Food</button>
+            <button class="forum-tab" id="tab-study" role="tab" aria-selected="false" data-category="Study">Study</button>
+          </div>
+
+          <!-- Post list -->
+          <div class="card forum-card" aria-label="Forum posts">
+            <ul class="forum-post-list" id="forum-post-list">
+
+              <li class="forum-post-item" data-category="Housing">
+                <div class="forum-post-icon" style="background:var(--pale-blue-1);" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
+                </div>
+                <div class="forum-post-body">
+                  <a href="#" class="forum-post-title" id="post-1">Is there a good place to find affordable shared apartments?</a>
+                  <div class="forum-post-meta">Housing &middot; 12 replies &middot; 2h ago</div>
+                </div>
+                <span class="forum-post-pill answered">Answered</span>
+              </li>
+
+              <li class="forum-post-item" data-category="Food">
+                <div class="forum-post-icon" style="background:var(--gold-light);" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <div class="forum-post-body">
+                  <a href="#" class="forum-post-title" id="post-2">Best food spots near campus?</a>
+                  <div class="forum-post-meta">Food &middot; 6 replies &middot; 4h ago</div>
+                </div>
+                <span class="forum-post-pill chat">Chat</span>
+              </li>
+
+              <li class="forum-post-item" data-category="Visas">
+                <div class="forum-post-icon" style="background:var(--pale-blue-1);" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <div class="forum-post-body">
+                  <a href="#" class="forum-post-title" id="post-3">Do I need to apply for a visa extension for summer?</a>
+                  <div class="forum-post-meta">Visas &middot; 15 replies &middot; 6h ago</div>
+                </div>
+                <span class="forum-post-pill answered">Answered</span>
+              </li>
+
+              <li class="forum-post-item" data-category="Other">
+                <div class="forum-post-icon" style="background:var(--pale-blue-1);" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <div class="forum-post-body">
+                  <a href="#" class="forum-post-title" id="post-4">How do you deal with homesickness?</a>
+                  <div class="forum-post-meta">Other &middot; 22 replies &middot; 8h ago</div>
+                </div>
+                <span class="forum-post-pill discussion">Discussion</span>
+              </li>
+
+              <li class="forum-post-item" data-category="Money">
+                <div class="forum-post-icon" style="background:var(--mint-light);" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                </div>
+                <div class="forum-post-body">
+                  <a href="#" class="forum-post-title" id="post-5">What's the best student bank account here?</a>
+                  <div class="forum-post-meta">Money &middot; 9 replies &middot; 1d ago</div>
+                </div>
+                <span class="forum-post-pill answered">Answered</span>
+              </li>
+
+              <li class="forum-post-item" data-category="Study">
+                <div class="forum-post-icon" style="background:var(--pale-blue-1);" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                </div>
+                <div class="forum-post-body">
+                  <a href="#" class="forum-post-title" id="post-6">Tips for studying in the library during peak hours?</a>
+                  <div class="forum-post-meta">Study &middot; 5 replies &middot; 2d ago</div>
+                </div>
+                <span class="forum-post-pill chat">Chat</span>
+              </li>
+
+            </ul>
+          </div>
+        </div>
+
+        <!-- Right sidebar -->
+        <aside class="forum-aside" aria-label="Forum sidebar">
+
+          <!-- Channels card -->
+          <div class="card">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Channels
+            </div>
+            <ul class="channel-list" aria-label="Forum channels">
+              <li class="channel-item">
+                <span class="channel-name">Housing</span>
+                <span class="channel-count">48</span>
+              </li>
+              <li class="channel-item">
+                <span class="channel-name">Visas</span>
+                <span class="channel-count">36</span>
+              </li>
+              <li class="channel-item">
+                <span class="channel-name">Money</span>
+                <span class="channel-count">29</span>
+              </li>
+              <li class="channel-item">
+                <span class="channel-name">Food</span>
+                <span class="channel-count">61</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Verified answers -->
+          <div class="card forum-verified-card">
+            <div class="forum-verified-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <div class="forum-verified-title">Verified answers</div>
+              <p class="forum-verified-sub">Checked by moderators and tagged with a badge. Helpful answers earn points once you log in.</p>
+            </div>
+          </div>
+
+        </aside>
+      </div>
+
+    </main>
+  </div><!-- /.app-shell -->
+
+  <script>
+    // Category filter
+    const tabs = document.querySelectorAll('.forum-tab');
+    const posts = document.querySelectorAll('.forum-post-item');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+
+        const cat = tab.dataset.category;
+        posts.forEach(post => {
+          if (cat === 'all' || post.dataset.category === cat) {
+            post.style.display = 'flex';
+          } else {
+            post.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    document.getElementById('new-post-btn').addEventListener('click', () => {
+      window.location.href = 'login.html';
+    });
+  </script>
+</body>
+</html>
