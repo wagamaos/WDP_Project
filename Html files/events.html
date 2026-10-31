@@ -6,6 +6,19 @@
   <title>Landed | Events</title>
   <meta name="description" content="Discover, join and make the most of your campus life. Every RSVP and check-in earns points on Landed.">
   <link rel="stylesheet" href="../Css/app.css">
+  <style>
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -74,10 +87,24 @@
 
       <!-- Filter row -->
       <div class="events-filter-row">
-        <div class="forum-filter-tabs" role="tablist" aria-label="Event time filter">
-          <button class="forum-tab active" id="ev-upcoming" role="tab" aria-selected="true" data-filter="upcoming">Upcoming</button>
-          <button class="forum-tab" id="ev-rsvps" role="tab" aria-selected="false" data-filter="rsvps">My RSVPs</button>
-          <button class="forum-tab" id="ev-past" role="tab" aria-selected="false" data-filter="past">Past</button>
+        <div class="forum-filter-tabs" role="group" aria-label="Filter events by time">
+          <button class="forum-tab active"
+                  aria-pressed="true"
+                  data-filter="upcoming">
+            Upcoming
+          </button>
+
+          <button class="forum-tab"
+                  aria-pressed="false"
+                  data-filter="rsvps">
+            My RSVPs
+          </button>
+
+          <button class="forum-tab"
+                  aria-pressed="false"
+                  data-filter="past">
+            Past
+          </button>
         </div>
         <div class="events-type-tabs" role="group" aria-label="Event type filter">
           <button class="events-type-btn active" id="etype-all" data-type="all">All</button>
@@ -89,27 +116,33 @@
       </div>
 
       <!-- Events grid -->
-      <div class="events-grid" id="events-grid" aria-label="Events listing">
+      <section class="events-grid" id="events-grid" aria-label="Events listing">
 
         <div class="event-card" data-type="Student Union" data-filter="upcoming" aria-labelledby="ev-card-1-title">
           <div class="event-card-img" style="background: linear-gradient(135deg, var(--mid-blue-1) 0%, var(--royal) 100%);">
-            <span class="event-pts-badge" aria-label="Earn 50 points">+50 pts</span>
+            <span class="event-pts-badge">+50 pts</span>
           </div>
           <div class="event-card-body">
-            <div class="event-card-title" id="ev-card-1-title">International Food Festival</div>
+            <h2 class="event-card-title" id="ev-card-1-title">International Food Festival</h2>
             <div class="event-card-meta">24 Oct &middot; 12:00 &middot; Campus Quad &middot; Free</div>
-            <button class="btn btn-royal btn-full event-rsvp-btn" id="rsvp-btn-1" data-rsvped="false">RSVP</button>
+            <button class="btn btn-royal btn-full event-rsvp-btn" 
+              id="rsvp-btn-1" 
+              data-rsvped="false"
+              aria-label="RSVP for international food festival">RSVP</button>
           </div>
         </div>
 
         <div class="event-card" data-type="Free" data-filter="upcoming" aria-labelledby="ev-card-2-title">
           <div class="event-card-img" style="background: linear-gradient(135deg, var(--mid-blue-2) 0%, var(--mid-blue-1) 100%);">
-            <span class="event-pts-badge" aria-label="Earn 30 points">+30 pts</span>
+            <span class="event-pts-badge">+30 pts</span>
           </div>
           <div class="event-card-body">
-            <div class="event-card-title" id="ev-card-2-title">Study Skills Workshop</div>
-            <div class="event-card-meta">27 Oct &middot; 15:00 &middot; Library &middot; Free</div>
-            <button class="btn btn-royal btn-full event-rsvp-btn" id="rsvp-btn-2" data-rsvped="false">RSVP</button>
+            <h2 class="event-card-title" id="ev-card-2-title">Study Skills Workshop</div>
+            <div class="event-card-meta">27 Oct &middot; 15:00 &middot; Library &middot; Free</h2>
+            <button class="btn btn-royal btn-full event-rsvp-btn" 
+              id="rsvp-btn-2"
+              data-rsvped="false"
+              aria-label="RSVP for study skills workshop">RSVP</button>
           </div>
         </div>
 
@@ -118,53 +151,67 @@
             <span class="event-pts-badge" aria-label="Earn 40 points">+40 pts</span>
           </div>
           <div class="event-card-body">
-            <div class="event-card-title" id="ev-card-3-title">Cultural Exchange Night</div>
+            <h2 class="event-card-title" id="ev-card-3-title">Cultural Exchange Night</h2>
             <div class="event-card-meta">2 Nov &middot; 18:00 &middot; Student Centre &middot; 5</div>
-            <button class="btn btn-royal btn-full event-rsvp-btn" id="rsvp-btn-3" data-rsvped="false">RSVP</button>
+            <button class="btn btn-royal btn-full event-rsvp-btn" 
+              id="rsvp-btn-3" 
+              data-rsvped="false"
+              aria-label="RSVP for cultural exchage night">RSVP</button>
           </div>
         </div>
 
         <div class="event-card" data-type="Under 10" data-filter="upcoming" aria-labelledby="ev-card-4-title">
           <div class="event-card-img" style="background: linear-gradient(135deg, var(--navy) 0%, var(--royal) 100%);">
-            <span class="event-pts-badge" aria-label="Earn 60 points">+60 pts</span>
+            <span class="event-pts-badge">+60 pts</span>
           </div>
           <div class="event-card-body">
-            <div class="event-card-title" id="ev-card-4-title">Hiking Trip</div>
+            <h2 class="event-card-title" id="ev-card-4-title">Hiking Trip</h2>
             <div class="event-card-meta">7 Nov &middot; 08:00 &middot; Campus Gate &middot; 10</div>
-            <button class="btn btn-royal btn-full event-rsvp-btn" id="rsvp-btn-4" data-rsvped="false">RSVP</button>
+            <button class="btn btn-royal btn-full event-rsvp-btn" 
+              id="rsvp-btn-4" 
+              data-rsvped="false"
+              aria-label="RSVP for hiking trip">RSVP</button>
           </div>
         </div>
 
         <div class="event-card" data-type="Student Union" data-filter="upcoming" aria-labelledby="ev-card-5-title">
           <div class="event-card-img" style="background: linear-gradient(135deg, #6B48E5 0%, var(--mid-blue-1) 100%);">
-            <span class="event-pts-badge" aria-label="Earn 35 points">+35 pts</span>
+            <span class="event-pts-badge">+35 pts</span>
           </div>
           <div class="event-card-body">
-            <div class="event-card-title" id="ev-card-5-title">Welcome Week Social</div>
-            <div class="event-card-meta">10 Nov &middot; 17:00 &middot; Main Hall &middot; Free</div>
-            <button class="btn btn-royal btn-full event-rsvp-btn" id="rsvp-btn-5" data-rsvped="false">RSVP</button>
+            <h2 class="event-card-title" id="ev-card-5-title">Welcome Week Social</div>
+            <div class="event-card-meta">10 Nov &middot; 17:00 &middot; Main Hall &middot; Free</h2>
+            <button class="btn btn-royal btn-full event-rsvp-btn" 
+              id="rsvp-btn-5" 
+              data-rsvped="false"
+              aria-label="RSVP for welcome week social">RSVP</button>
           </div>
         </div>
 
         <div class="event-card" data-type="Student Run" data-filter="upcoming" aria-labelledby="ev-card-6-title">
           <div class="event-card-img" style="background: linear-gradient(135deg, #2F9E8F 0%, var(--mid-blue-1) 100%);">
-            <span class="event-pts-badge" aria-label="Earn 25 points">+25 pts</span>
+            <span class="event-pts-badge">+25 pts</span>
           </div>
           <div class="event-card-body">
-            <div class="event-card-title" id="ev-card-6-title">Language Exchange Meetup</div>
+            <h2 class="event-card-title" id="ev-card-6-title">Language Exchange Meetup</h2>
             <div class="event-card-meta">14 Nov &middot; 14:00 &middot; Café Zone &middot; Free</div>
-            <button class="btn btn-royal btn-full event-rsvp-btn" id="rsvp-btn-6" data-rsvped="false">RSVP</button>
+            <button class="btn btn-royal btn-full event-rsvp-btn" 
+              id="rsvp-btn-6" 
+              data-rsvped="false"
+              aria-label="RSVP for language exchange meetup">RSVP</button>
           </div>
         </div>
 
-      </div><!-- /.events-grid -->
+      </section><!-- /.events-grid -->
 
     </main>
   </div><!-- /.app-shell -->
 
   <script>
     // Time filter tabs
-    const timeTabs = document.querySelectorAll('[data-filter]');
+    const timeTabs = document.querySelectorAll(
+      '.forum-filter-tabs button[data-filter]'
+    );
     timeTabs.forEach(tab => {
       tab.addEventListener('click', () => {
         timeTabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });

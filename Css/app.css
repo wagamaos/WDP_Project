@@ -845,6 +845,28 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .event-card-title { font-weight: 800; font-size: 1rem; color: var(--navy); }
 .event-card-meta { font-size: .85rem; color: var(--mid-blue-2); }
 
+/* Accessibility: Improve text contrast */
+
+/* Page subtitle */
+.page-sub {
+    color: #0E2466;
+}
+
+/* Inactive time filter buttons */
+.forum-tab {
+    color: #0E2466;
+}
+
+/* Event type filter buttons */
+.events-type-btn {
+    color: #0E2466;
+}
+
+/* Event date, time and location */
+.event-card-meta {
+    color: #0E2466;
+}
+
 /* ==========================================================
    REWARDS PAGE
    ========================================================== */
