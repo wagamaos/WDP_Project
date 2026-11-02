@@ -7,7 +7,12 @@
   <meta name="description" content="Earn points, collect badges, climb the leaderboard and redeem real-world treats on Landed.">
   <link rel="stylesheet" href="../Css/app.css">
   <style>
-    /* Accessibility: improve text contrast (WCAG 1.4.3 AA needs 4.5:1).
+    /* Accessibility fix 2 is in the HTML: aria-label on each sidebar link.
+       Between 481px and 900px wide, app.css hides the link text
+       (.sidebar-nav a span { display: none; }), which left the 8 links
+       with only a hidden icon and no accessible name. */
+
+    /* Accessibility fix 1: improve text contrast (WCAG 1.4.3 AA needs 4.5:1).
        Scoped to this page so the shared classes in app.css stay the same
        on index.html and profile.html. */
 
@@ -48,35 +53,35 @@
       </a>
 
       <div class="sidebar-nav">
-        <a href="index.html">
+        <a href="index.html" aria-label="Home">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
           <span>Home</span>
         </a>
-        <a href="forum.html">
+        <a href="forum.html" aria-label="Forum">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           <span>Forum</span>
         </a>
-        <a href="events.html">
+        <a href="events.html" aria-label="Events">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           <span>Events</span>
         </a>
-        <a href="rewards.html" class="active" aria-current="page">
+        <a href="rewards.html" class="active" aria-current="page" aria-label="Rewards">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
           <span>Rewards</span>
         </a>
-        <a href="profile.html">
+        <a href="profile.html" aria-label="Profile">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <span>Profile</span>
         </a>
-        <a href="school.html">
+        <a href="school.html" aria-label="School Tracker">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
           <span>School Tracker</span>
         </a>
-        <a href="budget.html">
+        <a href="budget.html" aria-label="Budget Tracker">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
           <span>Budget Tracker</span>
         </a>
-        <a href="onboarding.html">
+        <a href="onboarding.html" aria-label="Arrival Checklist">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           <span>Arrival Checklist</span>
         </a>
