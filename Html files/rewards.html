@@ -6,6 +6,32 @@
   <title>Landed | Rewards &amp; Leaderboard</title>
   <meta name="description" content="Earn points, collect badges, climb the leaderboard and redeem real-world treats on Landed.">
   <link rel="stylesheet" href="../Css/app.css">
+  <style>
+    /* Accessibility: improve text contrast (WCAG 1.4.3 AA needs 4.5:1).
+       Scoped to this page so the shared classes in app.css stay the same
+       on index.html and profile.html. */
+
+    /* "· 4 of 8" badge count, points cost of each reward
+       --mid-blue-2 #5B82E0 = 3.67:1 on white -> --mid-blue-1 #3A63D0 = 5.42:1 */
+    .card-title .badge-count,
+    .redeem-cost {
+      color: var(--mid-blue-1);
+    }
+
+    /* Leaderboard hint on the pale page-bg box
+       #5B82E0 = 3.42:1 on #F4F7FE -> #3A63D0 = 5.05:1 */
+    .lb-hint {
+      color: var(--mid-blue-1);
+    }
+
+    /* Locked badge names (Helper, Settled, Scholar, Local)
+       --mid-blue-3 #9DB5EE = 2.04:1 on white -> #3A63D0 = 5.42:1.
+       Still lighter than the navy earned-badge labels, and the locked
+       state is also given by the padlock icon and aria-label. */
+    .badge-label.locked-lbl {
+      color: var(--mid-blue-1);
+    }
+  </style>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
