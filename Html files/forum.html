@@ -6,6 +6,25 @@
   <title>Landed | Forum</title>
   <meta name="description" content="Ask questions, share advice and get trusted answers from fellow students on the Landed forum.">
   <link rel="stylesheet" href="../Css/app.css">
+  <style>
+    /* Accessibility: improve text contrast (WCAG 1.4.3 AA needs 4.5:1).
+       --mid-blue-2 #5B82E0 = 3.67:1 on white -> --mid-blue-1 #3A63D0 = 5.42:1 */
+
+    /* Post category, replies and time ("Housing · 12 replies · 2h ago") */
+    .forum-post-meta {
+      color: var(--mid-blue-1);
+    }
+
+    /* Post counts in the channel list (48, 36, 29, 61) */
+    .channel-count {
+      color: var(--mid-blue-1);
+    }
+
+    /* "Checked by moderators..." text in the verified answers card */
+    .forum-verified-sub {
+      color: var(--mid-blue-1);
+    }
+  </style>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
