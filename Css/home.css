@@ -1,0 +1,171 @@
+/* ---------- Top bar ---------- */
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+.topbar-greeting h1 {
+  font-size: clamp(1.6rem, 3vw, 2rem);
+  font-weight: 800; color: var(--navy);
+  letter-spacing: -.03em;
+}
+.topbar-greeting p { color: var(--mid-blue-2); font-size: .97rem; margin-top: .15rem; }
+
+/* XP Level card */
+.xp-card {
+  background: var(--royal);
+  border-radius: var(--radius);
+  padding: 1rem 1.4rem;
+  min-width: 240px;
+  color: var(--white);
+  display: flex; flex-direction: column; gap: .5rem;
+}
+.xp-card-top {
+  display: flex; align-items: center;
+  justify-content: space-between; gap: .5rem;
+}
+.xp-card-info { display: flex; align-items: center; gap: .6rem; }
+.xp-star-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.15);
+  display: grid; place-items: center;
+}
+.xp-star-icon svg { width: 18px; height: 18px; stroke: var(--gold); fill: none; stroke-width: 2; }
+.xp-card-level { font-size: .85rem; color: rgba(255,255,255,.75); }
+.xp-card-title { font-weight: 700; font-size: 1rem; }
+.xp-card-pts { font-weight: 800; font-size: 1rem; color: var(--gold); }
+.xp-bar-track {
+  height: 8px; background: rgba(255,255,255,.2);
+  border-radius: 99px; overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%; width: 80%;
+  background: var(--gold); border-radius: 99px;
+  animation: xpFill 1.2s ease-out both;
+}
+.xp-card-sub { font-size: .8rem; color: rgba(255,255,255,.6); }
+
+/* ==========================================================
+   STAT CARDS ROW
+   ========================================================== */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.3rem;
+  display: flex; align-items: center; gap: .9rem;
+  box-shadow: var(--shadow-card);
+  transition: transform .15s, box-shadow .15s;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.stat-chip {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: var(--pale-blue-1);
+  display: grid; place-items: center; flex: none;
+}
+.stat-chip svg { width: 22px; height: 22px; stroke: var(--royal); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.stat-chip.gold { background: var(--gold-light); }
+.stat-chip.gold svg { stroke: var(--gold-light-text); }
+.stat-chip.mint { background: var(--mint-light); }
+.stat-chip.mint svg { stroke: var(--mint-text); }
+.stat-num { font-size: 1.75rem; font-weight: 800; color: var(--navy); line-height: 1; }
+.stat-label { font-size: .85rem; color: var(--mid-blue-2); margin-top: .1rem; }
+
+/* ==========================================================
+   TWO COLUMN GRID
+   ========================================================== */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr .85fr;
+  gap: 1.25rem;
+}
+
+/* ==========================================================
+   QUESTS LIST
+   ========================================================== */
+.quest-list { display: flex; flex-direction: column; gap: .5rem; }
+.quest-item {
+  display: flex; align-items: center; gap: .9rem;
+  padding: .75rem .9rem;
+  border-radius: var(--radius-sm);
+  background: var(--page-bg);
+  border: 1px solid transparent;
+  transition: border-color .15s;
+}
+.quest-item:hover { border-color: var(--pale-blue-2); }
+.quest-check {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 2px solid var(--pale-blue-2);
+  flex: none; display: grid; place-items: center;
+  transition: background .15s, border-color .15s;
+}
+.quest-check.done { background: var(--mint); border-color: var(--mint); }
+.quest-check.done svg { display: block; }
+.quest-check svg {
+  display: none;
+  width: 14px; height: 14px;
+  stroke: var(--white); fill: none;
+  stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+}
+.quest-label { flex: 1; font-size: .97rem; color: var(--navy); }
+.quest-label.done-text { color: var(--mid-blue-2); text-decoration: line-through; }
+
+.xp-tag {
+  display: inline-flex; align-items: center;
+  padding: .25rem .65rem; border-radius: 99px;
+  background: var(--gold); color: var(--gold-text);
+  font-size: .82rem; font-weight: 700; white-space: nowrap;
+}
+.pts-tag {
+  display: inline-flex; align-items: center;
+  padding: .25rem .65rem; border-radius: 99px;
+  background: var(--pale-blue-1); color: var(--navy);
+  font-size: .82rem; font-weight: 700;
+}
+
+.quest-icon {
+  width: 26px; height: 26px; border-radius: 8px;
+  background: var(--gold-light); flex: none;
+  display: grid; place-items: center;
+}
+.quest-icon svg {
+  width: 14px; height: 14px;
+  stroke: var(--gold-light-text); fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+
+/* ==========================================================
+   EVENTS LIST (sidebar-right)
+   ========================================================== */
+.event-item {
+  display: flex; align-items: flex-start; gap: .8rem;
+  padding: .75rem 0;
+  border-bottom: 1px solid var(--pale-blue-2);
+}
+.event-item:last-child { border-bottom: none; }
+.event-icon-wrap {
+  width: 36px; height: 36px;
+  background: var(--pale-blue-1); border-radius: 10px;
+  flex: none; display: grid; place-items: center;
+}
+.event-icon-wrap svg { width: 18px; height: 18px; stroke: var(--mid-blue-1); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.event-info { flex: 1; min-width: 0; }
+.event-name { font-size: .95rem; font-weight: 700; color: var(--navy); }
+.event-meta { font-size: .82rem; color: var(--mid-blue-2); margin-top: .1rem; }
+.event-pts {
+  flex: none;
+  background: var(--gold); color: var(--gold-text);
+  font-size: .8rem; font-weight: 700;
+  padding: .2rem .6rem; border-radius: 99px;
+}

@@ -1,0 +1,271 @@
+/* ==========================================================
+   Landed – Gamified Design System
+   common.css  |  Shared design system and layout
+   ========================================================== */
+
+/* ---------- Google Fonts ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ---------- Color Tokens ---------- */
+:root {
+  /* Blues */
+  --royal:       #1B44B8;  /* sidebar, dark cards, primary btns, earned badges */
+  --mid-blue-1:  #3A63D0;
+  --mid-blue-2:  #5B82E0;
+  --mid-blue-3:  #9DB5EE;
+  --pale-blue-1: #E3ECFF;
+  --pale-blue-2: #DCE5F8;
+  --page-bg:     #F4F7FE;
+  --navy:        #0E2466;  /* text navy */
+
+  /* Gold */
+  --gold:            #F5B73B;  /* XP bars, +pts tags, streaks, CTA buttons */
+  --gold-text:       #3A2800;  /* text on gold */
+  --gold-light:      #FFF1CF;  /* soft gold chip bg */
+  --gold-light-text: #8A5A00;
+
+  /* Green */
+  --mint:       #2FBF8F;  /* checkmarks */
+  --mint-light: #D9F5EA;  /* Done/Answered pill bg */
+  --mint-text:  #157A58;  /* text on mint light */
+
+  /* Neutrals */
+  --white:   #FFFFFF;
+  --surface: #FFFFFF;
+  --line:    #DCE5F8;
+
+  /* Type */
+  --font: 'Inter', 'Segoe UI', system-ui, sans-serif;
+
+  /* Layout */
+  --sidebar-w:  236px;
+  --radius:     14px;
+  --radius-sm:  10px;
+  --radius-xs:   8px;
+  --shadow-card: 0 2px 12px rgba(14,36,102,.08);
+  --shadow-md:   0 8px 32px rgba(14,36,102,.14);
+}
+
+/* ---------- Reset ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--page-bg);
+  color: var(--navy);
+  font-size: 1rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+img, svg { display: block; max-width: 100%; }
+ul { list-style: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+/* ---------- Skip link ---------- */
+.skip-link {
+  position: absolute; left: -999px; top: 0;
+  background: var(--royal); color: #fff;
+  padding: .5rem 1rem; z-index: 999;
+  border-radius: 0 0 var(--radius-xs) 0;
+}
+.skip-link:focus { left: 0; }
+
+/* ==========================================================
+   LAYOUT: Sidebar + Main canvas
+   ========================================================== */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  width: var(--sidebar-w);
+  flex: none;
+  background: var(--royal);
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 2rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  padding: 1.6rem 1.4rem 1.2rem;
+  text-decoration: none;
+}
+.sidebar-logo-icon {
+  width: 38px; height: 38px;
+  background: var(--gold);
+  border-radius: 10px;
+  display: grid; place-items: center;
+  flex: none;
+}
+.sidebar-logo-icon svg { width: 20px; height: 20px; fill: var(--gold-text); }
+.sidebar-logo-name {
+  font-weight: 800;
+  font-size: 1.35rem;
+  color: var(--white);
+  letter-spacing: -.03em;
+}
+
+.sidebar-nav { flex: 1; padding: .5rem 0; }
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  padding: .7rem 1.4rem;
+  color: rgba(255,255,255,.75);
+  font-size: .97rem;
+  font-weight: 500;
+  transition: background .15s, color .15s;
+  position: relative;
+}
+.sidebar-nav a svg {
+  width: 20px; height: 20px; flex: none;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+}
+.sidebar-nav a:hover { background: rgba(255,255,255,.08); color: var(--white); }
+.sidebar-nav a.active {
+  background: rgba(255,255,255,.15);
+  color: var(--white);
+  font-weight: 700;
+}
+.sidebar-nav a.active::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--gold);
+  border-radius: 0 3px 3px 0;
+}
+
+/* ---------- Main content area ---------- */
+.main-canvas {
+  flex: 1;
+  min-width: 0;
+  padding: 2rem 2rem 3rem;
+}
+
+/* ==========================================================
+   CARD (generic)
+   ========================================================== */
+.card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.4rem;
+  box-shadow: var(--shadow-card);
+}
+.card-title {
+  font-size: 1rem; font-weight: 700; color: var(--navy);
+  display: flex; align-items: center; gap: .5rem;
+  margin-bottom: 1.1rem;
+}
+.card-title svg {
+  width: 18px; height: 18px;
+  stroke: var(--mid-blue-1); fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+.card-title .badge-count { font-size: .8rem; color: var(--mid-blue-2); font-weight: 500; }
+
+/* ==========================================================
+   BADGES
+   ========================================================== */
+.badges-grid {
+  display: flex; flex-wrap: wrap; gap: 1.2rem;
+  justify-content: flex-start;
+}
+.badge-item {
+  display: flex; flex-direction: column;
+  align-items: center; gap: .5rem; width: 72px;
+}
+.badge-hex {
+  width: 60px; height: 60px;
+  clip-path: polygon(50% 0%,93.3% 25%,93.3% 75%,50% 100%,6.7% 75%,6.7% 25%);
+  display: grid; place-items: center;
+  transition: transform .2s;
+}
+.badge-hex:hover { transform: scale(1.08); }
+.badge-hex.earned      { background: var(--royal); }
+.badge-hex.earned-gold { background: var(--gold); }
+.badge-hex.locked      { background: var(--pale-blue-2); }
+.badge-hex svg { width: 26px; height: 26px; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.badge-hex.earned svg      { stroke: var(--white); fill: none; }
+.badge-hex.earned-gold svg { stroke: var(--gold-text); fill: none; }
+.badge-hex.locked svg      { stroke: var(--mid-blue-3); fill: none; }
+.badge-label { font-size: .78rem; font-weight: 600; color: var(--navy); text-align: center; }
+.badge-label.locked-lbl { color: var(--mid-blue-3); }
+
+/* ==========================================================
+   BUTTONS
+   ========================================================== */
+.btn {
+  display: inline-flex; align-items: center;
+  justify-content: center; gap: .5rem;
+  font-family: inherit; font-size: .97rem; font-weight: 700;
+  padding: .75rem 1.4rem;
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: background .15s, transform .12s, box-shadow .15s;
+  text-decoration: none;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-gold  { background: var(--gold); color: var(--gold-text); }
+.btn-gold:hover { background: #e8a82a; box-shadow: 0 4px 16px rgba(245,183,59,.35); }
+.btn-royal { background: var(--royal); color: var(--white); }
+.btn-royal:hover { background: var(--mid-blue-1); }
+.btn-outline { background: transparent; color: var(--navy); border-color: var(--pale-blue-2); }
+.btn-outline:hover { border-color: var(--royal); color: var(--royal); background: var(--pale-blue-1); }
+.btn-full { width: 100%; }
+.btn-sm { padding: .5rem 1rem; font-size: .88rem; }
+
+/* ==========================================================
+   PILLS / CHIPS
+   ========================================================== */
+.pill-done {
+  display: inline-flex; align-items: center; gap: .3rem;
+  background: var(--mint-light); color: var(--mint-text);
+  font-size: .8rem; font-weight: 700;
+  padding: .2rem .6rem; border-radius: 99px;
+}
+.pill-done svg { width: 12px; height: 12px; stroke: var(--mint-text); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ==========================================================
+   PAGE HEADER (shared)
+   ========================================================== */
+.page-header {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 1rem;
+  margin-bottom: 1.5rem; flex-wrap: wrap;
+}
+.page-title {
+  font-size: clamp(1.6rem, 3vw, 2rem);
+  font-weight: 800; color: var(--navy);
+  letter-spacing: -.03em;
+}
+.page-sub { color: var(--mid-blue-2); font-size: .97rem; margin-top: .15rem; }
+
+/* Shared by the forum, events and school pages. */
+.forum-filter-tabs {
+  display: flex; gap: .4rem; flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.forum-tab {
+  padding: .4rem 1.1rem; border-radius: 99px;
+  font-size: .9rem; font-weight: 600; color: var(--mid-blue-2);
+  background: var(--white); border: 1.5px solid var(--line);
+  cursor: pointer; transition: background .15s, color .15s, border-color .15s;
+  font-family: inherit;
+}
+.forum-tab:hover { border-color: var(--royal); color: var(--royal); }
+.forum-tab.active { background: var(--royal); color: var(--white); border-color: var(--royal); }
+
+@keyframes xpFill { from { width: 0; } }

@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Landed | Sarah Tan – Profile</title>
   <meta name="description" content="View and manage your Landed profile, badges, contribution history and privacy settings.">
-  <link rel="stylesheet" href="../Css/app.css">
+  <link rel="stylesheet" href="../Css/common.css">
+  <link rel="stylesheet" href="../Css/profile.css">
+  <link rel="stylesheet" href="../Css/responsive.css">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -54,6 +56,10 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           <span>Arrival Checklist</span>
         </a>
+        <a href="login.html" id="logout-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Log out</span>
+        </a>
       </div>
     </nav>
 
@@ -62,14 +68,14 @@
 
       <!-- Profile header card -->
       <div class="profile-header-card" aria-label="Profile header">
-        <div class="profile-avatar" aria-hidden="true">ST</div>
+        <div class="profile-avatar" id="profile-avatar" aria-hidden="true"></div>
         <div class="profile-info">
-          <div class="profile-name">Sarah Tan</div>
-          <div class="profile-sub">Exchange Student &middot; Singapore &middot; Computer Science</div>
-          <div class="profile-xp-bar-track" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" aria-label="XP progress to next level">
-            <div class="profile-xp-bar-fill"></div>
+          <div class="profile-name" id="profile-name"></div>
+          <div class="profile-sub" id="profile-sub"></div>
+          <div class="profile-xp-bar-track" id="profile-xp-track" role="progressbar" aria-valuenow="12.5" aria-valuemin="0" aria-valuemax="100" aria-label="XP progress to next level">
+            <div class="profile-xp-bar-fill" id="profile-xp-fill"></div>
           </div>
-          <div class="profile-xp-label">Level 4 &middot; Explorer &middot; 320 / 400 XP</div>
+          <div class="profile-xp-label" id="profile-xp-label"></div>
         </div>
         <div class="profile-edit-btn">
           <button class="btn btn-outline btn-sm" id="edit-profile-btn" style="background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3);color:#fff;">
@@ -87,30 +93,25 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <h2 id="about-heading">About</h2>
           </div>
-          <p class="about-section-bio">
-            Computer science exchange student from Singapore. I love exploring new places, trying different foods and meeting new people.
-          </p>
+          <p class="about-section-bio" id="profile-bio"></p>
 
           <div class="about-row">
             <div class="about-row-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
             </div>
             <div>
-              <div class="about-row-label">Languages</div>
-              <div class="about-row-value">English, Mandarin</div>
+              <div class="about-row-label">Home country</div>
+              <div class="about-row-value" id="profile-country"></div>
             </div>
           </div>
 
           <div class="about-row">
             <div class="about-row-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
             </div>
-            <div style="flex:1;">
-              <div class="about-row-label">Profile visibility</div>
-              <div class="about-row-value">Visible to all students</div>
-            </div>
-            <div class="visibility-manage">
-              <button class="btn btn-outline btn-sm" id="manage-visibility-btn">Manage</button>
+            <div>
+              <div class="about-row-label">Field of study</div>
+              <div class="about-row-value" id="profile-major"></div>
             </div>
           </div>
         </div>
@@ -127,7 +128,7 @@
               <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             </div>
             <span class="contrib-label">Forum posts</span>
-            <span class="contrib-count">5</span>
+            <span class="contrib-count">0</span>
           </div>
 
           <div class="contrib-row">
@@ -135,7 +136,7 @@
               <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             </div>
             <span class="contrib-label">Comments</span>
-            <span class="contrib-count">12</span>
+            <span class="contrib-count">0</span>
           </div>
 
           <div class="contrib-row">
@@ -143,7 +144,7 @@
               <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </div>
             <span class="contrib-label">Events attended</span>
-            <span class="contrib-count">3</span>
+            <span class="contrib-count">0</span>
           </div>
 
           <div class="contrib-row">
@@ -151,7 +152,7 @@
               <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             </div>
             <span class="contrib-label">Points earned</span>
-            <span class="contrib-count gold-count">320</span>
+            <span class="contrib-count gold-count" id="profile-points">50</span>
           </div>
         </div>
 
@@ -162,36 +163,36 @@
         <div class="card-title">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
           <h2 id="badges-heading">Badges</h2>
-          <span class="badge-count">&middot; 4 of 8</span>
+          <span class="badge-count" id="profile-badge-count">&middot; 0 of 8</span>
         </div>
 
         <div class="badges-grid" aria-label="Your badges">
           <div class="badge-item">
-            <div class="badge-hex earned-gold" role="img" aria-label="First Post badge – earned">
+            <div class="badge-hex locked" role="img" aria-label="First Post badge – locked">
               <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             </div>
-            <span class="badge-label">First Post</span>
+            <span class="badge-label locked-lbl">First Post</span>
           </div>
 
           <div class="badge-item">
-            <div class="badge-hex earned" role="img" aria-label="Social badge – earned">
+            <div class="badge-hex locked" role="img" aria-label="Social badge – locked">
               <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             </div>
-            <span class="badge-label">Social</span>
+            <span class="badge-label locked-lbl">Social</span>
           </div>
 
           <div class="badge-item">
-            <div class="badge-hex earned" role="img" aria-label="5-day Streak badge – earned">
+            <div class="badge-hex locked" role="img" aria-label="5-day Streak badge – locked">
               <svg viewBox="0 0 24 24"><path d="M12 20.9l-1.5-.9C5.1 16.5 2 13.4 2 10a6 6 0 0 1 10-4.47A6 6 0 0 1 22 10c0 3.4-3.1 6.5-8.5 10l-1.5.9z"/></svg>
             </div>
-            <span class="badge-label">5-day Streak</span>
+            <span class="badge-label locked-lbl">5-day Streak</span>
           </div>
 
           <div class="badge-item">
-            <div class="badge-hex earned" role="img" aria-label="Verified badge – earned">
+            <div class="badge-hex locked" role="img" aria-label="Verified badge – locked">
               <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
-            <span class="badge-label">Verified</span>
+            <span class="badge-label locked-lbl">Verified</span>
           </div>
 
           <div class="badge-item">
@@ -225,15 +226,27 @@
       </div><!-- /.badges card -->
 
     </main>
+    <dialog class="profile-dialog" id="profile-dialog" aria-labelledby="profile-dialog-title">
+      <form id="profile-edit-form">
+        <h2 id="profile-dialog-title">Edit profile</h2>
+        <p id="profile-message" class="auth-message" role="status" aria-live="polite" hidden></p>
+        <label for="edit-name">Full name</label>
+        <input id="edit-name" name="name" type="text" autocomplete="name" required maxlength="80">
+        <label for="edit-country">Home country</label>
+        <input id="edit-country" name="country" type="text" autocomplete="country-name" required maxlength="80">
+        <label for="edit-major">Field of study</label>
+        <input id="edit-major" name="major" type="text" maxlength="100">
+        <label for="edit-bio">About you</label>
+        <textarea id="edit-bio" name="bio" rows="4" maxlength="300"></textarea>
+        <div class="profile-dialog-actions">
+          <button type="button" class="btn btn-outline" id="close-profile-dialog">Cancel</button>
+          <button type="submit" class="btn btn-gold" id="save-profile-btn">Save changes</button>
+        </div>
+      </form>
+    </dialog>
   </div><!-- /.app-shell -->
 
-  <script>
-    document.getElementById('edit-profile-btn').addEventListener('click', function() {
-      alert('Edit profile feature coming soon!');
-    });
-    document.getElementById('manage-visibility-btn').addEventListener('click', function() {
-      alert('Visibility settings feature coming soon!');
-    });
-  </script>
+  <script src="../Java/auth.js"></script>
+  <script src="../Java/profile.js"></script>
 </body>
 </html>

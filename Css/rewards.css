@@ -1,0 +1,105 @@
+/* ==========================================================
+   REWARDS PAGE
+   ========================================================== */
+.rewards-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.rewards-xp-card {
+  background: var(--royal); color: var(--white);
+  display: flex; align-items: center; gap: 1.2rem;
+  position: relative; overflow: hidden;
+}
+.rewards-xp-card::after {
+  content: ''; position: absolute; right: -40px; top: -40px;
+  width: 160px; height: 160px; border-radius: 50%;
+  background: rgba(255,255,255,.07); pointer-events: none;
+}
+.rewards-ring-wrap {
+  position: relative; width: 100px; height: 100px; flex: none; z-index: 1;
+}
+.rewards-ring-svg { width: 100%; height: 100%; }
+.rewards-ring-inner {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+}
+.rewards-ring-level {
+  font-size: 1.6rem; font-weight: 900; color: var(--white);
+}
+.rewards-xp-info { z-index: 1; }
+.rewards-xp-pts { font-size: 2rem; font-weight: 900; color: var(--gold); letter-spacing: -.03em; }
+.rewards-xp-label { font-size: .88rem; color: rgba(255,255,255,.75); margin-top: .2rem; }
+
+.leaderboard-list { display: flex; flex-direction: column; gap: .4rem; }
+.lb-item {
+  display: flex; align-items: center; gap: .9rem;
+  padding: .7rem .8rem; border-radius: var(--radius-xs);
+  transition: background .15s;
+}
+.lb-item:hover { background: var(--page-bg); }
+.lb-rank {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--pale-blue-1); color: var(--navy);
+  font-weight: 800; font-size: .9rem;
+  display: grid; place-items: center; flex: none;
+}
+.lb-rank.gold-rank { background: var(--gold); color: var(--gold-text); }
+.lb-rank.silver-rank { background: #C0C0C0; color: #444; }
+.lb-rank.bronze-rank { background: #CD7F32; color: #fff; }
+.lb-rank.lb-rank-you { background: var(--royal); color: var(--white); }
+.lb-name { flex: 1; font-size: .97rem; color: var(--navy); font-weight: 500; }
+.lb-pts { font-weight: 800; color: var(--navy); font-size: .97rem; }
+.lb-you { background: var(--pale-blue-1); border-radius: var(--radius-xs); }
+.lb-pts-you { color: var(--royal); }
+.lb-hint { font-size: .84rem; color: var(--mid-blue-2); margin-top: 1rem; padding: .6rem .8rem; background: var(--page-bg); border-radius: var(--radius-xs); }
+
+.redeem-list { display: flex; flex-direction: column; gap: .5rem; }
+.redeem-item {
+  display: flex; align-items: center; gap: .85rem;
+  padding: .7rem 0;
+  border-bottom: 1px solid var(--pale-blue-2);
+}
+.redeem-item:last-child { border-bottom: none; }
+.redeem-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  flex: none; display: grid; place-items: center;
+}
+.redeem-icon svg { width: 18px; height: 18px; stroke: var(--gold-light-text); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.redeem-info { flex: 1; }
+.redeem-name { font-size: .95rem; font-weight: 700; color: var(--navy); }
+.redeem-cost { font-size: .82rem; color: var(--mid-blue-2); }
+
+
+
+/* Accessibility fix 2 is in the HTML: aria-label on each sidebar link.
+       Between 481px and 900px wide, responsive.css hides the link text
+       (.sidebar-nav a span { display: none; }), which left the 8 links
+       with only a hidden icon and no accessible name. */
+
+    /* Accessibility fix 1: improve text contrast (WCAG 1.4.3 AA needs 4.5:1).
+       Scoped to this page so the shared classes in common.css stay the same
+       on index.html and profile.html. */
+
+    /* "· 4 of 8" badge count, points cost of each reward
+       --mid-blue-2 #5B82E0 = 3.67:1 on white -> --mid-blue-1 #3A63D0 = 5.42:1 */
+    .card-title .badge-count,
+    .redeem-cost {
+      color: var(--mid-blue-1);
+    }
+
+    /* Leaderboard hint on the pale page-bg box
+       #5B82E0 = 3.42:1 on #F4F7FE -> #3A63D0 = 5.05:1 */
+    .lb-hint {
+      color: var(--mid-blue-1);
+    }
+
+    /* Locked badge names (Helper, Settled, Scholar, Local)
+       --mid-blue-3 #9DB5EE = 2.04:1 on white -> #3A63D0 = 5.42:1.
+       Still lighter than the navy earned-badge labels, and the locked
+       state is also given by the padlock icon and aria-label. */
+    .badge-label.locked-lbl {
+      color: var(--mid-blue-1);
+    }

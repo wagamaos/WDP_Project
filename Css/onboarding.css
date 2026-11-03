@@ -1,0 +1,93 @@
+/* ==========================================================
+   ARRIVAL CHECKLIST / ONBOARDING PAGE
+   ========================================================== */
+.onboard-progress-card { margin-bottom: 1.25rem; }
+.onboard-progress-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: .7rem;
+}
+.onboard-progress-label { font-weight: 700; color: var(--navy); font-size: .97rem; }
+.onboard-progress-pts { font-weight: 800; color: var(--mid-blue-2); font-size: .97rem; }
+.onboard-bar-track {
+  height: 10px; background: var(--pale-blue-2);
+  border-radius: 99px; overflow: hidden; margin-bottom: 1.4rem;
+}
+.onboard-bar-fill {
+  height: 100%; background: var(--gold); border-radius: 99px;
+  animation: xpFill 1.2s ease-out both;
+  transition: width .5s ease;
+}
+
+.onboard-steps-row {
+  display: flex; gap: 1.2rem; flex-wrap: wrap; justify-content: space-between;
+}
+.onboard-step {
+  display: flex; flex-direction: column; align-items: center; gap: .4rem;
+  min-width: 72px;
+}
+.onboard-hex {
+  width: 64px; height: 64px;
+  clip-path: polygon(50% 0%,93.3% 25%,93.3% 75%,50% 100%,6.7% 75%,6.7% 25%);
+  display: grid; place-items: center;
+  transition: transform .2s;
+}
+.onboard-hex:hover { transform: scale(1.08); }
+.onboard-hex.done-hex { background: var(--gold); }
+.onboard-hex.pending-hex { background: var(--royal); }
+.onboard-hex.locked-hex { background: var(--pale-blue-2); }
+.onboard-hex.done-hex svg { stroke: var(--gold-text); }
+.onboard-hex.pending-hex svg { stroke: var(--white); }
+.onboard-hex.locked-hex svg { stroke: var(--mid-blue-3); }
+.onboard-hex svg { width: 28px; height: 28px; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.onboard-step-label { font-size: .78rem; font-weight: 600; color: var(--navy); text-align: center; }
+.onboard-step-pts { font-size: .75rem; font-weight: 700; color: var(--mid-blue-2); }
+
+.onboard-layout {
+  display: grid;
+  grid-template-columns: 1fr .75fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.onboard-checklist { display: flex; flex-direction: column; gap: .5rem; }
+.onboard-check-item {
+  display: flex; align-items: center; gap: .9rem;
+  padding: .8rem .9rem;
+  border-radius: var(--radius-sm);
+  background: var(--page-bg);
+  border: 1px solid transparent;
+  transition: border-color .15s;
+}
+.onboard-check-item:hover { border-color: var(--pale-blue-2); }
+.onboard-check-item.done-item { opacity: .75; }
+
+.onboard-badge-card {
+  background: var(--royal); color: var(--white);
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center; gap: 1rem;
+  position: relative; overflow: hidden;
+}
+.onboard-badge-bg-circles::before,
+.onboard-badge-bg-circles::after {
+  content: ''; position: absolute; border-radius: 50%;
+  background: rgba(255,255,255,.06); pointer-events: none;
+}
+.onboard-badge-bg-circles::before { width: 260px; height: 260px; bottom: -80px; right: -80px; }
+.onboard-badge-bg-circles::after  { width: 160px; height: 160px; top: -40px; left: -40px; }
+.onboard-badge-hex {
+  width: 90px; height: 90px;
+  clip-path: polygon(50% 0%,93.3% 25%,93.3% 75%,50% 100%,6.7% 75%,6.7% 25%);
+  background: var(--gold); display: grid; place-items: center;
+  position: relative; z-index: 1;
+  transition: background .3s;
+}
+.onboard-badge-hex svg { width: 40px; height: 40px; stroke: var(--gold-text); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.onboard-badge-title { font-size: 1.15rem; font-weight: 800; color: var(--white); position: relative; z-index: 1; }
+.onboard-badge-sub { font-size: .88rem; color: rgba(255,255,255,.75); position: relative; z-index: 1; }
+.onboard-badge-steps-left {
+  background: var(--gold); color: var(--gold-text);
+  padding: .35rem 1.1rem; border-radius: 99px;
+  font-size: .88rem; font-weight: 800;
+  position: relative; z-index: 1;
+}
+

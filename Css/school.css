@@ -1,0 +1,86 @@
+/* ==========================================================
+   SCHOOL TRACKER PAGE
+   ========================================================== */
+.school-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.school-deadline-list { display: flex; flex-direction: column; gap: .5rem; }
+.school-deadline-item {
+  display: flex; align-items: center; gap: .9rem;
+  padding: .8rem .9rem;
+  background: var(--page-bg); border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  transition: border-color .15s;
+}
+.school-deadline-item:hover { border-color: var(--pale-blue-2); }
+.school-deadline-icon {
+  width: 40px; height: 40px; border-radius: 11px;
+  flex: none; display: grid; place-items: center;
+}
+.school-deadline-icon svg { width: 20px; height: 20px; stroke: var(--mid-blue-1); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.school-deadline-info { flex: 1; min-width: 0; }
+.school-deadline-name { font-weight: 700; font-size: .97rem; color: var(--navy); }
+.school-deadline-meta { font-size: .82rem; color: var(--mid-blue-2); margin-top: .1rem; }
+.school-days-badge {
+  display: inline-flex; align-items: center;
+  padding: .22rem .7rem; border-radius: 99px;
+  background: var(--pale-blue-1); color: var(--navy);
+  font-size: .8rem; font-weight: 700; white-space: nowrap; flex: none;
+}
+.school-days-badge.urgent { background: #FEE2E2; color: #B91C1C; }
+
+.school-classes-list { display: flex; flex-direction: column; gap: .4rem; }
+.school-class-item {
+  display: flex; align-items: center; gap: .85rem;
+  padding: .75rem .9rem;
+  background: var(--page-bg); border-radius: var(--radius-xs);
+}
+.school-class-icon {
+  width: 36px; height: 36px; border-radius: 9px;
+  background: var(--pale-blue-1); flex: none;
+  display: grid; place-items: center;
+}
+.school-class-icon svg { width: 18px; height: 18px; stroke: var(--mid-blue-1); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.school-class-name { font-weight: 700; font-size: .95rem; color: var(--navy); }
+.school-class-meta { font-size: .82rem; color: var(--mid-blue-2); }
+
+.school-calendar-card {}
+.mini-cal {}
+.mini-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: .25rem;
+  text-align: center;
+}
+.cal-day-hdr {
+  font-size: .78rem; font-weight: 700; color: var(--mid-blue-2);
+  padding: .3rem 0;
+}
+.cal-day {
+  font-size: .88rem; font-weight: 500; color: var(--navy);
+  padding: .4rem .2rem; border-radius: 7px;
+  cursor: default;
+  transition: background .15s;
+}
+.cal-day.empty { opacity: 0; pointer-events: none; }
+.cal-day.cal-today {
+  background: var(--royal); color: var(--white); font-weight: 800;
+}
+.cal-day.cal-deadline {
+  background: var(--gold); color: var(--gold-text); font-weight: 800;
+}
+.cal-legend {
+  display: flex; gap: 1.2rem; margin-top: 1rem;
+}
+.cal-legend-item {
+  display: flex; align-items: center; gap: .45rem;
+  font-size: .82rem; color: var(--mid-blue-2); font-weight: 500;
+}
+.cal-legend-dot {
+  width: 12px; height: 12px; border-radius: 3px; flex: none;
+}
+

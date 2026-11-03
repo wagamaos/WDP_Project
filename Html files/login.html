@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Landed | Log in or Sign up</title>
   <meta name="description" content="Log in or create your free Landed account to track quests, earn XP and settle into student life faster.">
-  <link rel="stylesheet" href="../Css/app.css">
+  <link rel="stylesheet" href="../Css/common.css">
+  <link rel="stylesheet" href="../Css/login.css">
+  <link rel="stylesheet" href="../Css/responsive.css">
 </head>
 <body>
   <a class="skip-link" href="#auth-form">Skip to form</a>
@@ -57,13 +59,15 @@
           <button class="auth-tab active" id="tab-login" role="tab" aria-selected="true" aria-controls="panel-login">Log in</button>
           <button class="auth-tab" id="tab-signup" role="tab" aria-selected="false" aria-controls="panel-signup">Sign up</button>
         </div>
+        <p class="auth-message" id="auth-message" role="status" aria-live="polite" hidden></p>
 
         <!-- LOG IN PANEL -->
         <div class="auth-panel active" id="panel-login" role="tabpanel" aria-labelledby="tab-login">
           <h1 class="auth-form-title">Welcome back</h1>
-          <p class="auth-form-sub">Your 5-day streak is waiting. &#128293;</p>
+          <p class="auth-form-sub">Log in to continue your campus journey.</p>
+          <p class="auth-local-note">Local demo accounts are stored in this browser. Do not use a real or reused password.</p>
 
-          <form id="login-form" novalidate>
+          <form id="login-form">
             <div class="form-field">
               <label for="login-email">School email</label>
               <div class="field-input-wrap">
@@ -97,7 +101,7 @@
           <h1 class="auth-form-title">Create your account</h1>
           <p class="auth-form-sub">Start with 50 welcome points. &#127881;</p>
 
-          <form id="signup-form" novalidate>
+          <form id="signup-form">
             <div class="form-field">
               <label for="signup-name">Full name</label>
               <div class="field-input-wrap">
@@ -141,39 +145,7 @@
 
   </div><!-- /.auth-shell -->
 
-  <script>
-    const tabLogin  = document.getElementById('tab-login');
-    const tabSignup = document.getElementById('tab-signup');
-    const panelLogin  = document.getElementById('panel-login');
-    const panelSignup = document.getElementById('panel-signup');
-
-    function showLogin() {
-      tabLogin.classList.add('active');    tabSignup.classList.remove('active');
-      tabLogin.setAttribute('aria-selected', 'true');
-      tabSignup.setAttribute('aria-selected', 'false');
-      panelLogin.classList.add('active'); panelSignup.classList.remove('active');
-    }
-    function showSignup() {
-      tabSignup.classList.add('active');  tabLogin.classList.remove('active');
-      tabSignup.setAttribute('aria-selected', 'true');
-      tabLogin.setAttribute('aria-selected', 'false');
-      panelSignup.classList.add('active'); panelLogin.classList.remove('active');
-    }
-
-    tabLogin.addEventListener('click', showLogin);
-    tabSignup.addEventListener('click', showSignup);
-    document.getElementById('switch-to-login').addEventListener('click', function(e) {
-      e.preventDefault(); showLogin();
-    });
-
-    document.getElementById('login-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      window.location.href = 'index.html';
-    });
-    document.getElementById('signup-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      window.location.href = 'index.html';
-    });
-  </script>
+  <script src="../Java/auth.js"></script>
+  <script src="../Java/login.js"></script>
 </body>
 </html>

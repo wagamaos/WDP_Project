@@ -1,0 +1,106 @@
+/* ==========================================================
+   FORUM PAGE
+   ========================================================== */
+.forum-guest-banner {
+  display: flex; align-items: center; gap: 1rem;
+  background: var(--royal); border-radius: var(--radius);
+  padding: 1rem 1.4rem; margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.forum-guest-icon {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: rgba(255,255,255,.15); flex: none;
+  display: grid; place-items: center;
+}
+.forum-guest-icon svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.forum-guest-text { flex: 1; color: rgba(255,255,255,.9); font-size: .95rem; }
+.forum-guest-text strong { display: block; font-weight: 700; color: #fff; }
+.forum-guest-actions { display: flex; gap: .6rem; flex-shrink: 0; }
+
+.forum-layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.forum-card { padding: 0; overflow: hidden; }
+.forum-post-list { display: flex; flex-direction: column; }
+.forum-post-item {
+  display: flex; align-items: flex-start; gap: .9rem;
+  padding: 1rem 1.4rem;
+  border-bottom: 1px solid var(--pale-blue-2);
+  transition: background .15s;
+}
+.forum-post-item:last-child { border-bottom: none; }
+.forum-post-item:hover { background: var(--page-bg); }
+.forum-post-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  flex: none; display: grid; place-items: center;
+}
+.forum-post-icon svg { width: 18px; height: 18px; stroke: var(--mid-blue-1); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.forum-post-body { flex: 1; min-width: 0; }
+.forum-post-title {
+  display: block; font-size: .97rem; font-weight: 700; color: var(--navy);
+  text-decoration: none; margin-bottom: .2rem;
+  transition: color .15s;
+}
+.forum-post-title:hover { color: var(--royal); text-decoration: underline; }
+.forum-post-meta { font-size: .82rem; color: var(--mid-blue-2); }
+
+.forum-post-pill {
+  display: inline-flex; align-items: center;
+  padding: .22rem .75rem; border-radius: 99px;
+  font-size: .78rem; font-weight: 700;
+  white-space: nowrap; flex: none; align-self: center;
+}
+.forum-post-pill.answered { background: var(--mint-light); color: var(--mint-text); }
+.forum-post-pill.chat { background: var(--gold-light); color: var(--gold-light-text); }
+.forum-post-pill.discussion { background: var(--pale-blue-1); color: var(--royal); }
+
+.forum-aside { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.channel-list { display: flex; flex-direction: column; }
+.channel-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .65rem 0;
+  border-bottom: 1px solid var(--pale-blue-2);
+  font-size: .95rem;
+}
+.channel-item:last-child { border-bottom: none; }
+.channel-name { color: var(--navy); font-weight: 500; }
+.channel-count { font-weight: 800; color: var(--mid-blue-2); font-size: .9rem; }
+
+.forum-verified-card { display: flex; align-items: flex-start; gap: .9rem; }
+.forum-verified-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--mint-light); flex: none;
+  display: grid; place-items: center;
+}
+.forum-verified-icon svg { width: 18px; height: 18px; stroke: var(--mint-text); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.forum-verified-title { font-weight: 700; color: var(--navy); font-size: .95rem; margin-bottom: .25rem; }
+.forum-verified-sub { font-size: .85rem; color: var(--mid-blue-2); line-height: 1.5; }
+
+
+/* Accessibility fix 2 is in the HTML: aria-label on each sidebar link.
+       Between 481px and 900px wide, responsive.css hides the link text
+       (.sidebar-nav a span { display: none; }), which left the 8 links
+       with only a hidden icon and no accessible name. */
+
+    /* Accessibility fix 1: improve text contrast (WCAG 1.4.3 AA needs 4.5:1).
+       --mid-blue-2 #5B82E0 = 3.67:1 on white -> --mid-blue-1 #3A63D0 = 5.42:1 */
+
+    /* Post category, replies and time ("Housing · 12 replies · 2h ago") */
+    .forum-post-meta {
+      color: var(--mid-blue-1);
+    }
+
+    /* Post counts in the channel list (48, 36, 29, 61) */
+    .channel-count {
+      color: var(--mid-blue-1);
+    }
+
+    /* "Checked by moderators..." text in the verified answers card */
+    .forum-verified-sub {
+      color: var(--mid-blue-1);
+    }
