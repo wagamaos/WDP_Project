@@ -127,6 +127,43 @@
             </div>
 
             <div class="form-field">
+              <label for="signup-university">School in Korea</label>
+              <select id="signup-university" name="university" required>
+                <option value="">Select your school</option>
+                <option>Gachon University</option>
+                <option>Seoul National University</option>
+                <option>Korea University</option>
+                <option>Yonsei University</option>
+                <option>Hanyang University</option>
+                <option>Kyung Hee University</option>
+                <option>Ewha Womans University</option>
+                <option>Sungkyunkwan University</option>
+                <option>Other Korean university</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="signup-student-type">Student type</label>
+              <select id="signup-student-type" name="studentType" required>
+                <option value="">Select student type</option>
+                <option value="local">Local student</option>
+                <option value="exchange">Exchange student</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="signup-start-date">Study start date</label>
+              <input type="date" id="signup-start-date" name="studyStartDate" required>
+              <small class="auth-field-help">Used to automatically unlock verification after one year.</small>
+            </div>
+
+            <div class="form-field">
+              <label for="signup-student-id">Student identification card</label>
+              <input type="file" id="signup-student-id" name="studentId" accept="image/*,.pdf" required>
+              <small class="auth-field-help">Upload an image or PDF of your current student ID.</small>
+            </div>
+
+            <div class="form-field">
               <label for="signup-password">Create password</label>
               <div class="field-input-wrap">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>

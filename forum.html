@@ -114,7 +114,7 @@
 
           <!-- Post list -->
           <div class="card forum-card" aria-label="Forum posts">
-            <ul class="forum-post-list" id="forum-post-list">
+            <ul class="forum-post-list" id="forum-post-list" aria-live="polite">
 
               <li class="forum-post-item" data-category="Housing">
                 <div class="forum-post-icon" style="background:var(--pale-blue-1);" aria-hidden="true">
@@ -183,6 +183,7 @@
               </li>
 
             </ul>
+            <p class="forum-empty-state" id="forum-empty-state" hidden>No posts match this channel yet.</p>
           </div>
         </div>
 
@@ -232,31 +233,77 @@
     </main>
   </div><!-- /.app-shell -->
 
-  <script>
-    // Category filter
-    const tabs = document.querySelectorAll('.forum-tab');
-    const posts = document.querySelectorAll('.forum-post-item');
+  <dialog class="forum-dialog" id="post-dialog" aria-labelledby="post-dialog-title">
+    <form id="post-form" method="dialog" novalidate>
+      <h2 id="post-dialog-title">Create a new post</h2>
+      <p class="forum-dialog-sub">Ask a clear question or share helpful advice with the community.</p>
+      <div class="forum-form-message" id="post-message" role="alert" hidden></div>
+      <label for="post-category">Channel</label>
+      <select id="post-category" name="category" required>
+        <option value="">Choose a channel</option>
+        <option>Housing</option><option>Visas</option><option>Money</option>
+        <option>Food</option><option>Study</option><option>Other</option>
+      </select>
+      <div class="forum-field-error" id="post-category-error" role="alert"></div>
+      <label for="post-title">Title</label>
+      <input id="post-title" name="title" type="text" minlength="8" maxlength="100" required placeholder="What would you like to ask?">
+      <div class="forum-field-error" id="post-title-error" role="alert"></div>
+      <label for="post-body">Details</label>
+      <textarea id="post-body" name="body" minlength="20" maxlength="2000" required placeholder="Add enough context for helpful replies."></textarea>
+      <div class="forum-field-error" id="post-body-error" role="alert"></div>
+      <div class="forum-dialog-actions">
+        <button type="button" class="btn btn-outline" id="close-post-dialog">Cancel</button>
+        <button type="submit" class="btn btn-royal" id="submit-post-btn">Publish post</button>
+      </div>
+    </form>
+  </dialog>
 
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
-        tab.classList.add('active');
-        tab.setAttribute('aria-selected', 'true');
+  <dialog class="forum-dialog forum-thread-dialog" id="thread-dialog" aria-labelledby="thread-dialog-title">
+    <div>
+      <div class="forum-dialog-heading">
+        <h2 id="thread-dialog-title">Post thread</h2>
+        <button type="button" class="forum-dialog-close" id="close-thread-dialog" aria-label="Close thread">×</button>
+      </div>
+      <div id="thread-content"></div>
+      <div class="forum-comments-heading">
+        <h3>Comments</h3>
+        <button type="button" class="btn btn-outline btn-sm" id="report-post-btn">Report post</button>
+      </div>
+      <div class="forum-comments" id="thread-comments"></div>
+      <form class="forum-comment-form" id="comment-form" novalidate>
+        <label for="comment-body">Add a comment</label>
+        <textarea id="comment-body" name="body" minlength="2" maxlength="1000" required placeholder="Be respectful and constructive."></textarea>
+        <div class="forum-field-error" id="comment-body-error" role="alert"></div>
+        <div class="forum-form-message" id="comment-message" role="alert" hidden></div>
+        <button type="submit" class="btn btn-royal" id="submit-comment-btn">Post comment</button>
+      </form>
+    </div>
+  </dialog>
 
-        const cat = tab.dataset.category;
-        posts.forEach(post => {
-          if (cat === 'all' || post.dataset.category === cat) {
-            post.style.display = 'flex';
-          } else {
-            post.style.display = 'none';
-          }
-        });
-      });
-    });
+  <dialog class="forum-dialog" id="report-dialog" aria-labelledby="report-dialog-title">
+    <form id="report-form" method="dialog" novalidate>
+      <h2 id="report-dialog-title">Report this post</h2>
+      <p class="forum-dialog-sub">Reports help moderators keep the community safe.</p>
+      <div class="forum-form-message" id="report-message" role="alert" hidden></div>
+      <label for="report-reason">Reason</label>
+      <select id="report-reason" name="reason" required>
+        <option value="">Choose a reason</option>
+        <option>Harassment or hate</option><option>Spam or advertising</option>
+        <option>Unsafe or illegal advice</option><option>Privacy violation</option>
+        <option>Other community guideline concern</option>
+      </select>
+      <div class="forum-field-error" id="report-reason-error" role="alert"></div>
+      <label for="report-details">Additional details <span>(optional)</span></label>
+      <textarea id="report-details" name="details" maxlength="1000" placeholder="Tell moderators what happened."></textarea>
+      <div class="forum-field-error" id="report-details-error" role="alert"></div>
+      <div class="forum-dialog-actions">
+        <button type="button" class="btn btn-outline" id="close-report-dialog">Cancel</button>
+        <button type="submit" class="btn btn-royal" id="submit-report-btn">Submit report</button>
+      </div>
+    </form>
+  </dialog>
 
-    document.getElementById('new-post-btn').addEventListener('click', () => {
-      window.location.href = 'login.html';
-    });
-  </script>
+  <script src="js/auth.js"></script>
+  <script src="js/forum.js"></script>
 </body>
 </html>
