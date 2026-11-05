@@ -21,8 +21,7 @@
             database.createObjectStore('users', { keyPath: 'email' });
           }
           if (!database.objectStoreNames.contains('forumPosts')) {
-            var forumPosts = database.createObjectStore('forumPosts', { keyPath: 'id' });
-            seedForumPosts(forumPosts);
+            database.createObjectStore('forumPosts', { keyPath: 'id' });
           }
         };
         request.onsuccess = function () { resolve(request.result); };
@@ -116,7 +115,6 @@
       university: user.university || '',
       studentType: user.studentType || '',
       studyStartDate: user.studyStartDate || '',
-      studentId: user.studentId || null,
       helpfulAnswers: user.helpfulAnswers || 0,
       points: user.points,
       completedQuests: user.completedQuests || [],
@@ -338,6 +336,7 @@
           ? post.comments.find(function (comment) { return comment.id === commentId; })
           : post;
         if (!target) throw new Error('This comment is no longer available.');
+        target.likes = Array.isArray(target.likes) ? target.likes : [];
         var index = target.likes.indexOf(user.email);
         if (index === -1) target.likes.push(user.email);
         else target.likes.splice(index, 1);
@@ -422,10 +421,9 @@
     var email = details.email.trim().toLowerCase();
     var studyStartDate = details.studyStartDate;
     var startDate = new Date(studyStartDate + 'T00:00:00');
-    if (!details.studentId || !details.studentId.name || !details.university ||
-        !details.studentType ||
+    if (!details.university || !details.studentType ||
         !studyStartDate || Number.isNaN(startDate.getTime()) || startDate > new Date()) {
-      return Promise.reject(new Error('Please provide your student type, a valid study start date, and student identification card.'));
+      return Promise.reject(new Error('Please provide your student type, university, and a valid study start date.'));
     }
     var salt = createPasswordSalt();
 
@@ -440,7 +438,6 @@
         university: details.university,
         studentType: details.studentType,
         studyStartDate: studyStartDate,
-        studentId: details.studentId,
         helpfulAnswers: 0,
         points: 50,
         completedQuests: [],
@@ -450,15 +447,36 @@
       };
 
       return runTransaction('readwrite', function (store) {
-        return store.add(user);
-      }).then(function () {
-        window.localStorage.setItem(SESSION_KEY, email);
-        return publicUser(user);
-      }).catch(function (error) {
-        if (error && error.name === 'ConstraintError') {
-          throw new Error('An account with that email already exists. Log in instead.');
+        return store.get(email);
+      }).then(function (existingUser) {
+        if (existingUser) {
+          var existingSalt = new Uint8Array(existingUser.passwordSalt.match(/.{2}/g).map(function (pair) {
+            return parseInt(pair, 16);
+          }));
+          return hashPassword(details.password, existingSalt).then(function (existingPasswordHash) {
+            if (existingPasswordHash !== existingUser.passwordHash) {
+              throw new Error('An account with that email already exists. Log in instead.');
+            }
+            var completedUser = Object.assign({}, existingUser, {
+              name: user.name,
+              country: user.country,
+              university: user.university,
+              studentType: user.studentType,
+              studyStartDate: user.studyStartDate
+            });
+            delete completedUser.studentId;
+            return saveUser(completedUser).then(function () {
+              window.localStorage.setItem(SESSION_KEY, email);
+              return publicUser(completedUser);
+            });
+          });
         }
-        throw error;
+        return runTransaction('readwrite', function (store) {
+          return store.add(user);
+        }).then(function () {
+          window.localStorage.setItem(SESSION_KEY, email);
+          return publicUser(user);
+        });
       });
     });
   }
@@ -508,18 +526,22 @@
     oneYearAgo.setFullYear(now.getFullYear() - 1);
     var threeMonthsAgo = new Date(now);
     threeMonthsAgo.setMonth(now.getMonth() - 3);
+    var hasStudiedForOneYear = Boolean(start && start <= oneYearAgo);
+    var establishedHelpfulMember = Boolean(
+      user.createdAt && new Date(user.createdAt) <= threeMonthsAgo &&
+      (user.helpfulAnswers || 0) >= 5
+    );
     var verified = Boolean(
-      user.studentId && user.studentId.name && user.university && user.studentType &&
-      start && start <= oneYearAgo
+      user.university && user.studentType &&
+      (hasStudiedForOneYear || establishedHelpfulMember)
     );
     return {
       verified: verified,
       verificationLabel: verified
         ? 'Verified · ' + user.university + ' · ' +
           (user.studentType === 'exchange' ? 'Exchange student (Sem 1, 2026)' : 'Local student')
-        : 'Verification unlocks after 1 year of study',
-      campusGuide: verified && new Date(user.createdAt) <= threeMonthsAgo &&
-        (user.helpfulAnswers || 0) >= 5
+        : 'Verification unlocks after 1 year of study or 3 months and 5 helpful answers',
+      campusGuide: verified && establishedHelpfulMember
     };
   }
 

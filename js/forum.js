@@ -91,11 +91,14 @@
 
   function makeLikeButton(postId, commentId, likes) {
     var button = document.createElement('button');
+    likes = Array.isArray(likes) ? likes : [];
     var liked = currentUser && likes.indexOf(currentUser.email) !== -1;
     button.type = 'button';
     button.className = 'forum-like-btn' + (liked ? ' liked' : '');
     button.setAttribute('aria-pressed', String(liked));
-    button.textContent = '♥ ' + likes.length;
+    button.setAttribute('aria-label', (commentId ? 'Like comment' : 'Like post') + ' (' + likes.length + ')');
+    button.title = currentUser ? 'Like or unlike this ' + (commentId ? 'comment' : 'post') : 'Log in to like';
+    button.textContent = (liked ? '♥ Liked' : '♡ Like') + ' (' + likes.length + ')';
     button.addEventListener('click', function () {
       window.LandedAuth.toggleForumLike(postId, commentId).then(function (post) {
         renderThread(post);
@@ -255,14 +258,23 @@
   }
 
   function renderUserBanner(user) {
-    if (!user) return;
     var banner = document.querySelector('.forum-guest-banner');
     var heading = banner.querySelector('strong');
     var description = banner.querySelector('.forum-guest-text span');
     var actions = banner.querySelector('.forum-guest-actions');
-    heading.textContent = 'You are signed in as ' + user.name;
-    description.textContent = 'Create posts, join discussions, and earn points for helpful answers.';
-    actions.hidden = true;
+    if (user) {
+      banner.setAttribute('aria-label', 'Signed-in forum notice');
+      heading.textContent = 'You are signed in as ' + user.name;
+      description.textContent = 'Create posts, join discussions, and earn points for helpful answers.';
+      actions.hidden = true;
+      actions.style.display = 'none';
+      return;
+    }
+    banner.setAttribute('aria-label', 'Guest browsing notice');
+    heading.textContent = 'You are browsing as a guest';
+    description.textContent = 'Log in to post, reply, and earn points for helpful answers.';
+    actions.hidden = false;
+    actions.style.display = '';
   }
 
   document.getElementById('new-post-btn').addEventListener('click', function () {

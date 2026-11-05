@@ -66,13 +66,7 @@
       password: form.elements.password.value,
       university: form.elements.university.value,
       studentType: form.elements.studentType.value,
-      studyStartDate: form.elements.studyStartDate.value,
-      studentId: form.elements.studentId.files[0] ? {
-        name: form.elements.studentId.files[0].name,
-        type: form.elements.studentId.files[0].type,
-        size: form.elements.studentId.files[0].size,
-        lastModified: form.elements.studentId.files[0].lastModified
-      } : null
+      studyStartDate: form.elements.studyStartDate.value
     }).then(function () {
       window.location.href = 'index.html';
     }).catch(function (error) {
