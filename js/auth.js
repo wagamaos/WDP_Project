@@ -2,7 +2,7 @@
   'use strict';
 
   var DATABASE_NAME = 'landed-local';
-  var DATABASE_VERSION = 3;
+  var DATABASE_VERSION = 4;
   var SESSION_KEY = 'landed-user-email';
   var databasePromise;
   var DEFAULT_REWARDS = [
