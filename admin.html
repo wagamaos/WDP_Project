@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Landed | Admin</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23F5B73B'/%3E%3Cpath d='M6 13l6-6 6 6M12 7v11' stroke='%231B44B8' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- ===== LOGIN GATE ===== -->
+  <div class="admin-gate" id="admin-gate">
+    <div class="gate-card">
+      <div class="gate-logo">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <h1 class="gate-title">Admin Access</h1>
+      <p class="gate-sub">Enter the admin password to continue.</p>
+      <p class="gate-message" id="gate-message" role="alert" hidden></p>
+      <form id="gate-form" novalidate>
+        <div class="gate-field">
+          <label for="gate-password">Admin password</label>
+          <div class="gate-input-wrap">
+            <input type="password" id="gate-password" placeholder="••••••••••••" autocomplete="current-password" required>
+            <button type="button" class="pw-toggle" id="gate-pw-toggle" aria-label="Show password">
+              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="gate-btn" id="gate-btn">Enter Admin Panel</button>
+      </form>
+      <a href="login.html" class="gate-back">← Back to main site</a>
+    </div>
+  </div>
+
+  <!-- ===== ADMIN SHELL ===== -->
+  <div class="admin-shell" id="admin-shell" hidden>
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
+        <span>Landed</span>
+        <span class="admin-badge">Admin</span>
+      </div>
+
+      <nav class="admin-nav" aria-label="Admin sections">
+        <button class="admin-nav-item active" id="nav-rewards" data-section="rewards">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/></svg>
+          Rewards Catalogue
+        </button>
+        <button class="admin-nav-item" id="nav-reports" data-section="reports">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Forum Reports
+          <span class="nav-badge" id="reports-count" hidden>0</span>
+        </button>
+      </nav>
+
+      <button class="admin-logout" id="admin-logout-btn">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign out
+      </button>
+    </aside>
+
+    <!-- Main content -->
+    <main class="admin-main" id="admin-main">
+
+      <!-- ── REWARDS SECTION ── -->
+      <section class="admin-section active" id="section-rewards">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Rewards Catalogue</h2>
+            <p class="section-sub">Manage the items students can redeem with their points.</p>
+          </div>
+          <button class="btn-admin-primary" id="add-reward-btn">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Reward
+          </button>
+        </div>
+
+        <div class="admin-message" id="rewards-message" role="alert" hidden></div>
+
+        <div class="rewards-grid" id="rewards-grid">
+          <div class="admin-loading">Loading rewards…</div>
+        </div>
+      </section>
+
+      <!-- ── REPORTS SECTION ── -->
+      <section class="admin-section" id="section-reports">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Forum Reports</h2>
+            <p class="section-sub">Review posts flagged by community members.</p>
+          </div>
+          <button class="btn-admin-secondary" id="refresh-reports-btn">
+            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+
+        <div class="admin-message" id="reports-message" role="alert" hidden></div>
+
+        <div id="reports-list">
+          <div class="admin-loading">Loading reports…</div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ===== ADD / EDIT REWARD DIALOG ===== -->
+  <dialog class="admin-dialog" id="reward-dialog" aria-labelledby="reward-dialog-title">
+    <form id="reward-form" novalidate>
+      <div class="dialog-header">
+        <h2 id="reward-dialog-title">Add Reward</h2>
+        <button type="button" class="dialog-close" id="close-reward-dialog" aria-label="Close">×</button>
+      </div>
+      <div class="admin-message" id="reward-form-message" role="alert" hidden></div>
+
+      <div class="dialog-grid">
+        <div class="dialog-field full">
+          <label for="r-name">Reward name <span class="req">*</span></label>
+          <input type="text" id="r-name" placeholder="e.g. Korean Snack Box" required>
+          <span class="field-error" id="r-name-error"></span>
+        </div>
+        <div class="dialog-field">
+          <label for="r-cost">Points cost <span class="req">*</span></label>
+          <input type="number" id="r-cost" placeholder="e.g. 200" min="1" required>
+          <span class="field-error" id="r-cost-error"></span>
+        </div>
+        <div class="dialog-field">
+          <label for="r-stock">Stock qty <span class="req">*</span></label>
+          <input type="number" id="r-stock" placeholder="e.g. 10" min="0" required>
+          <span class="field-error" id="r-stock-error"></span>
+        </div>
+        <div class="dialog-field full">
+          <label for="r-description">Description</label>
+          <textarea id="r-description" rows="2" placeholder="Short description for students…"></textarea>
+        </div>
+        <div class="dialog-field full">
+          <label for="r-donated-by">Donated by</label>
+          <input type="text" id="r-donated-by" placeholder="e.g. Landed community">
+        </div>
+        <div class="dialog-field full">
+          <label for="r-collection">Collection details <span class="req">*</span></label>
+          <input type="text" id="r-collection" placeholder="e.g. Collect from your school office" required>
+          <span class="field-error" id="r-collection-error"></span>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button type="button" class="btn-admin-ghost" id="cancel-reward-btn">Cancel</button>
+        <button type="submit" class="btn-admin-primary" id="save-reward-btn">Save Reward</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ===== VIEW REPORT DIALOG ===== -->
+  <dialog class="admin-dialog admin-dialog-wide" id="report-dialog" aria-labelledby="report-dialog-title">
+    <div>
+      <div class="dialog-header">
+        <h2 id="report-dialog-title">Reported Post</h2>
+        <button type="button" class="dialog-close" id="close-report-dialog" aria-label="Close">×</button>
+      </div>
+      <div id="report-dialog-body"></div>
+      <div class="dialog-actions">
+        <button type="button" class="btn-admin-ghost"    id="dismiss-reports-btn">Dismiss all reports</button>
+        <button type="button" class="btn-admin-danger"   id="delete-post-btn">Delete post</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="js/auth.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
+

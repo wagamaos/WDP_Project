@@ -720,6 +720,93 @@
     window.localStorage.removeItem(SESSION_KEY);
   }
 
+  /* ── Admin helpers ── */
+  var ADMIN_KEY = 'landed-admin';
+
+  function adminLogin(password) {
+    if (password === 'Admin@Landed1') {
+      window.localStorage.setItem(ADMIN_KEY, '1');
+      return Promise.resolve(true);
+    }
+    return Promise.reject(new Error('Incorrect admin password.'));
+  }
+
+  function adminLogout() {
+    window.localStorage.removeItem(ADMIN_KEY);
+  }
+
+  function adminIsLoggedIn() {
+    return window.localStorage.getItem(ADMIN_KEY) === '1';
+  }
+
+  function adminListReportedPosts() {
+    return listForumPosts().then(function (posts) {
+      return posts.filter(function (p) { return p.reports && p.reports.length > 0; });
+    });
+  }
+
+  function adminDismissReports(postId) {
+    return getForumPost(postId).then(function (post) {
+      if (!post) throw new Error('Post not found.');
+      post.reports = [];
+      return runForumTransaction('readwrite', function (store) {
+        return store.put(post);
+      }).then(function () { return copyForumPost(post); });
+    });
+  }
+
+  function adminDeleteForumPost(postId) {
+    return runForumTransaction('readwrite', function (store) {
+      return store.delete(postId);
+    });
+  }
+
+  function adminAddReward(details) {
+    if (!details.name || details.name.trim().length < 2 ||
+        !Number.isInteger(Number(details.cost))  || Number(details.cost)  < 1 ||
+        !Number.isInteger(Number(details.stock)) || Number(details.stock) < 0 ||
+        !details.collectionDetails || !details.collectionDetails.trim()) {
+      return Promise.reject(new Error('Provide a name, point cost, stock and collection details.'));
+    }
+    var reward = {
+      id: createId('reward'),
+      name: details.name.trim(),
+      cost: Number(details.cost),
+      stock: Number(details.stock),
+      description: (details.description || 'A community reward for students.').trim(),
+      donatedBy: (details.donatedBy || 'Admin').trim(),
+      donatedAt: new Date().toISOString(),
+      collectionDetails: details.collectionDetails.trim()
+    };
+    return runRewardTransaction('readwrite', function (store) {
+      return store.add(reward);
+    }).then(function () { return reward; });
+  }
+
+  function adminDeleteReward(rewardId) {
+    return runRewardTransaction('readwrite', function (store) {
+      return store.delete(rewardId);
+    });
+  }
+
+  function adminUpdateReward(rewardId, changes) {
+    return runRewardTransaction('readonly', function (store) {
+      return store.get(rewardId);
+    }).then(function (reward) {
+      if (!reward) throw new Error('Reward not found.');
+      var updated = Object.assign({}, reward, {
+        name:  changes.name  ? changes.name.trim()  : reward.name,
+        cost:  Number.isInteger(Number(changes.cost))  ? Number(changes.cost)  : reward.cost,
+        stock: Number.isInteger(Number(changes.stock)) ? Number(changes.stock) : reward.stock,
+        description:       changes.description       ? changes.description.trim()       : reward.description,
+        collectionDetails: changes.collectionDetails ? changes.collectionDetails.trim() : reward.collectionDetails
+      });
+      return runRewardTransaction('readwrite', function (store) {
+        return store.put(updated);
+      }).then(function () { return updated; });
+    });
+  }
+
   window.LandedAuth = {
     authenticate: authenticate,
     createAccount: createAccount,
@@ -743,6 +830,15 @@
     toggleForumLike: toggleForumLike,
     reportForumPost: reportForumPost
     ,
-    markForumCommentHelpful: markForumCommentHelpful
+    markForumCommentHelpful: markForumCommentHelpful,
+    adminLogin: adminLogin,
+    adminLogout: adminLogout,
+    adminIsLoggedIn: adminIsLoggedIn,
+    adminListReportedPosts: adminListReportedPosts,
+    adminDismissReports: adminDismissReports,
+    adminDeleteForumPost: adminDeleteForumPost,
+    adminAddReward: adminAddReward,
+    adminDeleteReward: adminDeleteReward,
+    adminUpdateReward: adminUpdateReward
   };
 })();
