@@ -26,7 +26,8 @@
             database.createObjectStore('users', { keyPath: 'email' });
           }
           if (!database.objectStoreNames.contains('forumPosts')) {
-            database.createObjectStore('forumPosts', { keyPath: 'id' });
+            var forumStore = database.createObjectStore('forumPosts', { keyPath: 'id' });
+            seedForumPosts(forumStore);
           }
           if (!database.objectStoreNames.contains('rewards')) {
             var rewards = database.createObjectStore('rewards', { keyPath: 'id' });
