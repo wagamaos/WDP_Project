@@ -81,7 +81,7 @@
       <div class="rewards-layout">
 
         <!-- Left: XP ring + Badges -->
-        <div style="display:flex;flex-direction:column;gap:1.25rem;">
+        <div class="rewards-left">
 
           <!-- XP ring card -->
           <div class="card rewards-xp-card">
@@ -110,62 +110,7 @@
               <h2 id="rw-badges-heading" style="font-size:1rem;font-weight:700;color:var(--navy);">Badges</h2>
               <span class="badge-count">&middot; 4 of 9</span>
             </div>
-            <div class="badges-grid" aria-label="Your badges">
-              <div class="badge-item">
-                <div class="badge-hex earned-gold" role="img" aria-label="First Post badge – earned">
-                  <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                </div>
-                <span class="badge-label">First Post</span>
-              </div>
-              <div class="badge-item">
-                <div class="badge-hex earned" role="img" aria-label="Social badge – earned">
-                  <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                </div>
-                <span class="badge-label">Social</span>
-              </div>
-              <div class="badge-item">
-                <div class="badge-hex earned" role="img" aria-label="Streak badge – earned">
-                  <svg viewBox="0 0 24 24"><path d="M12 20.9l-1.5-.9C5.1 16.5 2 13.4 2 10a6 6 0 0 1 10-4.47A6 6 0 0 1 22 10c0 3.4-3.1 6.5-8.5 10l-1.5.9z"/></svg>
-                </div>
-                <span class="badge-label">Streak</span>
-              </div>
-              <div class="badge-item">
-                <div class="badge-hex earned" role="img" aria-label="Verified badge – earned">
-                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-                <div>
-                  <span class="badge-label">Verified</span>
-                  <span class="badge-detail">Verified · Korean university · Local student</span>
-                </div>
-              </div>
-              <div class="badge-item">
-                <div class="badge-hex locked" role="img" aria-label="Helper badge – locked">
-                  <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                </div>
-                <span class="badge-label locked-lbl">Helper</span>
-              </div>
-              <div class="badge-item">
-                <div class="badge-hex locked" role="img" aria-label="Settled badge – locked">
-                  <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                </div>
-                <span class="badge-label locked-lbl">Settled</span>
-              </div>
-              <div class="badge-item">
-                <div class="badge-hex locked" role="img" aria-label="Scholar badge – locked">
-                  <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                </div>
-                <span class="badge-label locked-lbl">Scholar</span>
-              </div>
-              <div class="badge-item">
-                <div class="badge-hex locked" role="img" aria-label="Campus Guide badge – locked">
-                  <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .5-5.3 4.5 1.7 7-6.4-3.8L5.6 21l1.7-7L2 9.5 9 9z"/></svg>
-                </div>
-                <div>
-                  <span class="badge-label locked-lbl">Campus Guide</span>
-                  <span class="badge-detail">Verified · 3+ months · 5 helpful answers</span>
-                </div>
-              </div>
-            </div>
+            <div class="badges-grid" id="rewards-badges-grid" aria-label="Your badges"></div>
           </div>
         </div>
 
@@ -173,36 +118,10 @@
         <div class="card" aria-labelledby="lb-heading">
           <div class="card-title">
             <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="18 20 18 10"/><polyline points="12 20 12 4"/><polyline points="6 20 6 14"/></svg>
-            <h2 id="lb-heading" style="font-size:1rem;font-weight:700;color:var(--navy);">Monthly leaderboard</h2>
+            <h2 id="lb-heading" style="font-size:1rem;font-weight:700;color:var(--navy);">Total points leaderboard</h2>
           </div>
-          <ol class="leaderboard-list" aria-label="Monthly leaderboard">
-            <li class="lb-item">
-              <div class="lb-rank gold-rank" aria-label="Rank 1">1</div>
-              <span class="lb-name">Alex Chen</span>
-              <span class="lb-pts">520</span>
-            </li>
-            <li class="lb-item">
-              <div class="lb-rank silver-rank" aria-label="Rank 2">2</div>
-              <span class="lb-name">Maria Lopez</span>
-              <span class="lb-pts">460</span>
-            </li>
-            <li class="lb-item">
-              <div class="lb-rank bronze-rank" aria-label="Rank 3">3</div>
-              <span class="lb-name">Daniel Kim</span>
-              <span class="lb-pts">460</span>
-            </li>
-            <li class="lb-item lb-you">
-              <div class="lb-rank lb-rank-you" aria-label="Rank 4 – you">4</div>
-              <span class="lb-name">You (Sarah Tan)</span>
-              <span class="lb-pts lb-pts-you">320</span>
-            </li>
-            <li class="lb-item">
-              <div class="lb-rank" aria-label="Rank 5">5</div>
-              <span class="lb-name">Priya Nair</span>
-              <span class="lb-pts">280</span>
-            </li>
-          </ol>
-          <p class="lb-hint">140 pts behind #3. Attend 2 events to catch up.</p>
+          <ol class="leaderboard-list" id="leaderboard-list" aria-label="Leaderboard by total accumulated points"></ol>
+          <p class="lb-hint" id="lb-hint">Your total accumulated points determine your rank.</p>
         </div>
 
         <!-- Right: Redeem -->
@@ -211,53 +130,62 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
             <h2 id="redeem-heading" style="font-size:1rem;font-weight:700;color:var(--navy);">Redeem rewards</h2>
           </div>
-          <ul class="redeem-list" aria-label="Redeemable rewards">
-            <li class="redeem-item">
-              <div class="redeem-icon" style="background:var(--gold-light);" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/></svg>
-              </div>
-              <div class="redeem-info">
-                <div class="redeem-name">Kaya (Singapore)</div>
-                <div class="redeem-cost">150 pts</div>
-              </div>
-              <button class="btn btn-gold btn-sm redeem-btn" id="redeem-btn-1" aria-label="Redeem Kaya for 150 points">Redeem</button>
-            </li>
-            <li class="redeem-item">
-              <div class="redeem-icon" style="background:var(--gold-light);" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/></svg>
-              </div>
-              <div class="redeem-info">
-                <div class="redeem-name">Korean snack box</div>
-                <div class="redeem-cost">200 pts</div>
-              </div>
-              <button class="btn btn-gold btn-sm redeem-btn" id="redeem-btn-2" aria-label="Redeem Korean snack box for 200 points">Redeem</button>
-            </li>
-            <li class="redeem-item">
-              <div class="redeem-icon" style="background:var(--pale-blue-2);" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              </div>
-              <div class="redeem-info">
-                <div class="redeem-name">Vietnamese coffee</div>
-                <div class="redeem-cost">180 pts</div>
-              </div>
-              <button class="btn btn-outline btn-sm" id="redeem-more-btn" aria-label="20 more rewards available">20 more</button>
-            </li>
-          </ul>
+          <ul class="redeem-list" id="redeem-list" aria-label="Redeemable rewards"></ul>
+          <p class="rewards-empty" id="rewards-empty" hidden>No rewards are available yet.</p>
+          <button class="btn btn-gold add-reward-cta" id="donate-reward-btn" type="button">Add a reward for points</button>
         </div>
-
       </div><!-- /.rewards-layout -->
 
     </main>
   </div><!-- /.app-shell -->
 
-  <script>
-    document.querySelectorAll('.redeem-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        this.textContent = '✓ Done';
-        this.disabled = true;
-        this.style.opacity = '.6';
-      });
-    });
-  </script>
+  <dialog id="redeem-success-dialog" aria-labelledby="redeem-success-title">
+    <button class="dialog-close" id="close-redeem-success-x" type="button" aria-label="Close redemption confirmation">&times;</button>
+    <h2 id="redeem-success-title">Successfully redeemed</h2>
+    <p id="redeem-success-message"></p>
+    <button class="btn btn-gold" id="close-redeem-success" type="button">Done</button>
+  </dialog>
+  <dialog id="reward-details-dialog" aria-labelledby="reward-details-title">
+    <button class="dialog-close" id="close-reward-details" type="button" aria-label="Close reward details">&times;</button>
+    <div id="reward-details-content"></div>
+    <button class="btn btn-gold" id="details-redeem-btn" type="button">Redeem reward</button>
+  </dialog>
+  <dialog id="donate-dialog" aria-labelledby="donate-title">
+    <button class="dialog-close" id="close-donate-x" type="button" aria-label="Close donate reward dialog">&times;</button>
+    <h2 id="donate-title">Donate a reward</h2>
+    <p>Leave the item with your school office first, then submit these details to receive points.</p>
+    <form id="donate-form" novalidate>
+      <div class="reward-form-message" id="donate-message" role="alert" hidden></div>
+      <label for="donate-name">Reward name
+        <input id="donate-name" name="name" required minlength="2" autocomplete="off" aria-describedby="donate-name-error">
+        <span class="reward-field-error" id="donate-name-error"></span>
+      </label>
+      <label for="donate-description">Description
+        <textarea id="donate-description" name="description" rows="3" maxlength="1000" aria-describedby="donate-description-error"></textarea>
+        <span class="reward-field-error" id="donate-description-error"></span>
+      </label>
+      <label for="donate-school-office">School office
+        <input id="donate-school-office" name="schoolOffice" required autocomplete="off" aria-describedby="donate-school-office-error">
+        <span class="reward-field-error" id="donate-school-office-error"></span>
+      </label>
+      <label for="donate-collection-date">Date left with school
+        <input id="donate-collection-date" type="date" name="collectionDate" required aria-describedby="donate-collection-date-error">
+        <span class="reward-field-error" id="donate-collection-date-error"></span>
+      </label>
+      <label for="donate-points">Points requested
+        <input id="donate-points" type="number" name="points" min="1" max="500" step="1" value="50" required aria-describedby="donate-points-error">
+        <span class="reward-field-error" id="donate-points-error"></span>
+      </label>
+      <label class="reward-checkbox-row" for="donate-confirmed">
+        <input id="donate-confirmed" type="checkbox" name="confirmed" required aria-describedby="donate-confirmed-error">
+        <span>I left this reward with the school office.</span>
+        <span class="reward-field-error" id="donate-confirmed-error"></span>
+      </label>
+      <button class="btn btn-gold" type="submit">Submit donation</button>
+      <button class="btn btn-outline" id="close-donate" type="button">Cancel</button>
+    </form>
+  </dialog>
+  <script src="js/auth.js"></script>
+  <script src="js/rewards.js"></script>
 </body>
 </html>

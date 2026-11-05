@@ -2,9 +2,14 @@
   'use strict';
 
   var DATABASE_NAME = 'landed-local';
-  var DATABASE_VERSION = 2;
+  var DATABASE_VERSION = 3;
   var SESSION_KEY = 'landed-user-email';
   var databasePromise;
+  var DEFAULT_REWARDS = [
+    { id: 'kaya-singapore', name: 'Kaya (Singapore)', cost: 150, stock: 20, description: 'A sweet coconut and egg spread, popular on toast and breakfast snacks.', donatedBy: 'Landed welcome team', donatedAt: '2026-09-01', collectionDetails: 'Collect from your school office.' },
+    { id: 'korean-snack-box', name: 'Korean snack box', cost: 200, stock: 20, description: 'A selection of Korean snacks to enjoy or share with friends.', donatedBy: 'Landed community', donatedAt: '2026-09-15', collectionDetails: 'Collect from your school office.' },
+    { id: 'vietnamese-coffee', name: 'Vietnamese coffee', cost: 180, stock: 20, description: 'A locally loved Vietnamese coffee set for a study break.', donatedBy: 'Landed community', donatedAt: '2026-10-01', collectionDetails: 'Collect from your school office.' }
+  ];
 
   function openDatabase() {
     if (!window.indexedDB) {
@@ -22,6 +27,10 @@
           }
           if (!database.objectStoreNames.contains('forumPosts')) {
             database.createObjectStore('forumPosts', { keyPath: 'id' });
+          }
+          if (!database.objectStoreNames.contains('rewards')) {
+            var rewards = database.createObjectStore('rewards', { keyPath: 'id' });
+            DEFAULT_REWARDS.forEach(function (reward) { rewards.add(reward); });
           }
         };
         request.onsuccess = function () { resolve(request.result); };
@@ -118,7 +127,9 @@
       helpfulAnswers: user.helpfulAnswers || 0,
       points: user.points,
       completedQuests: user.completedQuests || [],
-      createdAt: user.createdAt
+      createdAt: user.createdAt,
+      redemptions: user.redemptions || [],
+      donations: user.donations || []
     };
   }
 
@@ -132,6 +143,156 @@
     return runTransaction('readwrite', function (store) {
       return store.put(user);
     });
+  }
+
+  function listLeaderboard() {
+    return runTransaction('readonly', function (store) {
+      return store.getAll();
+    }).then(function (users) {
+      return users.map(function (user) {
+        return { name: user.name, email: user.email, points: user.points || 0 };
+      }).sort(function (a, b) {
+        return b.points - a.points || a.name.localeCompare(b.name);
+      });
+    });
+  }
+
+  function runRewardTransaction(mode, operation) {
+    return openDatabase().then(function (database) {
+      return new Promise(function (resolve, reject) {
+        var transaction;
+        var result;
+        try {
+          transaction = database.transaction('rewards', mode);
+          var request = operation(transaction.objectStore('rewards'));
+          request.onsuccess = function () { result = request.result; };
+          request.onerror = function () { reject(request.error); };
+          transaction.oncomplete = function () { resolve(result); };
+          transaction.onerror = function () { reject(transaction.error); };
+          transaction.onabort = function () { reject(transaction.error); };
+        } catch (error) {
+          reject(error);
+        }
+      });
+    });
+  }
+
+  function listRewards() {
+    return runRewardTransaction('readonly', function (store) {
+      return store.getAll();
+    }).then(function (rewards) {
+      if (rewards.length > 0) return rewards;
+      return runRewardTransaction('readwrite', function (store) {
+        DEFAULT_REWARDS.slice(0, -1).forEach(function (reward) { store.put(reward); });
+        return store.put(DEFAULT_REWARDS[DEFAULT_REWARDS.length - 1]);
+      }).then(function () { return DEFAULT_REWARDS.slice(); });
+    });
+  }
+
+  function addReward(details) {
+    if (!details.name || details.name.trim().length < 2 ||
+        !Number.isInteger(Number(details.cost)) || Number(details.cost) < 1 ||
+        !Number.isInteger(Number(details.stock)) || Number(details.stock) < 0 ||
+        !details.collectionDetails || !details.collectionDetails.trim() ||
+        !details.image || !details.image.dataUrl) {
+      return Promise.reject(new Error('Provide a reward name, whole-number cost, stock, and collection details.'));
+    }
+    var reward = {
+      id: createId('reward'),
+      name: details.name.trim(),
+      cost: Number(details.cost),
+      stock: Number(details.stock),
+      description: (details.description || 'A community-donated reward for students.').trim(),
+      donatedBy: (details.donatedBy || 'Landed community').trim(),
+      donatedAt: details.donatedAt || new Date().toISOString(),
+      collectionDetails: details.collectionDetails.trim(),
+      image: details.image
+    };
+    return runRewardTransaction('readwrite', function (store) {
+      return store.add(reward);
+    }).then(function () { return reward; });
+  }
+
+  function redeemReward(rewardId) {
+    return getCurrentUser().then(function (currentUser) {
+      if (!currentUser) throw new Error('Please log in to redeem a reward.');
+      return listRewards().then(function (rewards) {
+        var reward = rewards.find(function (item) { return item.id === rewardId; });
+        if (!reward) throw new Error('This reward is no longer available.');
+        if (reward.stock < 1) throw new Error('This reward is currently out of stock.');
+      return getUser(currentUser.email).then(function (user) {
+        if ((user.points || 0) < reward.cost) {
+          throw new Error('You need ' + (reward.cost - (user.points || 0)) + ' more points for this reward.');
+        }
+        user.points -= reward.cost;
+        user.redemptions = user.redemptions || [];
+        var redemption = {
+          id: createId('redemption'),
+          rewardId: reward.id,
+          rewardName: reward.name,
+          cost: reward.cost,
+          collectionDetails: reward.collectionDetails,
+          redeemedAt: new Date().toISOString(),
+          collectionDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          email: user.email
+        };
+        user.redemptions.push(redemption);
+        return saveUser(user).then(function () {
+          reward.stock -= 1;
+          return runRewardTransaction('readwrite', function (store) {
+            return store.put(reward);
+          }).then(function () {
+            return { user: publicUser(user), redemption: redemption };
+          });
+        });
+      });
+      });
+    });
+  }
+
+  function donateReward(details) {
+    return getCurrentUser().then(function (currentUser) {
+      if (!currentUser) throw new Error('Please log in to donate a reward.');
+      if (!details.name || details.name.trim().length < 2 ||
+          !details.schoolOffice || !details.schoolOffice.trim() ||
+          !details.collectionDate || details.confirmed !== true ||
+          !Number.isInteger(Number(details.points)) || Number(details.points) < 1 ||
+          Number(details.points) > 500) {
+        throw new Error('Enter the reward details, collection date, school office, and confirm that you left the item there.');
+      }
+      return getUser(currentUser.email).then(function (user) {
+        var donation = {
+          id: createId('donation'),
+          name: details.name.trim(),
+          description: (details.description || '').trim(),
+          points: Number(details.points) > 0 ? Number(details.points) : 50,
+          schoolOffice: details.schoolOffice.trim(),
+          collectionDate: details.collectionDate,
+          donatedAt: new Date().toISOString()
+        };
+        user.points = (user.points || 0) + donation.points;
+        user.donations = user.donations || [];
+        user.donations.push(donation);
+        return saveUser(user).then(function () {
+          return { user: publicUser(user), donation: donation };
+        });
+      });
+    });
+  }
+
+  function getBadgeCatalog(user) {
+    var status = getBadgeStatus(user);
+    return [
+      { name: 'Welcome', earned: (user.points || 0) >= 50, detail: 'Earn 50 total points' },
+      { name: 'Explorer', earned: (user.points || 0) >= 400, detail: 'Earn 400 total points' },
+      { name: 'Helper', earned: (user.helpfulAnswers || 0) >= 5, detail: 'Give 5 helpful answers' },
+      { name: 'Verified', earned: status.verified, detail: status.verificationLabel },
+      { name: 'Campus Guide', earned: status.campusGuide, detail: '3+ months and 5 helpful answers' },
+      { name: 'Pathfinder', earned: (user.points || 0) >= 800, detail: 'Earn 800 total points' },
+      { name: 'Scholar', earned: (user.points || 0) >= 1200, detail: 'Earn 1,200 total points' },
+      { name: 'Community Champion', earned: (user.helpfulAnswers || 0) >= 10, detail: 'Give 10 helpful answers' },
+      { name: 'Landed Legend', earned: (user.points || 0) >= 2000, detail: 'Earn 2,000 total points' }
+    ];
   }
 
   function createId(prefix) {
@@ -302,7 +463,11 @@
       };
       return runForumTransaction('readwrite', function (store) {
         return store.add(post);
-      }).then(function () { return copyForumPost(post); });
+      }).then(function () {
+        return updateCurrentUser({ points: (user.points || 0) + 10 }).then(function () {
+          return copyForumPost(post);
+        });
+      });
     });
   }
 
@@ -323,7 +488,11 @@
         });
         return runForumTransaction('readwrite', function (store) {
           return store.put(post);
-        }).then(function () { return copyForumPost(post); });
+        }).then(function () {
+          return updateCurrentUser({ points: (user.points || 0) + 5 }).then(function () {
+            return copyForumPost(post);
+          });
+        });
       });
     });
   }
@@ -388,6 +557,7 @@
         return getUser(comment.authorEmail).then(function (commentAuthor) {
           if (commentAuthor) {
             commentAuthor.helpfulAnswers = (commentAuthor.helpfulAnswers || 0) + 1;
+            commentAuthor.points = (commentAuthor.points || 0) + 25;
             return saveUser(commentAuthor);
           }
         }).then(function () {
@@ -556,6 +726,12 @@
     logout: logout,
     updateCurrentUser: updateCurrentUser,
     updateProgress: updateProgress,
+    listLeaderboard: listLeaderboard,
+    listRewards: listRewards,
+    addReward: addReward,
+    donateReward: donateReward,
+    redeemReward: redeemReward,
+    getBadgeCatalog: getBadgeCatalog,
     getBadgeStatus: function (user) {
       return getBadgeStatus(user);
     },

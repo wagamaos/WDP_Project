@@ -67,10 +67,15 @@
   }
 
   function formatTime(dateString) {
-    var minutes = Math.max(1, Math.floor((Date.now() - new Date(dateString).getTime()) / 60000));
-    if (minutes < 60) return minutes + 'm ago';
-    if (minutes < 1440) return Math.floor(minutes / 60) + 'h ago';
-    return Math.floor(minutes / 1440) + 'd ago';
+    var date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return 'Time unavailable';
+    var minutes = Math.max(0, Math.floor((Date.now() - date.getTime()) / 60000));
+    if (minutes < 1) return 'just now';
+    if (minutes < 60) return minutes + ' minute' + (minutes === 1 ? '' : 's') + ' ago';
+    var hours = Math.floor(minutes / 60);
+    if (hours < 24) return hours + ' hour' + (hours === 1 ? '' : 's') + ' ago';
+    var days = Math.floor(hours / 24);
+    return days + ' day' + (days === 1 ? '' : 's') + ' ago';
   }
 
   function categoryClass(category) {
@@ -290,6 +295,9 @@
   document.getElementById('close-post-dialog').addEventListener('click', function () {
     postDialog.close();
   });
+  document.getElementById('close-post-dialog-x').addEventListener('click', function () {
+    postDialog.close();
+  });
   document.getElementById('close-thread-dialog').addEventListener('click', function () {
     threadDialog.close();
   });
@@ -303,6 +311,9 @@
     reportDialog.showModal();
   });
   document.getElementById('close-report-dialog').addEventListener('click', function () {
+    reportDialog.close();
+  });
+  document.getElementById('close-report-dialog-x').addEventListener('click', function () {
     reportDialog.close();
   });
 
