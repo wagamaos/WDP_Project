@@ -247,12 +247,37 @@
     });
 
     // Search
-    document.getElementById('events-search').addEventListener('input', function() {
-      const q = this.value.toLowerCase();
-      document.querySelectorAll('.event-card').forEach(card => {
-        const title = card.querySelector('.event-card-title').textContent.toLowerCase();
-        card.style.display = title.includes(q) ? 'flex' : 'none';
-      });
+    const searchInput = document.getElementById('events-search');
+
+    searchInput.addEventListener('input', function() {
+
+        const q = this.value.trim().toLowerCase();
+        let found = false;
+
+        document.querySelectorAll('.event-card').forEach(card => {
+
+            const title = card.querySelector('.event-card-title').textContent.toLowerCase();
+
+            if (title.includes(q)) {
+                card.style.display = 'flex';
+                found = true;
+            } else {
+                card.style.display = 'none';
+            }
+
+        });
+
+        // Validation
+        if (q === '') {
+            // Empty search: display all events
+            document.querySelectorAll('.event-card').forEach(card => {
+                card.style.display = 'flex';
+            });
+
+        } else if (!found) {
+            console.log('No matching events found.');
+        }
+
     });
   </script>
 </body>
