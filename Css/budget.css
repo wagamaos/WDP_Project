@@ -11,6 +11,7 @@
 
 .budget-label { font-size: .88rem; color: var(--mid-blue-2); font-weight: 500; margin-bottom: .3rem; }
 .budget-big { font-size: 1.7rem; font-weight: 900; color: var(--navy); letter-spacing: -.03em; }
+.budget-edit-button { margin-top: .5rem; color: var(--royal); font-size: .85rem; font-weight: 700; text-decoration: underline; }
 
 .budget-spent-card {
   background: var(--royal);
@@ -79,4 +80,28 @@
 .budget-expense-name { font-weight: 700; font-size: .95rem; color: var(--navy); }
 .budget-expense-meta { font-size: .82rem; color: var(--mid-blue-2); }
 .budget-expense-amount { font-weight: 800; font-size: 1rem; color: var(--navy); }
-
+.budget-expense-remove { color: var(--mid-blue-2); font-size: .78rem; font-weight: 700; }
+.budget-empty { padding: .8rem 0; color: var(--mid-blue-2); font-size: .9rem; }
+.budget-dialog {
+  width: min(440px, calc(100vw - 2rem));
+  margin: auto;
+  padding: 1.5rem;
+  border: 0;
+  border-radius: var(--radius);
+  color: var(--navy);
+  box-shadow: var(--shadow-md);
+}
+.budget-dialog::backdrop { background: rgba(14, 36, 102, .45); }
+.budget-dialog h2 { margin-bottom: 1rem; }
+.budget-dialog label { display: block; margin: .8rem 0 .3rem; font-weight: 600; }
+.budget-dialog input, .budget-dialog select {
+  width: 100%;
+  min-height: 42px;
+  padding: .55rem .7rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  color: var(--navy);
+  font: inherit;
+}
+.budget-dialog-actions { display: flex; justify-content: flex-end; gap: .6rem; margin-top: 1.2rem; }
+.budget-form-message { margin-top: .75rem; color: #b42318; font-size: .9rem; }

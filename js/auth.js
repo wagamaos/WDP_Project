@@ -1,81 +1,60 @@
 (function () {
   'use strict';
 
-  var DATABASE_NAME = 'landed-local';
-  var DATABASE_VERSION = 4;
   var SESSION_KEY = 'landed-user-email';
-  var databasePromise;
   var DEFAULT_REWARDS = [
     { id: 'kaya-singapore', name: 'Kaya (Singapore)', cost: 150, stock: 20, description: 'A sweet coconut and egg spread, popular on toast and breakfast snacks.', donatedBy: 'Landed welcome team', donatedAt: '2026-09-01', collectionDetails: 'Collect from your school office.' },
     { id: 'korean-snack-box', name: 'Korean snack box', cost: 200, stock: 20, description: 'A selection of Korean snacks to enjoy or share with friends.', donatedBy: 'Landed community', donatedAt: '2026-09-15', collectionDetails: 'Collect from your school office.' },
     { id: 'vietnamese-coffee', name: 'Vietnamese coffee', cost: 180, stock: 20, description: 'A locally loved Vietnamese coffee set for a study break.', donatedBy: 'Landed community', donatedAt: '2026-10-01', collectionDetails: 'Collect from your school office.' }
   ];
 
-  function openDatabase() {
-    if (!window.indexedDB) {
-      return Promise.reject(new Error('This browser does not support the local database.'));
-    }
-
-    if (!databasePromise) {
-      databasePromise = new Promise(function (resolve, reject) {
-        var request = window.indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
-
-        request.onupgradeneeded = function () {
-          var database = request.result;
-          if (!database.objectStoreNames.contains('users')) {
-            database.createObjectStore('users', { keyPath: 'email' });
-          }
-          if (!database.objectStoreNames.contains('forumPosts')) {
-            var forumStore = database.createObjectStore('forumPosts', { keyPath: 'id' });
-            seedForumPosts(forumStore);
-          }
-          if (!database.objectStoreNames.contains('rewards')) {
-            var rewards = database.createObjectStore('rewards', { keyPath: 'id' });
-            DEFAULT_REWARDS.forEach(function (reward) { rewards.add(reward); });
-          }
-        };
-        request.onsuccess = function () { resolve(request.result); };
-        request.onerror = function () {
-          databasePromise = null;
-          reject(request.error || new Error('Could not open the local database.'));
-        };
+  var databaseReady = window.LandedDatabase.ready.then(function () {
+    return Promise.all([
+      window.LandedDatabase.all('forum_posts'),
+      window.LandedDatabase.all('rewards')
+    ]);
+  }).then(function (stored) {
+    var jobs = [];
+    if (!stored[0].length) {
+      seedForumPosts().forEach(function (post) {
+        jobs.push(window.LandedDatabase.insert('forum_posts', post.id, post));
       });
     }
+    if (!stored[1].length) {
+      DEFAULT_REWARDS.forEach(function (reward) {
+        jobs.push(window.LandedDatabase.insert('rewards', reward.id, reward));
+      });
+    }
+    return Promise.all(jobs);
+  });
 
-    return databasePromise;
+  function getRecord(collection, id) {
+    return databaseReady.then(function () {
+      return window.LandedDatabase.get(collection, id);
+    });
   }
 
-  function runTransaction(mode, operation) {
-    return openDatabase().then(function (database) {
-      return new Promise(function (resolve, reject) {
-        var transaction;
-        var result;
-        var settled = false;
+  function getRecords(collection) {
+    return databaseReady.then(function () {
+      return window.LandedDatabase.all(collection);
+    });
+  }
 
-        function fail(error) {
-          if (!settled) {
-            settled = true;
-            reject(error || new Error('The local database operation failed.'));
-          }
-        }
+  function putRecord(collection, record) {
+    return databaseReady.then(function () {
+      return window.LandedDatabase.put(collection, record.id || record.email, record);
+    });
+  }
 
-        try {
-          transaction = database.transaction('users', mode);
-          var request = operation(transaction.objectStore('users'));
-          request.onsuccess = function () { result = request.result; };
-          request.onerror = function () { fail(request.error); };
-          transaction.oncomplete = function () {
-            if (!settled) {
-              settled = true;
-              resolve(result);
-            }
-          };
-          transaction.onerror = function () { fail(transaction.error); };
-          transaction.onabort = function () { fail(transaction.error); };
-        } catch (error) {
-          fail(error);
-        }
-      });
+  function insertRecord(collection, record) {
+    return databaseReady.then(function () {
+      return window.LandedDatabase.insert(collection, record.id || record.email, record);
+    });
+  }
+
+  function removeRecord(collection, id) {
+    return databaseReady.then(function () {
+      return window.LandedDatabase.remove(collection, id);
     });
   }
 
@@ -135,21 +114,15 @@
   }
 
   function getUser(email) {
-    return runTransaction('readonly', function (store) {
-      return store.get(email);
-    });
+    return getRecord('users', email);
   }
 
   function saveUser(user) {
-    return runTransaction('readwrite', function (store) {
-      return store.put(user);
-    });
+    return putRecord('users', user);
   }
 
   function listLeaderboard() {
-    return runTransaction('readonly', function (store) {
-      return store.getAll();
-    }).then(function (users) {
+    return getRecords('users').then(function (users) {
       return users.map(function (user) {
         return { name: user.name, email: user.email, points: user.points || 0 };
       }).sort(function (a, b) {
@@ -158,35 +131,12 @@
     });
   }
 
-  function runRewardTransaction(mode, operation) {
-    return openDatabase().then(function (database) {
-      return new Promise(function (resolve, reject) {
-        var transaction;
-        var result;
-        try {
-          transaction = database.transaction('rewards', mode);
-          var request = operation(transaction.objectStore('rewards'));
-          request.onsuccess = function () { result = request.result; };
-          request.onerror = function () { reject(request.error); };
-          transaction.oncomplete = function () { resolve(result); };
-          transaction.onerror = function () { reject(transaction.error); };
-          transaction.onabort = function () { reject(transaction.error); };
-        } catch (error) {
-          reject(error);
-        }
-      });
-    });
-  }
-
   function listRewards() {
-    return runRewardTransaction('readonly', function (store) {
-      return store.getAll();
-    }).then(function (rewards) {
+    return getRecords('rewards').then(function (rewards) {
       if (rewards.length > 0) return rewards;
-      return runRewardTransaction('readwrite', function (store) {
-        DEFAULT_REWARDS.slice(0, -1).forEach(function (reward) { store.put(reward); });
-        return store.put(DEFAULT_REWARDS[DEFAULT_REWARDS.length - 1]);
-      }).then(function () { return DEFAULT_REWARDS.slice(); });
+      return Promise.all(DEFAULT_REWARDS.map(function (reward) {
+        return insertRecord('rewards', reward);
+      })).then(function () { return DEFAULT_REWARDS.slice(); });
     });
   }
 
@@ -209,9 +159,7 @@
       collectionDetails: details.collectionDetails.trim(),
       image: details.image
     };
-    return runRewardTransaction('readwrite', function (store) {
-      return store.add(reward);
-    }).then(function () { return reward; });
+    return insertRecord('rewards', reward).then(function () { return reward; });
   }
 
   function redeemReward(rewardId) {
@@ -240,9 +188,7 @@
         user.redemptions.push(redemption);
         return saveUser(user).then(function () {
           reward.stock -= 1;
-          return runRewardTransaction('readwrite', function (store) {
-            return store.put(reward);
-          }).then(function () {
+          return putRecord('rewards', reward).then(function () {
             return { user: publicUser(user), redemption: redemption };
           });
         });
@@ -301,9 +247,9 @@
       Math.random().toString(36).slice(2, 10);
   }
 
-  function seedForumPosts(store) {
+  function seedForumPosts() {
     var now = Date.now();
-    [
+    return [
       {
         id: 'post-1',
         category: 'Housing',
@@ -378,45 +324,11 @@
         comments: [],
         reports: []
       }
-    ].forEach(function (post) { store.add(post); });
+    ];
   }
 
   function copyForumPost(post) {
     return post ? JSON.parse(JSON.stringify(post)) : null;
-  }
-
-  function runForumTransaction(mode, operation) {
-    return openDatabase().then(function (database) {
-      return new Promise(function (resolve, reject) {
-        var transaction;
-        var result;
-        var settled = false;
-
-        function fail(error) {
-          if (!settled) {
-            settled = true;
-            reject(error || new Error('The forum database operation failed.'));
-          }
-        }
-
-        try {
-          transaction = database.transaction('forumPosts', mode);
-          var request = operation(transaction.objectStore('forumPosts'));
-          request.onsuccess = function () { result = request.result; };
-          request.onerror = function () { fail(request.error); };
-          transaction.oncomplete = function () {
-            if (!settled) {
-              settled = true;
-              resolve(result);
-            }
-          };
-          transaction.onerror = function () { fail(transaction.error); };
-          transaction.onabort = function () { fail(transaction.error); };
-        } catch (error) {
-          fail(error);
-        }
-      });
-    });
   }
 
   function requireForumUser() {
@@ -427,15 +339,11 @@
   }
 
   function getForumPost(id) {
-    return runForumTransaction('readonly', function (store) {
-      return store.get(id);
-    }).then(copyForumPost);
+    return getRecord('forum_posts', id).then(copyForumPost);
   }
 
   function listForumPosts() {
-    return runForumTransaction('readonly', function (store) {
-      return store.getAll();
-    }).then(function (posts) {
+    return getRecords('forum_posts').then(function (posts) {
       return posts.map(copyForumPost).sort(function (a, b) {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
@@ -462,9 +370,7 @@
         comments: [],
         reports: []
       };
-      return runForumTransaction('readwrite', function (store) {
-        return store.add(post);
-      }).then(function () {
+      return insertRecord('forum_posts', post).then(function () {
         return updateCurrentUser({ points: (user.points || 0) + 10 }).then(function () {
           return copyForumPost(post);
         });
@@ -487,9 +393,7 @@
           createdAt: new Date().toISOString(),
           likes: []
         });
-        return runForumTransaction('readwrite', function (store) {
-          return store.put(post);
-        }).then(function () {
+        return putRecord('forum_posts', post).then(function () {
           return updateCurrentUser({ points: (user.points || 0) + 5 }).then(function () {
             return copyForumPost(post);
           });
@@ -510,9 +414,7 @@
         var index = target.likes.indexOf(user.email);
         if (index === -1) target.likes.push(user.email);
         else target.likes.splice(index, 1);
-        return runForumTransaction('readwrite', function (store) {
-          return store.put(post);
-        }).then(function () { return copyForumPost(post); });
+        return putRecord('forum_posts', post).then(function () { return copyForumPost(post); });
       });
     });
   }
@@ -535,9 +437,7 @@
           details: details.trim(),
           createdAt: new Date().toISOString()
         });
-        return runForumTransaction('readwrite', function (store) {
-          return store.put(post);
-        }).then(function () { return copyForumPost(post); });
+        return putRecord('forum_posts', post).then(function () { return copyForumPost(post); });
       });
     });
   }
@@ -563,9 +463,7 @@
           }
         }).then(function () {
           comment.helpfulBy.push(user.email);
-          return runForumTransaction('readwrite', function (store) {
-            return store.put(post);
-          });
+          return putRecord('forum_posts', post);
         }).then(function () { return copyForumPost(post); });
       });
     });
@@ -617,9 +515,7 @@
         passwordHash: passwordHash
       };
 
-      return runTransaction('readwrite', function (store) {
-        return store.get(email);
-      }).then(function (existingUser) {
+      return getUser(email).then(function (existingUser) {
         if (existingUser) {
           var existingSalt = new Uint8Array(existingUser.passwordSalt.match(/.{2}/g).map(function (pair) {
             return parseInt(pair, 16);
@@ -642,9 +538,7 @@
             });
           });
         }
-        return runTransaction('readwrite', function (store) {
-          return store.add(user);
-        }).then(function () {
+        return insertRecord('users', user).then(function () {
           window.localStorage.setItem(SESSION_KEY, email);
           return publicUser(user);
         });
@@ -687,6 +581,77 @@
     return updateCurrentUser({
       completedQuests: completedQuests,
       points: points
+    });
+  }
+
+  function requireCurrentUser() {
+    return getCurrentUser().then(function (user) {
+      if (!user) throw new Error('Please log in to use the budget tracker.');
+      return user;
+    });
+  }
+
+  function listBudgetEntries() {
+    return requireCurrentUser().then(function (user) {
+      return getRecords('budget_entries').then(function (entries) {
+        return entries.filter(function (entry) { return entry.ownerEmail === user.email; })
+          .sort(function (a, b) { return b.date.localeCompare(a.date); });
+      });
+    });
+  }
+
+  function getMonthlyBudget() {
+    return requireCurrentUser().then(function (user) {
+      return getRecord('budget_settings', user.email).then(function (settings) {
+        return settings ? settings.monthlyBudget : 1000;
+      });
+    });
+  }
+
+  function updateMonthlyBudget(amount) {
+    var budget = Number(amount);
+    if (!Number.isFinite(budget) || budget <= 0 || budget > 1000000) {
+      return Promise.reject(new Error('Enter a monthly budget greater than 0 and no more than 1,000,000.'));
+    }
+    return requireCurrentUser().then(function (user) {
+      return putRecord('budget_settings', {
+        id: user.email,
+        monthlyBudget: Math.round(budget * 100) / 100
+      }).then(function (settings) { return settings.monthlyBudget; });
+    });
+  }
+
+  function addBudgetEntry(details) {
+    var amount = Number(details.amount);
+    var categories = ['Food', 'Transport', 'Housing', 'Study', 'Entertainment', 'Other'];
+    var entryDate = new Date((details.date || '') + 'T00:00:00');
+    if (!details.name || details.name.trim().length < 2 || details.name.trim().length > 100 ||
+        !Number.isFinite(amount) || amount <= 0 || amount > 1000000 ||
+        categories.indexOf(details.category) === -1 ||
+        !details.date || Number.isNaN(entryDate.getTime())) {
+      return Promise.reject(new Error('Enter a name, valid amount, category, and date for this expense.'));
+    }
+    return requireCurrentUser().then(function (user) {
+      var entry = {
+        id: createId('expense'),
+        ownerEmail: user.email,
+        name: details.name.trim(),
+        category: details.category,
+        amount: Math.round(amount * 100) / 100,
+        date: details.date
+      };
+      return insertRecord('budget_entries', entry).then(function () { return entry; });
+    });
+  }
+
+  function deleteBudgetEntry(entryId) {
+    return requireCurrentUser().then(function (user) {
+      return getRecord('budget_entries', entryId).then(function (entry) {
+        if (!entry || entry.ownerEmail !== user.email) {
+          throw new Error('This expense is no longer available.');
+        }
+        return removeRecord('budget_entries', entryId);
+      });
     });
   }
 
@@ -749,16 +714,12 @@
     return getForumPost(postId).then(function (post) {
       if (!post) throw new Error('Post not found.');
       post.reports = [];
-      return runForumTransaction('readwrite', function (store) {
-        return store.put(post);
-      }).then(function () { return copyForumPost(post); });
+      return putRecord('forum_posts', post).then(function () { return copyForumPost(post); });
     });
   }
 
   function adminDeleteForumPost(postId) {
-    return runForumTransaction('readwrite', function (store) {
-      return store.delete(postId);
-    });
+    return removeRecord('forum_posts', postId);
   }
 
   function adminAddReward(details) {
@@ -778,21 +739,15 @@
       donatedAt: new Date().toISOString(),
       collectionDetails: details.collectionDetails.trim()
     };
-    return runRewardTransaction('readwrite', function (store) {
-      return store.add(reward);
-    }).then(function () { return reward; });
+    return insertRecord('rewards', reward).then(function () { return reward; });
   }
 
   function adminDeleteReward(rewardId) {
-    return runRewardTransaction('readwrite', function (store) {
-      return store.delete(rewardId);
-    });
+    return removeRecord('rewards', rewardId);
   }
 
   function adminUpdateReward(rewardId, changes) {
-    return runRewardTransaction('readonly', function (store) {
-      return store.get(rewardId);
-    }).then(function (reward) {
+    return getRecord('rewards', rewardId).then(function (reward) {
       if (!reward) throw new Error('Reward not found.');
       var updated = Object.assign({}, reward, {
         name:  changes.name  ? changes.name.trim()  : reward.name,
@@ -801,9 +756,7 @@
         description:       changes.description       ? changes.description.trim()       : reward.description,
         collectionDetails: changes.collectionDetails ? changes.collectionDetails.trim() : reward.collectionDetails
       });
-      return runRewardTransaction('readwrite', function (store) {
-        return store.put(updated);
-      }).then(function () { return updated; });
+      return putRecord('rewards', updated).then(function () { return updated; });
     });
   }
 
@@ -814,6 +767,11 @@
     logout: logout,
     updateCurrentUser: updateCurrentUser,
     updateProgress: updateProgress,
+    listBudgetEntries: listBudgetEntries,
+    getMonthlyBudget: getMonthlyBudget,
+    updateMonthlyBudget: updateMonthlyBudget,
+    addBudgetEntry: addBudgetEntry,
+    deleteBudgetEntry: deleteBudgetEntry,
     listLeaderboard: listLeaderboard,
     listRewards: listRewards,
     addReward: addReward,

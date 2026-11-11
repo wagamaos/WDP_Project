@@ -16,7 +16,7 @@
 
     <!-- ===== SIDEBAR ===== -->
     <nav class="sidebar" aria-label="Main navigation">
-      <a class="sidebar-logo" href="index.html" aria-label="Landed – home">
+      <a class="sidebar-logo" href="index.html" aria-label="Landed ï¿½ home">
         <span class="sidebar-logo-icon">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
         </span>
@@ -56,6 +56,10 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           <span>Arrival Checklist</span>
         </a>
+        <a href="database.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
+          <span>Database backup</span>
+        </a>
         <a href="login.html" id="logout-link">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           <span>Log out</span>
@@ -80,7 +84,7 @@
                 <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               </div>
               <div>
-                <div class="xp-card-level" id="home-level">Level 1 · Newcomer</div>
+                <div class="xp-card-level" id="home-level">Level 1 ï¿½ Newcomer</div>
                 <div class="xp-card-title" id="home-next-level">350 XP to your next level</div>
               </div>
             </div>
@@ -109,7 +113,7 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
           </div>
           <div>
-            <div class="stat-num" id="home-rank">—</div>
+            <div class="stat-num" id="home-rank">ï¿½</div>
             <div class="stat-label">Monthly Rank</div>
           </div>
         </div>
@@ -141,7 +145,7 @@
           <div class="card-title">
             <svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             Today's quests
-            <span class="badge-count" id="quest-count">· 0 of 3</span>
+            <span class="badge-count" id="quest-count">ï¿½ 0 of 3</span>
           </div>
 
           <ul class="quest-list" aria-label="Today's quests">
@@ -189,7 +193,7 @@
                 </div>
                 <div class="event-info">
                   <div class="event-name">International Food Festival</div>
-                  <div class="event-meta">24 Oct · Student Union</div>
+                  <div class="event-meta">24 Oct ï¿½ Student Union</div>
                 </div>
                 <span class="event-pts" aria-label="Earn 50 points">+50</span>
               </div>
@@ -199,7 +203,7 @@
                 </div>
                 <div class="event-info">
                   <div class="event-name">Study Skills Workshop</div>
-                  <div class="event-meta">27 Oct · Library</div>
+                  <div class="event-meta">27 Oct ï¿½ Library</div>
                 </div>
                 <span class="event-pts" aria-label="Earn 30 points">+30</span>
               </div>
@@ -240,6 +244,7 @@
     </main>
   </div><!-- /.app-shell -->
 
+  <script src="js/database.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/home.js"></script>
 </body>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Landed | Budget Tracker</title>
-  <meta name="description" content="Track your spending, convert currencies and stay on budget. Stay under budget to build a streak on Landed.">
+  <meta name="description" content="Track your spending, set a monthly budget and review expenses by category.">
   <link rel="stylesheet" href="Css/common.css">
   <link rel="stylesheet" href="Css/budget.css">
   <link rel="stylesheet" href="Css/responsive.css">
@@ -56,6 +56,10 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           <span>Arrival Checklist</span>
         </a>
+        <a href="database.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
+          <span>Database backup</span>
+        </a>
       </div>
     </nav>
 
@@ -65,7 +69,7 @@
       <div class="page-header" style="margin-bottom:1.5rem;">
         <div>
           <h1 class="page-title">Budget Tracker</h1>
-          <p class="page-sub">Track your spending, convert currencies and stay on budget. Stay under budget to build a streak.</p>
+          <p class="page-sub">Track your spending, set a monthly budget and review expenses by category.</p>
         </div>
       </div>
 
@@ -73,19 +77,20 @@
       <div class="budget-summary-row">
         <div class="card budget-budget-card">
           <div class="budget-label">Monthly budget</div>
-          <div class="budget-big">SGD 1,000</div>
+          <div class="budget-big" id="monthly-budget">SGD 1,000</div>
+          <button class="budget-edit-button" id="edit-budget-btn" type="button">Edit budget</button>
         </div>
 
         <div class="card budget-spent-card">
           <div class="budget-spent-header">
             <div>
               <div class="budget-label" style="color:rgba(255,255,255,.75);">Spent this month</div>
-              <div class="budget-big" style="color:#fff;">SGD 642</div>
+              <div class="budget-big" id="spent-this-month" style="color:#fff;">SGD 0.00</div>
             </div>
-            <div class="budget-pct" aria-label="64 percent spent">64%</div>
+            <div class="budget-pct" id="budget-percent" aria-label="0 percent spent">0%</div>
           </div>
-          <div class="budget-bar-track" role="progressbar" aria-valuenow="64" aria-valuemin="0" aria-valuemax="100" aria-label="Budget used: 64%">
-            <div class="budget-bar-fill" style="width:64%;"></div>
+          <div class="budget-bar-track" id="budget-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Budget used: 0%">
+            <div class="budget-bar-fill" id="budget-progress-fill" style="width:0;"></div>
           </div>
         </div>
 
@@ -94,8 +99,8 @@
             <svg viewBox="0 0 24 24"><path d="M12 20.9l-1.5-.9C5.1 16.5 2 13.4 2 10a6 6 0 0 1 10-4.47A6 6 0 0 1 22 10c0 3.4-3.1 6.5-8.5 10l-1.5.9z"/></svg>
           </div>
           <div>
-            <div class="budget-streak-title">3-week streak</div>
-            <div class="budget-streak-sub">Under budget +20 pts</div>
+            <div class="budget-streak-title" id="budget-status">Monthly spending</div>
+            <div class="budget-streak-sub" id="budget-remaining">SGD 1,000.00 remaining</div>
           </div>
         </div>
       </div>
@@ -114,31 +119,25 @@
             <!-- SVG donut -->
             <div class="donut-wrap" aria-hidden="true">
               <svg viewBox="0 0 160 160" class="donut-svg">
-                <!-- Food 32% -->
                 <circle cx="80" cy="80" r="60" fill="none" stroke="var(--royal)" stroke-width="26"
-                  stroke-dasharray="120.6 380.6" stroke-dashoffset="0"
+                  data-category="Food" stroke-dasharray="0 380.6" stroke-dashoffset="0"
                   transform="rotate(-90 80 80)"/>
-                <!-- Transport 18% -->
                 <circle cx="80" cy="80" r="60" fill="none" stroke="var(--gold)" stroke-width="26"
-                  stroke-dasharray="67.85 380.6" stroke-dashoffset="-120.6"
+                  data-category="Transport" stroke-dasharray="0 380.6" stroke-dashoffset="0"
                   transform="rotate(-90 80 80)"/>
-                <!-- Housing 16% -->
                 <circle cx="80" cy="80" r="60" fill="none" stroke="var(--mid-blue-2)" stroke-width="26"
-                  stroke-dasharray="60.3 380.6" stroke-dashoffset="-188.45"
+                  data-category="Housing" stroke-dasharray="0 380.6" stroke-dashoffset="0"
                   transform="rotate(-90 80 80)"/>
-                <!-- Study 12% -->
                 <circle cx="80" cy="80" r="60" fill="none" stroke="var(--mint)" stroke-width="26"
-                  stroke-dasharray="45.2 380.6" stroke-dashoffset="-248.75"
+                  data-category="Study" stroke-dasharray="0 380.6" stroke-dashoffset="0"
                   transform="rotate(-90 80 80)"/>
-                <!-- Entertainment 10% -->
                 <circle cx="80" cy="80" r="60" fill="none" stroke="var(--mid-blue-3)" stroke-width="26"
-                  stroke-dasharray="37.7 380.6" stroke-dashoffset="-293.95"
+                  data-category="Entertainment" stroke-dasharray="0 380.6" stroke-dashoffset="0"
                   transform="rotate(-90 80 80)"/>
-                <!-- Other 12% -->
                 <circle cx="80" cy="80" r="60" fill="none" stroke="var(--pale-blue-2)" stroke-width="26"
-                  stroke-dasharray="45.2 380.6" stroke-dashoffset="-331.65"
+                  data-category="Other" stroke-dasharray="0 380.6" stroke-dashoffset="0"
                   transform="rotate(-90 80 80)"/>
-                <text x="80" y="85" text-anchor="middle" font-size="22" font-weight="800" fill="var(--navy)" font-family="Inter,sans-serif">642</text>
+                <text id="donut-total" x="80" y="85" text-anchor="middle" font-size="22" font-weight="800" fill="var(--navy)" font-family="Inter,sans-serif">0</text>
               </svg>
             </div>
 
@@ -147,32 +146,32 @@
               <li class="budget-legend-item">
                 <span class="budget-legend-dot" style="background:var(--royal);"></span>
                 <span class="budget-legend-name">Food</span>
-                <span class="budget-legend-pct">32%</span>
+                <span class="budget-legend-pct" data-category-total="Food">SGD 0.00</span>
               </li>
               <li class="budget-legend-item">
                 <span class="budget-legend-dot" style="background:var(--gold);"></span>
                 <span class="budget-legend-name">Transport</span>
-                <span class="budget-legend-pct">18%</span>
+                <span class="budget-legend-pct" data-category-total="Transport">SGD 0.00</span>
               </li>
               <li class="budget-legend-item">
                 <span class="budget-legend-dot" style="background:var(--mid-blue-2);"></span>
                 <span class="budget-legend-name">Housing</span>
-                <span class="budget-legend-pct">16%</span>
+                <span class="budget-legend-pct" data-category-total="Housing">SGD 0.00</span>
               </li>
               <li class="budget-legend-item">
                 <span class="budget-legend-dot" style="background:var(--mint);"></span>
                 <span class="budget-legend-name">Study</span>
-                <span class="budget-legend-pct">12%</span>
+                <span class="budget-legend-pct" data-category-total="Study">SGD 0.00</span>
               </li>
               <li class="budget-legend-item">
                 <span class="budget-legend-dot" style="background:var(--mid-blue-3);"></span>
                 <span class="budget-legend-name">Entertainment</span>
-                <span class="budget-legend-pct">10%</span>
+                <span class="budget-legend-pct" data-category-total="Entertainment">SGD 0.00</span>
               </li>
               <li class="budget-legend-item">
                 <span class="budget-legend-dot" style="background:var(--pale-blue-2);"></span>
                 <span class="budget-legend-name">Other</span>
-                <span class="budget-legend-pct">12%</span>
+                <span class="budget-legend-pct" data-category-total="Other">SGD 0.00</span>
               </li>
             </ul>
           </div>
@@ -185,48 +184,8 @@
             <h2 id="expenses-heading" style="font-size:1rem;font-weight:700;color:var(--navy);">Recent expenses</h2>
           </div>
 
-          <ul class="budget-expense-list" aria-label="Recent expenses">
-            <li class="budget-expense-item" id="expense-1">
-              <div class="budget-expense-icon" style="background:var(--pale-blue-1);" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-              </div>
-              <div class="budget-expense-info">
-                <div class="budget-expense-name">Lunch</div>
-                <div class="budget-expense-meta">Food &middot; 20 Oct</div>
-              </div>
-              <span class="budget-expense-amount">8.50</span>
-            </li>
-            <li class="budget-expense-item" id="expense-2">
-              <div class="budget-expense-icon" style="background:var(--gold-light);" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              </div>
-              <div class="budget-expense-info">
-                <div class="budget-expense-name">Bus fare</div>
-                <div class="budget-expense-meta">Transport &middot; 19 Oct</div>
-              </div>
-              <span class="budget-expense-amount">2.30</span>
-            </li>
-            <li class="budget-expense-item" id="expense-3">
-              <div class="budget-expense-icon" style="background:var(--pale-blue-1);" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-              </div>
-              <div class="budget-expense-info">
-                <div class="budget-expense-name">Groceries</div>
-                <div class="budget-expense-meta">Food &middot; 18 Oct</div>
-              </div>
-              <span class="budget-expense-amount">15.20</span>
-            </li>
-            <li class="budget-expense-item" id="expense-4">
-              <div class="budget-expense-icon" style="background:var(--mint-light);" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-              </div>
-              <div class="budget-expense-info">
-                <div class="budget-expense-name">Textbooks</div>
-                <div class="budget-expense-meta">Study &middot; 10 Oct</div>
-              </div>
-              <span class="budget-expense-amount">42.00</span>
-            </li>
-          </ul>
+          <ul class="budget-expense-list" id="budget-expense-list" aria-label="Recent expenses"></ul>
+          <p class="budget-empty" id="budget-empty" hidden>No expenses yet. Add one to start tracking your budget.</p>
 
           <button class="btn btn-outline btn-full" id="add-expense-btn" style="margin-top:1rem;">
             <svg viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -239,10 +198,47 @@
     </main>
   </div><!-- /.app-shell -->
 
-  <script>
-    document.getElementById('add-expense-btn').addEventListener('click', function() {
-      alert('Add expense feature coming soon!');
-    });
-  </script>
+  <dialog class="budget-dialog" id="expense-dialog" aria-labelledby="expense-dialog-title">
+    <form id="expense-form">
+      <h2 id="expense-dialog-title">Add expense</h2>
+      <label for="expense-name">Expense name</label>
+      <input id="expense-name" name="name" required minlength="2" maxlength="100">
+      <label for="expense-amount">Amount (SGD)</label>
+      <input id="expense-amount" name="amount" type="number" min="0.01" max="1000000" step="0.01" required>
+      <label for="expense-category">Category</label>
+      <select id="expense-category" name="category" required>
+        <option value="Food">Food</option>
+        <option value="Transport">Transport</option>
+        <option value="Housing">Housing</option>
+        <option value="Study">Study</option>
+        <option value="Entertainment">Entertainment</option>
+        <option value="Other">Other</option>
+      </select>
+      <label for="expense-date">Date</label>
+      <input id="expense-date" name="date" type="date" required>
+      <p class="budget-form-message" id="expense-message" role="status" hidden></p>
+      <div class="budget-dialog-actions">
+        <button class="btn btn-outline" type="button" id="cancel-expense-btn">Cancel</button>
+        <button class="btn" type="submit" id="save-expense-btn">Save expense</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="budget-dialog" id="budget-dialog" aria-labelledby="budget-dialog-title">
+    <form id="budget-form">
+      <h2 id="budget-dialog-title">Set monthly budget</h2>
+      <label for="budget-amount">Monthly budget (SGD)</label>
+      <input id="budget-amount" name="amount" type="number" min="0.01" max="1000000" step="0.01" required>
+      <p class="budget-form-message" id="budget-message" role="status" hidden></p>
+      <div class="budget-dialog-actions">
+        <button class="btn btn-outline" type="button" id="cancel-budget-btn">Cancel</button>
+        <button class="btn" type="submit" id="save-budget-btn">Save budget</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="js/database.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/budget.js"></script>
 </body>
 </html>
