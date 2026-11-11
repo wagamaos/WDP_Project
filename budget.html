@@ -4,10 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Landed | Budget Tracker</title>
-  <meta name="description" content="Track your spending, set a monthly budget and review expenses by category.">
+  <meta name="description" content="Track your spending, convert currencies and stay on budget. Stay under budget to build a streak on Landed.">
   <link rel="stylesheet" href="Css/common.css">
   <link rel="stylesheet" href="Css/budget.css">
   <link rel="stylesheet" href="Css/responsive.css">
+  <script src="js/page-guard.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -56,20 +57,20 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           <span>Arrival Checklist</span>
         </a>
-        <a href="database.html">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>
-          <span>Database backup</span>
+        <a href="login.html" class="logout-link" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Log out</span>
         </a>
       </div>
     </nav>
 
     <!-- ===== MAIN CANVAS ===== -->
-    <main class="main-canvas" id="main">
+    <main class="main-canvas" id="main" tabindex="-1">
 
       <div class="page-header" style="margin-bottom:1.5rem;">
         <div>
           <h1 class="page-title">Budget Tracker</h1>
-          <p class="page-sub">Track your spending, set a monthly budget and review expenses by category.</p>
+          <p class="page-sub">Track your spending, convert currencies and stay on budget. Stay under budget to build a streak.</p>
         </div>
       </div>
 
@@ -77,7 +78,7 @@
       <div class="budget-summary-row">
         <div class="card budget-budget-card">
           <div class="budget-label">Monthly budget</div>
-          <div class="budget-big" id="monthly-budget">SGD 1,000</div>
+          <div class="budget-big" id="monthly-budget">SGD 1,000.00</div>
           <button class="budget-edit-button" id="edit-budget-btn" type="button">Edit budget</button>
         </div>
 
@@ -99,7 +100,7 @@
             <svg viewBox="0 0 24 24"><path d="M12 20.9l-1.5-.9C5.1 16.5 2 13.4 2 10a6 6 0 0 1 10-4.47A6 6 0 0 1 22 10c0 3.4-3.1 6.5-8.5 10l-1.5.9z"/></svg>
           </div>
           <div>
-            <div class="budget-streak-title" id="budget-status">Monthly spending</div>
+            <div class="budget-streak-title" id="budget-status">Under monthly budget</div>
             <div class="budget-streak-sub" id="budget-remaining">SGD 1,000.00 remaining</div>
           </div>
         </div>
@@ -119,21 +120,27 @@
             <!-- SVG donut -->
             <div class="donut-wrap" aria-hidden="true">
               <svg viewBox="0 0 160 160" class="donut-svg">
+                <!-- Food 32% -->
                 <circle cx="80" cy="80" r="60" fill="none" stroke="var(--royal)" stroke-width="26"
                   data-category="Food" stroke-dasharray="0 380.6" stroke-dashoffset="0"
                   transform="rotate(-90 80 80)"/>
+                <!-- Transport 18% -->
                 <circle cx="80" cy="80" r="60" fill="none" stroke="var(--gold)" stroke-width="26"
                   data-category="Transport" stroke-dasharray="0 380.6" stroke-dashoffset="0"
                   transform="rotate(-90 80 80)"/>
+                <!-- Housing 16% -->
                 <circle cx="80" cy="80" r="60" fill="none" stroke="var(--mid-blue-2)" stroke-width="26"
                   data-category="Housing" stroke-dasharray="0 380.6" stroke-dashoffset="0"
                   transform="rotate(-90 80 80)"/>
+                <!-- Study 12% -->
                 <circle cx="80" cy="80" r="60" fill="none" stroke="var(--mint)" stroke-width="26"
                   data-category="Study" stroke-dasharray="0 380.6" stroke-dashoffset="0"
                   transform="rotate(-90 80 80)"/>
+                <!-- Entertainment 10% -->
                 <circle cx="80" cy="80" r="60" fill="none" stroke="var(--mid-blue-3)" stroke-width="26"
                   data-category="Entertainment" stroke-dasharray="0 380.6" stroke-dashoffset="0"
                   transform="rotate(-90 80 80)"/>
+                <!-- Other 12% -->
                 <circle cx="80" cy="80" r="60" fill="none" stroke="var(--pale-blue-2)" stroke-width="26"
                   data-category="Other" stroke-dasharray="0 380.6" stroke-dashoffset="0"
                   transform="rotate(-90 80 80)"/>
@@ -198,6 +205,7 @@
     </main>
   </div><!-- /.app-shell -->
 
+  <script src="js/auth.js"></script>
   <dialog class="budget-dialog" id="expense-dialog" aria-labelledby="expense-dialog-title">
     <form id="expense-form">
       <h2 id="expense-dialog-title">Add expense</h2>
@@ -237,7 +245,6 @@
     </form>
   </dialog>
 
-  <script src="js/database.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/budget.js"></script>
 </body>

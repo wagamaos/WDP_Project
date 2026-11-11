@@ -37,7 +37,7 @@
   background: var(--gold); border-radius: 99px;
   animation: xpFill 1.2s ease-out both;
 }
-.profile-xp-label { font-size: .85rem; color: rgba(255,255,255,.65); }
+.profile-xp-label { font-size: .85rem; color: rgba(255,255,255,.75); }
 .profile-edit-btn { position: relative; z-index: 1; margin-left: auto; flex: none; }
 
 .profile-grid {

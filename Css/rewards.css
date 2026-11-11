@@ -70,7 +70,7 @@
 }
 .lb-rank.gold-rank { background: var(--gold); color: var(--gold-text); }
 .lb-rank.silver-rank { background: #C0C0C0; color: #444; }
-.lb-rank.bronze-rank { background: #CD7F32; color: #fff; }
+.lb-rank.bronze-rank { background: #CD7F32; color: var(--navy); }
 .lb-rank.lb-rank-you { background: var(--royal); color: var(--white); }
 .lb-name { flex: 1; font-size: .97rem; color: var(--navy); font-weight: 500; }
 .lb-pts { font-weight: 800; color: var(--navy); font-size: .97rem; }

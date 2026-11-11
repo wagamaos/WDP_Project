@@ -43,9 +43,9 @@
 }
 .gate-input-wrap:focus-within { border-color: var(--royal); box-shadow: 0 0 0 3px rgba(27,68,184,.1); }
 .gate-input-wrap input { flex: 1; border: none; outline: none; background: transparent; font-family: inherit; font-size: .97rem; color: var(--navy); }
-.gate-input-wrap input::placeholder { color: var(--mid-blue-3); }
+.gate-input-wrap input::placeholder { color: var(--mid-blue-1); }
 
-.pw-toggle { background: none; border: none; cursor: pointer; padding: 0; color: var(--mid-blue-3); display: grid; place-items: center; flex: none; }
+.pw-toggle { background: none; border: none; cursor: pointer; padding: 0; color: var(--mid-blue-1); display: grid; place-items: center; flex: none; }
 .pw-toggle svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .pw-toggle:hover { color: var(--royal); }
 
@@ -110,7 +110,7 @@
   display: flex; align-items: center; gap: .7rem;
   padding: .7rem .85rem; border-radius: var(--radius-sm);
   font-family: inherit; font-size: .88rem; font-weight: 600;
-  color: rgba(255,255,255,.45); background: none; border: none;
+  color: rgba(255,255,255,.65); background: none; border: none;
   cursor: pointer; margin-top: auto;
   transition: background .15s, color .15s;
 }
@@ -194,7 +194,7 @@
 .reward-card-meta { font-size: .82rem; color: var(--mid-blue-2); }
 .reward-card-meta span { font-weight: 700; color: var(--navy); }
 .reward-card-desc { font-size: .83rem; color: var(--mid-blue-2); flex: 1; }
-.reward-card-collection { font-size: .78rem; color: var(--mid-blue-3); }
+.reward-card-collection { font-size: .78rem; color: var(--mid-blue-1); }
 .reward-card-actions {
   display: flex; gap: .5rem; margin-top: .5rem;
   padding-top: .75rem; border-top: 1px solid var(--pale-blue-1);
@@ -312,11 +312,10 @@
 }
 .report-entry-reason { font-weight: 700; font-size: .85rem; color: #9c2520; }
 .report-entry-detail { font-size: .82rem; color: var(--mid-blue-2); margin-top: .2rem; }
-.report-entry-by     { font-size: .75rem; color: var(--mid-blue-3); margin-top: .15rem; }
+.report-entry-by     { font-size: .75rem; color: var(--mid-blue-1); margin-top: .15rem; }
 
 /* ── Misc ── */
 .admin-loading { color: var(--mid-blue-2); font-size: .9rem; padding: 2rem; text-align: center; }
 .admin-empty   { text-align: center; padding: 3rem 1rem; color: var(--mid-blue-2); }
-.admin-empty svg { width: 40px; height: 40px; stroke: var(--mid-blue-3); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; display: block; margin: 0 auto .8rem; }
+.admin-empty svg { width: 40px; height: 40px; stroke: var(--mid-blue-1); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; display: block; margin: 0 auto .8rem; }
 .admin-empty p { font-size: .92rem; }
-

@@ -81,6 +81,7 @@
 .budget-expense-meta { font-size: .82rem; color: var(--mid-blue-2); }
 .budget-expense-amount { font-weight: 800; font-size: 1rem; color: var(--navy); }
 .budget-expense-remove { color: var(--mid-blue-2); font-size: .78rem; font-weight: 700; }
+.budget-expense-remove:disabled { cursor: wait; opacity: .6; }
 .budget-empty { padding: .8rem 0; color: var(--mid-blue-2); font-size: .9rem; }
 .budget-dialog {
   width: min(440px, calc(100vw - 2rem));
@@ -104,4 +105,5 @@
   font: inherit;
 }
 .budget-dialog-actions { display: flex; justify-content: flex-end; gap: .6rem; margin-top: 1.2rem; }
+.budget-dialog button:disabled { cursor: wait; opacity: .7; }
 .budget-form-message { margin-top: .75rem; color: #b42318; font-size: .9rem; }

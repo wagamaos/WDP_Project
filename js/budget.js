@@ -18,78 +18,80 @@
     Entertainment: '<circle cx="12" cy="12" r="10"/><path d="M8 15s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>',
     Other: '<circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>'
   };
+  var entries = [];
+  var monthlyBudget = 1000;
   var expenseList = document.getElementById('budget-expense-list');
-  var emptyState = document.getElementById('budget-empty');
   var expenseDialog = document.getElementById('expense-dialog');
   var expenseForm = document.getElementById('expense-form');
   var budgetDialog = document.getElementById('budget-dialog');
   var budgetForm = document.getElementById('budget-form');
-  var expenses = [];
-  var monthlyBudget = 1000;
 
   function money(amount) {
-    return 'SGD ' + Number(amount).toFixed(2);
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency: 'SGD',
+      minimumFractionDigits: 2
+    }).format(amount);
   }
 
-  function currentMonth() {
-    var now = new Date();
-    return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+  function today() {
+    var date = new Date();
+    return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') +
+      '-' + String(date.getDate()).padStart(2, '0');
   }
 
-  function localDate() {
-    var now = new Date();
-    return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') +
-      '-' + String(now.getDate()).padStart(2, '0');
-  }
-
-  function showFormMessage(id, message) {
+  function message(id, text, isError) {
     var element = document.getElementById(id);
-    element.textContent = message || '';
-    element.hidden = !message;
+    element.textContent = text || '';
+    element.hidden = !text;
+    element.classList.toggle('is-error', Boolean(isError));
   }
 
   function render() {
-    var month = currentMonth();
-    var thisMonth = expenses.filter(function (expense) {
-      return expense.date.slice(0, 7) === month;
+    var month = today().slice(0, 7);
+    var currentEntries = entries.filter(function (entry) {
+      return entry.date.slice(0, 7) === month;
     });
-    var spent = thisMonth.reduce(function (total, expense) { return total + expense.amount; }, 0);
+    var spent = currentEntries.reduce(function (sum, entry) { return sum + entry.amount; }, 0);
     var totals = {};
     categories.forEach(function (category) { totals[category] = 0; });
-    thisMonth.forEach(function (expense) { totals[expense.category] += expense.amount; });
+    currentEntries.forEach(function (entry) { totals[entry.category] += entry.amount; });
 
     document.getElementById('monthly-budget').textContent = money(monthlyBudget);
     document.getElementById('spent-this-month').textContent = money(spent);
     document.getElementById('donut-total').textContent = Math.round(spent).toString();
-    document.querySelectorAll('[data-category-total]').forEach(function (element) {
-      element.textContent = money(totals[element.dataset.categoryTotal]);
-    });
-
-    var percent = monthlyBudget ? spent / monthlyBudget * 100 : 0;
-    var roundedPercent = Math.round(percent);
-    document.getElementById('budget-percent').textContent = roundedPercent + '%';
-    document.getElementById('budget-percent').setAttribute('aria-label', roundedPercent + ' percent spent');
-    document.getElementById('budget-progress').setAttribute('aria-valuenow', String(Math.min(100, roundedPercent)));
-    document.getElementById('budget-progress').setAttribute('aria-label', 'Budget used: ' + roundedPercent + '%');
-    document.getElementById('budget-progress-fill').style.width = Math.min(100, percent) + '%';
+    document.getElementById('budget-percent').textContent = Math.round(spent / monthlyBudget * 100) + '%';
+    document.getElementById('budget-percent').setAttribute(
+      'aria-label', Math.round(spent / monthlyBudget * 100) + ' percent spent'
+    );
+    document.getElementById('budget-progress').setAttribute(
+      'aria-valuenow', String(Math.min(100, Math.round(spent / monthlyBudget * 100)))
+    );
+    document.getElementById('budget-progress').setAttribute(
+      'aria-label', 'Budget used: ' + Math.round(spent / monthlyBudget * 100) + '%'
+    );
+    document.getElementById('budget-progress-fill').style.width =
+      Math.min(100, spent / monthlyBudget * 100) + '%';
     document.getElementById('budget-status').textContent =
-      spent > monthlyBudget ? 'Over monthly budget' : 'Monthly spending';
-    document.getElementById('budget-remaining').textContent = money(Math.abs(monthlyBudget - spent)) +
-      (spent > monthlyBudget ? ' over budget' : ' remaining');
+      spent > monthlyBudget ? 'Over monthly budget' : 'Under monthly budget';
+    document.getElementById('budget-remaining').textContent =
+      money(Math.abs(monthlyBudget - spent)) + (spent > monthlyBudget ? ' over budget' : ' remaining');
 
+    document.querySelectorAll('[data-category-total]').forEach(function (item) {
+      item.textContent = money(totals[item.dataset.categoryTotal]);
+    });
     var circumference = 2 * Math.PI * 60;
     var offset = 0;
     document.querySelectorAll('.donut-svg circle[data-category]').forEach(function (circle) {
-      var value = totals[circle.dataset.category];
-      var segment = spent ? value / spent * circumference : 0;
-      circle.setAttribute('stroke-dasharray', segment + ' ' + (circumference - segment));
+      var length = spent ? totals[circle.dataset.category] / spent * circumference : 0;
+      circle.setAttribute('stroke-dasharray', length + ' ' + (circumference - length));
       circle.setAttribute('stroke-dashoffset', String(-offset));
-      offset += segment;
+      offset += length;
     });
 
     expenseList.innerHTML = '';
-    emptyState.hidden = expenses.length > 0;
-    expenses.forEach(function (expense) {
+    document.getElementById('budget-empty').hidden = entries.length > 0;
+    entries.forEach(function (entry) {
       var item = document.createElement('li');
       var icon = document.createElement('div');
       var info = document.createElement('div');
@@ -99,22 +101,27 @@
       var remove = document.createElement('button');
       item.className = 'budget-expense-item';
       icon.className = 'budget-expense-icon';
-      icon.style.background = categoryColors[expense.category];
+      icon.style.background = categoryColors[entry.category];
       icon.setAttribute('aria-hidden', 'true');
-      icon.innerHTML = '<svg viewBox="0 0 24 24">' + categoryIcons[expense.category] + '</svg>';
+      icon.innerHTML = '<svg viewBox="0 0 24 24">' + categoryIcons[entry.category] + '</svg>';
       info.className = 'budget-expense-info';
       name.className = 'budget-expense-name';
-      name.textContent = expense.name;
+      name.textContent = entry.name;
       meta.className = 'budget-expense-meta';
-      meta.textContent = expense.category + ' · ' + new Date(expense.date + 'T00:00:00').toLocaleDateString();
+      meta.textContent = entry.category + ' · ' +
+        new Date(entry.date + 'T00:00:00').toLocaleDateString();
       amount.className = 'budget-expense-amount';
-      amount.textContent = money(expense.amount);
+      amount.textContent = money(entry.amount);
       remove.type = 'button';
       remove.className = 'budget-expense-remove';
       remove.textContent = 'Remove';
-      remove.setAttribute('aria-label', 'Remove ' + expense.name);
+      remove.setAttribute('aria-label', 'Remove ' + entry.name);
       remove.addEventListener('click', function () {
-        window.LandedAuth.deleteBudgetEntry(expense.id).then(loadData).catch(showError);
+        remove.disabled = true;
+        window.LandedAuth.deleteBudgetEntry(entry.id).then(loadData).catch(function (error) {
+          remove.disabled = false;
+          window.alert(error.message);
+        });
       });
       info.appendChild(name);
       info.appendChild(meta);
@@ -130,22 +137,17 @@
     return Promise.all([
       window.LandedAuth.listBudgetEntries(),
       window.LandedAuth.getMonthlyBudget()
-    ]).then(function (data) {
-      expenses = data[0];
-      monthlyBudget = data[1];
+    ]).then(function (result) {
+      entries = result[0];
+      monthlyBudget = result[1];
       render();
     });
   }
 
-  function showError(error) {
-    var message = error && error.message ? error.message : 'Could not load budget data.';
-    window.alert(message);
-  }
-
   document.getElementById('add-expense-btn').addEventListener('click', function () {
-    showFormMessage('expense-message', '');
     expenseForm.reset();
-    expenseForm.elements.date.value = localDate();
+    expenseForm.elements.date.value = today();
+    message('expense-message', '');
     expenseDialog.showModal();
   });
   document.getElementById('cancel-expense-btn').addEventListener('click', function () {
@@ -165,15 +167,15 @@
       expenseDialog.close();
       return loadData();
     }).catch(function (error) {
-      showFormMessage('expense-message', error.message);
+      message('expense-message', error.message, true);
     }).finally(function () {
       button.disabled = false;
     });
   });
 
   document.getElementById('edit-budget-btn').addEventListener('click', function () {
-    showFormMessage('budget-message', '');
     budgetForm.elements.amount.value = monthlyBudget.toFixed(2);
+    message('budget-message', '');
     budgetDialog.showModal();
   });
   document.getElementById('cancel-budget-btn').addEventListener('click', function () {
@@ -189,7 +191,7 @@
       render();
       budgetDialog.close();
     }).catch(function (error) {
-      showFormMessage('budget-message', error.message);
+      message('budget-message', error.message, true);
     }).finally(function () {
       button.disabled = false;
     });
@@ -201,5 +203,7 @@
       return;
     }
     return loadData();
-  }).catch(showError);
+  }).catch(function (error) {
+    window.alert(error.message || 'Could not load budget data.');
+  });
 })();

@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="Css/admin.css">
 </head>
 <body>
-
   <!-- ===== LOGIN GATE ===== -->
   <div class="admin-gate" id="admin-gate">
     <div class="gate-card">
@@ -32,12 +31,12 @@
         <button type="submit" class="gate-btn" id="gate-btn">Enter Admin Panel</button>
       </form>
       <a href="login.html" class="gate-back">← Back to main site</a>
-      <a href="database.html" class="gate-back">Database backup</a>
     </div>
   </div>
 
   <!-- ===== ADMIN SHELL ===== -->
   <div class="admin-shell" id="admin-shell" hidden>
+    <a class="skip-link" href="#admin-main">Skip to content</a>
 
     <!-- Sidebar -->
     <aside class="admin-sidebar">
@@ -59,7 +58,6 @@
         </button>
       </nav>
 
-      <a class="admin-logout" href="database.html">Database backup</a>
       <button class="admin-logout" id="admin-logout-btn">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Sign out
@@ -67,7 +65,7 @@
     </aside>
 
     <!-- Main content -->
-    <main class="admin-main" id="admin-main">
+    <main class="admin-main" id="admin-main" tabindex="-1">
 
       <!-- ── REWARDS SECTION ── -->
       <section class="admin-section active" id="section-rewards">
@@ -174,7 +172,6 @@
     </div>
   </dialog>
 
-  <script src="js/database.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/admin.js"></script>
 </body>
