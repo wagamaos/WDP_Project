@@ -135,7 +135,7 @@
   window.LandedAuth.getCurrentUser().then(function (user) {
     if (user) window.location.replace('index.html');
   }).catch(function (err) {
-    showMessage(err.message || 'Could not open the local database.', true);
+    showMessage(err.message || 'Could not open the local app.', true);
   });
 
 })();

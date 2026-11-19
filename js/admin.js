@@ -2,8 +2,7 @@
   'use strict';
 
   /* ═══════════════════════════════════════════
-     GATE — admin password check
-     Admin password: Admin@Landed1
+     GATE — browser demo admin account check
      ═══════════════════════════════════════════ */
   var gateEl = document.getElementById('admin-gate');
   var shellEl = document.getElementById('admin-shell');
@@ -157,11 +156,13 @@
   }
 
   function stockClass(stock) {
+    if (stock === null) return 'stock-ok';
     if (stock === 0) return 'stock-out';
     if (stock <= 3) return 'stock-low';
     return 'stock-ok';
   }
   function stockLabel(stock) {
+    if (stock === null) return 'Unlimited stock';
     if (stock === 0) return 'Out of stock';
     if (stock <= 3) return stock + ' left';
     return stock + ' in stock';
