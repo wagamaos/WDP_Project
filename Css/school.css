@@ -84,3 +84,159 @@
   width: 12px; height: 12px; border-radius: 3px; flex: none;
 }
 
+.school-status {
+  margin: 0 0 1rem;
+  padding: .7rem .9rem;
+  border-radius: var(--radius-xs);
+  background: var(--mint-light);
+  color: var(--mint-text);
+  font-size: .9rem;
+}
+.school-status.is-error {
+  background: #fff0ef;
+  color: #9c2520;
+}
+.school-status[hidden],
+.school-layout .card[hidden],
+.school-dialog [hidden] { display: none; }
+.school-card-add {
+  margin-left: auto;
+  color: var(--royal);
+  font-size: .83rem;
+  font-weight: 700;
+}
+.school-card-add:hover { text-decoration: underline; }
+.school-deadline-icon.is-admin {
+  background: var(--gold-light);
+}
+.school-deadline-icon.is-class {
+  background: var(--pale-blue-1);
+}
+.school-deadline-item.is-completed .school-deadline-name {
+  color: var(--mid-blue-2);
+  text-decoration: line-through;
+}
+.school-completed-badge {
+  flex: none;
+  padding: .22rem .7rem;
+  border-radius: 99px;
+  background: var(--mint-light);
+  color: var(--mint-text);
+  font-size: .8rem;
+  font-weight: 700;
+}
+.school-item-actions {
+  display: flex;
+  flex: none;
+  gap: .3rem;
+  margin-left: auto;
+}
+.school-action-button {
+  padding: .3rem .45rem;
+  border-radius: 6px;
+  color: var(--royal);
+  font-size: .78rem;
+  font-weight: 700;
+}
+.school-action-button:hover { background: var(--pale-blue-1); }
+.school-action-button.is-danger { color: #B91C1C; }
+.school-action-button.is-danger:hover { background: #FEE2E2; }
+.school-empty {
+  color: var(--mid-blue-2);
+  font-size: .9rem;
+}
+.school-class-info { flex: 1; min-width: 0; }
+.school-class-item .school-item-actions { margin-left: .25rem; }
+.school-calendar-card .card-title { gap: .35rem; }
+.school-calendar-card .card-title h2 {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--navy);
+  text-align: center;
+}
+.school-month-nav {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 7px;
+  color: var(--royal);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.school-month-nav:hover { background: var(--pale-blue-1); }
+.cal-day.cal-class { box-shadow: inset 0 -3px var(--mint); }
+.cal-day.cal-today { outline: 2px solid var(--royal); outline-offset: -2px; }
+.cal-day.cal-deadline.cal-today { background: var(--gold); color: var(--gold-text); }
+.cal-day.cal-class.cal-today { box-shadow: inset 0 -3px var(--mint); }
+
+.school-dialog {
+  width: min(100% - 2rem, 480px);
+  max-height: min(90vh, 760px);
+  overflow: auto;
+  margin: auto;
+  padding: 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--navy);
+  box-shadow: var(--shadow-md);
+}
+.school-dialog::backdrop { background: rgba(14, 36, 102, .45); }
+.school-dialog form { display: grid; gap: .55rem; }
+.school-dialog h2 { margin-bottom: .35rem; font-size: 1.2rem; }
+.school-dialog label { display: block; font-size: .88rem; font-weight: 600; }
+.school-dialog input,
+.school-dialog select {
+  width: 100%;
+  min-height: 42px;
+  padding: .55rem .7rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  background: var(--white);
+  color: var(--navy);
+  font: inherit;
+}
+.school-dialog input:focus,
+.school-dialog select:focus {
+  outline: 2px solid var(--mid-blue-1);
+  outline-offset: 1px;
+}
+.school-dialog #school-class-fields,
+.school-dialog #school-deadline-fields {
+  display: grid;
+  gap: .55rem;
+}
+.school-dialog #school-class-fields[hidden],
+.school-dialog #school-deadline-fields[hidden] { display: none; }
+.school-time-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .7rem;
+}
+.school-time-fields > div { display: grid; gap: .55rem; }
+.school-dialog-error {
+  padding: .65rem .8rem;
+  border-radius: var(--radius-xs);
+  background: #fff0ef;
+  color: #9c2520;
+  font-size: .9rem;
+}
+.school-dialog-error[hidden] { display: none; }
+.school-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: .6rem;
+  margin-top: .75rem;
+}
+.school-dialog button:disabled { cursor: wait; opacity: .7; }
+
+@media (max-width: 640px) {
+  .page-header > .btn { width: 100%; }
+  .school-deadline-item { flex-wrap: wrap; }
+  .school-deadline-info { flex-basis: calc(100% - 56px); }
+  .school-deadline-item .school-item-actions { margin-left: 0; }
+  .school-class-item { flex-wrap: wrap; }
+  .school-class-info { flex-basis: calc(100% - 52px); }
+  .school-class-item .school-item-actions { margin-left: 3.2rem; }
+}

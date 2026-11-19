@@ -122,6 +122,79 @@
     return Promise.resolve(user);
   }
 
+  function getUserSchool(user) {
+    state.schoolByUser = state.schoolByUser || {};
+    if (!state.schoolByUser[user.email]) {
+      state.schoolByUser[user.email] = clone(state.school || seedState().school);
+    }
+
+    var school = state.schoolByUser[user.email];
+    school.classes = school.classes || [];
+    school.assignments = school.assignments || [];
+    school.administrativeDeadlines = school.administrativeDeadlines || [];
+    ['classes', 'assignments', 'administrativeDeadlines'].forEach(function (collection) {
+      school[collection].forEach(function (item) {
+        if (!item.id) item.id = uid('school');
+      });
+    });
+    return school;
+  }
+
+  function validateSchoolItem(collection, details) {
+    if (!details || typeof details !== 'object') {
+      throw new Error('Enter the required school item details.');
+    }
+
+    if (collection === 'classes') {
+      if (typeof details.courseName !== 'string' || !details.courseName.trim() ||
+          details.courseName.length > 100) {
+        throw new Error('Enter a class name (up to 100 characters).');
+      }
+      if (!Number.isInteger(Number(details.dayOfWeek)) ||
+          Number(details.dayOfWeek) < 1 || Number(details.dayOfWeek) > 7) {
+        throw new Error('Choose a valid class day.');
+      }
+      if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(details.startTime) ||
+          !/^([01]\d|2[0-3]):[0-5]\d$/.test(details.endTime) ||
+          details.startTime >= details.endTime) {
+        throw new Error('Choose a valid start and end time.');
+      }
+      if (typeof details.location !== 'string' || details.location.length > 100) {
+        throw new Error('Location must be 100 characters or fewer.');
+      }
+      return {
+        courseName: details.courseName.trim(),
+        dayOfWeek: Number(details.dayOfWeek),
+        startTime: details.startTime,
+        endTime: details.endTime,
+        location: details.location.trim()
+      };
+    }
+
+    if (collection !== 'assignments' && collection !== 'administrativeDeadlines') {
+      throw new Error('Choose a valid school item type.');
+    }
+    if (typeof details.title !== 'string' || !details.title.trim() ||
+        details.title.length > 100) {
+      throw new Error('Enter a title (up to 100 characters).');
+    }
+    if (typeof details.dueAt !== 'string' || isNaN(new Date(details.dueAt).getTime())) {
+      throw new Error('Choose a valid deadline date and time.');
+    }
+
+    var deadline = {
+      title: details.title.trim(),
+      dueAt: details.dueAt
+    };
+    var label = collection === 'assignments' ? 'courseName' : 'organization';
+    if (typeof details[label] !== 'string' || details[label].length > 100) {
+      throw new Error('Course or organization must be 100 characters or fewer.');
+    }
+    deadline[label] = details[label].trim();
+    if (typeof details.completed === 'boolean') deadline.completed = details.completed;
+    return deadline;
+  }
+
   function getBadgeStatus(user) {
     var start = user.studyStartDate ? new Date(user.studyStartDate + 'T00:00:00') : null;
     var now = new Date();
@@ -347,7 +420,45 @@
       return Promise.resolve({ registered: index < 0 });
     },
     getSchoolData: function () {
-      return Promise.resolve(clone(state.school));
+      return requireUser().then(function (user) {
+        return clone(getUserSchool(user));
+      });
+    },
+    createSchoolItem: function (collection, details) {
+      return requireUser().then(function (user) {
+        var item = Object.assign(
+          { id: uid('school') },
+          validateSchoolItem(collection, details)
+        );
+        getUserSchool(user)[collection].push(item);
+        save();
+        return clone(item);
+      });
+    },
+    updateSchoolItem: function (collection, itemId, details) {
+      return requireUser().then(function (user) {
+        var school = getUserSchool(user);
+        if (['classes', 'assignments', 'administrativeDeadlines'].indexOf(collection) === -1) {
+          throw new Error('Choose a valid school item type.');
+        }
+        var item = school[collection].find(function (entry) { return entry.id === itemId; });
+        if (!item) throw new Error('School item not found.');
+        Object.assign(item, validateSchoolItem(collection, details));
+        save();
+        return clone(item);
+      });
+    },
+    deleteSchoolItem: function (collection, itemId) {
+      return requireUser().then(function (user) {
+        var school = getUserSchool(user);
+        if (['classes', 'assignments', 'administrativeDeadlines'].indexOf(collection) === -1) {
+          throw new Error('Choose a valid school item type.');
+        }
+        var index = school[collection].findIndex(function (entry) { return entry.id === itemId; });
+        if (index === -1) throw new Error('School item not found.');
+        school[collection].splice(index, 1);
+        save();
+      });
     },
     getBadgeCatalog: getBadgeCatalog,
     getBadgeStatus: getBadgeStatus,

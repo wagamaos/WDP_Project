@@ -70,12 +70,15 @@
       <div class="page-header">
         <div>
           <h1 class="page-title">School Tracker</h1>
-          <p class="page-sub">Keep track of your academic and administrative deadlines. On-time completion earns points.</p>
+          <p class="page-sub">Manage your class schedule, assignments, and school deadlines.</p>
         </div>
+        <button class="btn btn-gold" id="add-school-item" type="button">Add schedule or deadline</button>
       </div>
 
+      <p class="school-status" id="school-status" role="status" aria-live="polite" hidden></p>
+
       <!-- Filter tabs -->
-      <div class="forum-filter-tabs" style="margin-bottom:1.25rem;" role="tablist" aria-label="Tracker filter">
+      <div class="forum-filter-tabs" role="tablist" aria-label="Tracker filter">
         <button class="forum-tab active" id="school-tab-all" role="tab" aria-selected="true" data-school-filter="all">All</button>
         <button class="forum-tab" id="school-tab-class" role="tab" aria-selected="false" data-school-filter="class">Classes and Assignments</button>
         <button class="forum-tab" id="school-tab-admin" role="tab" aria-selected="false" data-school-filter="admin">Visa and Admin</button>
@@ -92,10 +95,11 @@
             <div class="card-title">
               <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               <h2 id="due-soon-heading" style="font-size:1rem;font-weight:700;color:var(--navy);">Due soon</h2>
+              <button class="school-card-add" type="button" data-add-type="assignment">Add assignment</button>
+              <button class="school-card-add" type="button" data-add-type="admin">Add admin deadline</button>
             </div>
 
             <ul class="school-deadline-list" id="deadline-list" aria-label="Upcoming deadlines">
-              <li id="deadline-empty">No upcoming deadlines.</li>
             </ul>
           </div>
 
@@ -104,9 +108,9 @@
             <div class="card-title">
               <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
               <h2 id="classes-heading" style="font-size:1rem;font-weight:700;color:var(--navy);">Upcoming classes</h2>
+              <button class="school-card-add" type="button" data-add-type="class">Add class</button>
             </div>
             <ul class="school-classes-list" id="classes-list" data-category="class" aria-label="Upcoming classes">
-              <li id="classes-empty">No class schedules.</li>
             </ul>
           </div>
         </div>
@@ -115,10 +119,12 @@
         <div class="card school-calendar-card" aria-labelledby="cal-heading">
           <div class="card-title">
             <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <h2 id="cal-heading" style="font-size:1rem;font-weight:700;color:var(--navy);"></h2>
+            <button type="button" class="school-month-nav" id="calendar-prev" aria-label="Previous month">&lsaquo;</button>
+            <h2 id="cal-heading" aria-live="polite"></h2>
+            <button type="button" class="school-month-nav" id="calendar-next" aria-label="Next month">&rsaquo;</button>
           </div>
 
-          <div class="mini-cal" aria-label="Monthly assignment calendar">
+          <div class="mini-cal">
             <div class="mini-cal-grid">
             </div>
 
@@ -131,6 +137,10 @@
                 <span class="cal-legend-dot" style="background:var(--gold);"></span>
                 Deadline
               </div>
+              <div class="cal-legend-item">
+                <span class="cal-legend-dot" style="background:var(--mint);"></span>
+                Class
+              </div>
             </div>
           </div>
         </div>
@@ -139,6 +149,60 @@
 
     </main>
   </div><!-- /.app-shell -->
+
+  <dialog class="school-dialog" id="school-dialog" aria-labelledby="school-dialog-title">
+    <form id="school-item-form">
+      <h2 id="school-dialog-title">Add schedule or deadline</h2>
+      <label for="school-item-type">Item type</label>
+      <select id="school-item-type" name="type" required>
+        <option value="class">Class schedule</option>
+        <option value="assignment">Assignment deadline</option>
+        <option value="admin">Visa or admin deadline</option>
+      </select>
+
+      <div id="school-class-fields">
+        <label for="school-course-name">Class name</label>
+        <input id="school-course-name" name="courseName" type="text" maxlength="100" placeholder="e.g. Algorithms">
+        <label for="school-day">Day of week</label>
+        <select id="school-day" name="dayOfWeek">
+          <option value="1">Monday</option>
+          <option value="2">Tuesday</option>
+          <option value="3">Wednesday</option>
+          <option value="4">Thursday</option>
+          <option value="5">Friday</option>
+          <option value="6">Saturday</option>
+          <option value="7">Sunday</option>
+        </select>
+        <div class="school-time-fields">
+          <div>
+            <label for="school-start-time">Start time</label>
+            <input id="school-start-time" name="startTime" type="time">
+          </div>
+          <div>
+            <label for="school-end-time">End time</label>
+            <input id="school-end-time" name="endTime" type="time">
+          </div>
+        </div>
+        <label for="school-location">Location</label>
+        <input id="school-location" name="location" type="text" maxlength="100" placeholder="e.g. Lecture Hall 3">
+      </div>
+
+      <div id="school-deadline-fields" hidden>
+        <label for="school-deadline-title">Name</label>
+        <input id="school-deadline-title" name="title" type="text" maxlength="100" placeholder="e.g. Data Structures project">
+        <label for="school-due-at">Due date and time</label>
+        <input id="school-due-at" name="dueAt" type="datetime-local">
+        <label for="school-related-to" id="school-related-label">Course</label>
+        <input id="school-related-to" name="relatedTo" type="text" maxlength="100" placeholder="e.g. Computer Science">
+      </div>
+
+      <p class="school-dialog-error" id="school-dialog-error" role="alert" hidden></p>
+      <div class="school-dialog-actions">
+        <button type="button" class="btn btn-outline" id="cancel-school-item">Cancel</button>
+        <button type="submit" class="btn btn-gold" id="save-school-item">Add item</button>
+      </div>
+    </form>
+  </dialog>
 
   <script src="js/auth.js"></script>
   <script src="js/school.js"></script>
