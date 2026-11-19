@@ -74,6 +74,13 @@
       }
       badgeGrid.appendChild(item);
     });
+    window.LandedAuth.getContributionStats().then(function (stats) {
+      var rows = document.querySelectorAll('.contrib-row');
+      if (rows[0]) rows[0].querySelector('.contrib-count').textContent = String(stats.forumPosts);
+      if (rows[1]) rows[1].querySelector('.contrib-count').textContent = String(stats.comments);
+      if (rows[2]) rows[2].querySelector('.contrib-count').textContent = String(stats.eventsAttended);
+      if (rows[3]) rows[3].querySelector('.contrib-count').textContent = String(stats.points);
+    });
   }
 
   function showError(error) {

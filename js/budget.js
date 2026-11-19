@@ -20,6 +20,7 @@
   };
   var entries = [];
   var monthlyBudget = 1000;
+  var currency = 'SGD';
   var expenseList = document.getElementById('budget-expense-list');
   var expenseDialog = document.getElementById('expense-dialog');
   var expenseForm = document.getElementById('expense-form');
@@ -29,7 +30,7 @@
   function money(amount) {
     return new Intl.NumberFormat(undefined, {
       style: 'currency',
-      currency: 'SGD',
+      currency: currency,
       minimumFractionDigits: 2
     }).format(amount);
   }
@@ -136,10 +137,16 @@
   function loadData() {
     return Promise.all([
       window.LandedAuth.listBudgetEntries(),
-      window.LandedAuth.getMonthlyBudget()
+      window.LandedAuth.getMonthlyBudget(),
+      window.LandedAuth.getCurrency()
     ]).then(function (result) {
       entries = result[0];
       monthlyBudget = result[1];
+      currency = result[2] || 'SGD';
+      document.getElementById('expense-amount-label').textContent = 'Amount (' + currency + ')';
+      document.getElementById('budget-amount-label').textContent = 'Monthly budget (' + currency + ')';
+      var currencySelect = document.getElementById('budget-currency');
+      if (currencySelect) currencySelect.value = currency;
       render();
     });
   }
@@ -186,8 +193,16 @@
     if (!budgetForm.reportValidity()) return;
     var button = document.getElementById('save-budget-btn');
     button.disabled = true;
+    var selectedCurrency = budgetForm.elements.currency.value;
     window.LandedAuth.updateMonthlyBudget(budgetForm.elements.amount.value).then(function (budget) {
+      return window.LandedAuth.updateCurrency(selectedCurrency).then(function () {
+        return budget;
+      });
+    }).then(function (budget) {
       monthlyBudget = budget;
+      currency = budgetForm.elements.currency.value;
+      document.getElementById('expense-amount-label').textContent = 'Amount (' + currency + ')';
+      document.getElementById('budget-amount-label').textContent = 'Monthly budget (' + currency + ')';
       render();
       budgetDialog.close();
     }).catch(function (error) {

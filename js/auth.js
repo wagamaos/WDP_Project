@@ -31,6 +31,7 @@
       users: [],
       sessionEmail: null,
       monthlyBudgets: {},
+      currencies: {},
       budgetEntries: {},
       rewards: [
         { id: 'kaya', name: 'Kaya (Singapore)', description: 'A sweet coconut and egg spread, popular on toast and breakfast snacks.', cost: 150, stock: 20, collectionDetails: 'Collect from your school office.', donatedBy: 'Landed welcome team', donatedAt: '2026-09-01', image: null },
@@ -78,7 +79,12 @@
   function readState() {
     try {
       var value = window.localStorage.getItem(STATE_KEY);
-      return value ? JSON.parse(value) : seedState();
+      var loaded = value ? JSON.parse(value) : seedState();
+      loaded.currencies = loaded.currencies || {};
+      loaded.eventRegistrations = loaded.eventRegistrations || {};
+      loaded.forumPosts = loaded.forumPosts || [];
+      loaded.users = loaded.users || [];
+      return loaded;
     } catch (error) {
       return seedState();
     }
@@ -225,6 +231,17 @@
       var email = window.localStorage.getItem(SESSION_KEY);
       return Promise.resolve(state.monthlyBudgets[email] || 500);
     },
+    getCurrency: function () {
+      var email = window.localStorage.getItem(SESSION_KEY);
+      return Promise.resolve(state.currencies[email] || 'SGD');
+    },
+    updateCurrency: function (currency) {
+      var email = window.localStorage.getItem(SESSION_KEY);
+      if (!email) return Promise.reject(new Error('Please log in first.'));
+      state.currencies[email] = String(currency).toUpperCase();
+      save();
+      return Promise.resolve(state.currencies[email]);
+    },
     updateMonthlyBudget: function (amount) {
       var email = window.localStorage.getItem(SESSION_KEY);
       state.monthlyBudgets[email] = Number(amount);
@@ -334,6 +351,29 @@
     },
     getBadgeCatalog: getBadgeCatalog,
     getBadgeStatus: getBadgeStatus,
+    getContributionStats: function () {
+      var email = window.localStorage.getItem(SESSION_KEY);
+      if (!email) return Promise.resolve({ forumPosts: 0, comments: 0, eventsAttended: 0, points: 0 });
+      var user = findUser(email);
+      var forumPosts = state.forumPosts.filter(function (post) {
+        return post.authorEmail === email;
+      }).length;
+      var comments = 0;
+      state.forumPosts.forEach(function (post) {
+        (post.comments || []).forEach(function (comment) {
+          if (comment.authorEmail === email) comments += 1;
+        });
+      });
+      var eventsAttended = state.events.filter(function (event) {
+        return (state.eventRegistrations[event.id] || []).indexOf(email) !== -1;
+      }).length;
+      return Promise.resolve({
+        forumPosts: forumPosts,
+        comments: comments,
+        eventsAttended: eventsAttended,
+        points: user ? (user.points || 0) : 0
+      });
+    },
     listForumPosts: function () {
       return Promise.resolve(clone(state.forumPosts));
     },
