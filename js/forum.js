@@ -94,23 +94,62 @@
     return icons[category] || icons.Other;
   }
 
+  function paintLikeButton(button, liked, count) {
+    var kind = button.dataset.commentId ? 'comment' : 'post';
+    button.classList.toggle('liked', liked);
+    button.setAttribute('aria-pressed', String(liked));
+    button.setAttribute('aria-label', (kind === 'comment' ? 'Like comment' : 'Like post') + ' (' + count + ')');
+    button.textContent = (liked ? '♥ Liked' : '♡ Like') + ' (' + count + ')';
+  }
+
   function makeLikeButton(postId, commentId, likes) {
     var button = document.createElement('button');
     likes = Array.isArray(likes) ? likes : [];
-    var liked = currentUser && likes.indexOf(currentUser.email) !== -1;
+    var liked = Boolean(currentUser && likes.indexOf(currentUser.email) !== -1);
+    var count = likes.length;
+    // Whether the user wants it liked, and whether a save is already running.
+    var wantLiked = liked;
+    var saving = false;
+
     button.type = 'button';
-    button.className = 'forum-like-btn' + (liked ? ' liked' : '');
-    button.setAttribute('aria-pressed', String(liked));
-    button.setAttribute('aria-label', (commentId ? 'Like comment' : 'Like post') + ' (' + likes.length + ')');
+    button.className = 'forum-like-btn';
+    if (commentId) button.dataset.commentId = commentId;
     button.title = currentUser ? 'Like or unlike this ' + (commentId ? 'comment' : 'post') : 'Log in to like';
-    button.textContent = (liked ? '♥ Liked' : '♡ Like') + ' (' + likes.length + ')';
-    button.addEventListener('click', function () {
+    paintLikeButton(button, liked, count);
+
+    // Save one change at a time; if the user clicked again meanwhile, save again until it matches.
+    function sync() {
+      if (saving || wantLiked === liked) return;
+      saving = true;
       window.LandedAuth.toggleForumLike(postId, commentId).then(function (post) {
-        renderThread(post);
-        refreshPosts();
+        var target = commentId
+          ? post.comments.find(function (comment) { return comment.id === commentId; })
+          : post;
+        var savedLikes = (target && target.likes) || [];
+        liked = savedLikes.indexOf(currentUser.email) !== -1;
+        count = savedLikes.length;
       }).catch(function (error) {
+        wantLiked = liked;
         showMessage(document.getElementById('comment-message'), error.message, true);
+      }).finally(function () {
+        saving = false;
+        if (wantLiked !== liked) {
+          sync();
+        } else {
+          paintLikeButton(button, liked, count);
+        }
       });
+    }
+
+    button.addEventListener('click', function () {
+      if (!currentUser) {
+        window.location.href = 'login.html';
+        return;
+      }
+      wantLiked = !wantLiked;
+      // Show the change immediately; the database catches up in the background.
+      paintLikeButton(button, wantLiked, count + (wantLiked === liked ? 0 : (wantLiked ? 1 : -1)));
+      sync();
     });
     return button;
   }
@@ -236,8 +275,27 @@
     });
   }
 
+  // Unsent comment text, kept separately for each post.
+  var commentDrafts = {};
+
+  function saveCommentDraft() {
+    if (!activePostId) return;
+    var value = document.getElementById('comment-body').value;
+    if (value) commentDrafts[activePostId] = value;
+    else delete commentDrafts[activePostId];
+  }
+
+  function loadCommentDraft(postId) {
+    var field = document.getElementById('comment-body');
+    field.value = commentDrafts[postId] || '';
+    setFieldError(field, '');
+    showMessage(document.getElementById('comment-message'), '', false);
+  }
+
   function openThread(postId) {
+    saveCommentDraft();
     activePostId = postId;
+    loadCommentDraft(postId);
     window.LandedAuth.getForumPost(postId).then(function (post) {
       if (!post) throw new Error('This post is no longer available.');
       renderThread(post);
@@ -301,6 +359,11 @@
   document.getElementById('close-thread-dialog').addEventListener('click', function () {
     threadDialog.close();
   });
+  // Covers the X button and the Esc key: remember the draft, and refresh the list so like/reply counts are current.
+  threadDialog.addEventListener('close', function () {
+    saveCommentDraft();
+    refreshPosts();
+  });
   document.getElementById('report-post-btn').addEventListener('click', function () {
     if (!currentUser) {
       window.location.href = 'login.html';
@@ -346,7 +409,9 @@
     if (!validateForm(form, [form.elements.body])) return;
     var button = document.getElementById('submit-comment-btn');
     button.disabled = true;
-    window.LandedAuth.addForumComment(activePostId, form.elements.body.value).then(function (post) {
+    var postId = activePostId;
+    window.LandedAuth.addForumComment(postId, form.elements.body.value).then(function (post) {
+      delete commentDrafts[postId];
       form.reset();
       showMessage(document.getElementById('comment-message'), '', false);
       renderThread(post);
