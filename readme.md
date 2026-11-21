@@ -6,7 +6,20 @@ The + admin password is `landed2026`.
 
 ## Running locally
 
-Open the project with a local server (for example VS Code **Live Server**) and go to `login.html`.
+Open the project with a local server (for example VS Code **Live Server**, or `npm run dev`) and go to `login.html`.
+The live site on GitHub Pages works the same way, straight from the files in `main`.
+
+## React pages (sign up, forum, rewards, events)
+
+These pages are written in React in `src/`. Browsers cannot run that code directly, so it is pre-built into `react-dist/`, which the HTML pages load.
+
+**After changing anything in `src/`:**
+
+1. `npm install` (first time only)
+2. `npm run build:react` (or keep `npm run watch:react` running while you work)
+3. Commit the updated `react-dist/` folder together with your `src/` changes.
+
+If you skip step 2, the site (and GitHub Pages) keeps showing the old version.
 
 ## Welcome email
 
