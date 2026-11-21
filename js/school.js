@@ -5,17 +5,29 @@
   var classesList = document.getElementById('classes-list');
   var classesCard = classesList.closest('.card');
   var grid = document.querySelector('.mini-cal-grid');
+  var selectedDayList = document.getElementById('selected-day-list');
   var dialog = document.getElementById('school-dialog');
+  var confirmDialog = document.getElementById('school-confirm-dialog');
+  var timetableDialog = document.getElementById('timetable-import-dialog');
+  var timetableRows = document.getElementById('timetable-import-rows');
+  var timetableProgress = document.getElementById('timetable-import-progress');
+  var timetableError = document.getElementById('timetable-import-error');
   var form = document.getElementById('school-item-form');
   var typeField = document.getElementById('school-item-type');
   var classFields = document.getElementById('school-class-fields');
   var deadlineFields = document.getElementById('school-deadline-fields');
   var status = document.getElementById('school-status');
   var dialogError = document.getElementById('school-dialog-error');
+  var pendingConfirmation = null;
   var filter = 'all';
+  var deadlineStatusFilter = 'all';
   var schoolData = null;
+  var currentUser = null;
   var editingItem = null;
   var calendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  var selectedDate = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+  var reminderTimer = null;
+  var remindersEnabled = false;
   var weekdayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   var typeCollections = {
     class: 'classes',
@@ -27,6 +39,15 @@
     status.textContent = message;
     status.classList.toggle('is-error', Boolean(isError));
     status.hidden = !message;
+  }
+
+  function requestConfirmation(message, label, callback, isDanger) {
+    pendingConfirmation = callback;
+    document.getElementById('school-confirm-message').textContent = message;
+    var confirmButton = document.getElementById('school-confirm-action');
+    confirmButton.textContent = label;
+    confirmButton.classList.toggle('is-danger', Boolean(isDanger));
+    confirmDialog.showModal();
   }
 
   function formatDate(value, options) {
@@ -44,6 +65,28 @@
     var today = new Date();
     today.setHours(0, 0, 0, 0);
     return Math.round((due.getTime() - today.getTime()) / 86400000);
+  }
+
+  function localDateKey(date) {
+    return date.getFullYear() + '-' +
+      String(date.getMonth() + 1).padStart(2, '0') + '-' +
+      String(date.getDate()).padStart(2, '0');
+  }
+
+  function classOccursOn(item, date) {
+    var key = localDateKey(date);
+    var dayOfWeek = (date.getDay() + 6) % 7 + 1;
+    return Number(item.dayOfWeek) === dayOfWeek &&
+      (!item.startDate || key >= item.startDate) &&
+      (!item.endDate || key <= item.endDate) &&
+      (item.holidays || []).indexOf(key) === -1;
+  }
+
+  function getTrackerAssignments() {
+    var hiddenIds = schoolData.defaultAssignmentIds || [];
+    return schoolData.assignments.filter(function (item) {
+      return hiddenIds.indexOf(item.id) === -1;
+    });
   }
 
   function sortByDueDate(left, right) {
@@ -124,7 +167,7 @@
     deadlinesList.textContent = '';
     var deadlines = [];
     if (filter !== 'admin') {
-      schoolData.assignments.forEach(function (item) {
+      getTrackerAssignments().forEach(function (item) {
         deadlines.push({ item: item, type: 'assignment' });
       });
     }
@@ -133,13 +176,30 @@
         deadlines.push({ item: item, type: 'admin' });
       });
     }
+    deadlines = deadlines.filter(function (entry) {
+      var due = daysUntil(entry.item.dueAt);
+      if (deadlineStatusFilter === 'completed') return Boolean(entry.item.completed);
+      if (deadlineStatusFilter === 'upcoming') {
+        return !entry.item.completed && due !== null && due >= 0;
+      }
+      if (deadlineStatusFilter === 'overdue') {
+        return !entry.item.completed && due !== null && due < 0;
+      }
+      return true;
+    });
     deadlines.sort(function (left, right) { return sortByDueDate(left.item, right.item); });
     if (!deadlines.length) {
       var empty = document.createElement('li');
       empty.className = 'school-empty';
-      empty.textContent = filter === 'admin'
-        ? 'No visa or administrative deadlines yet.'
-        : 'No assignments or deadlines yet.';
+      empty.textContent = deadlineStatusFilter === 'completed'
+        ? 'No completed deadlines.'
+        : deadlineStatusFilter === 'overdue'
+          ? 'No overdue deadlines.'
+          : deadlineStatusFilter === 'upcoming'
+            ? 'No upcoming deadlines.'
+            : filter === 'admin'
+              ? 'No visa or administrative deadlines yet.'
+              : 'No assignments or deadlines yet.';
       deadlinesList.appendChild(empty);
       return;
     }
@@ -189,11 +249,18 @@
     var firstDay = new Date(year, month, 1);
     var lastDay = new Date(year, month + 1, 0);
     var deadlineDays = {};
-    schoolData.assignments.concat(schoolData.administrativeDeadlines).forEach(function (item) {
+    var eventDays = {};
+    getTrackerAssignments().concat(schoolData.administrativeDeadlines).forEach(function (item) {
       if (!item.dueAt || item.completed) return;
       var due = new Date(item.dueAt);
       if (due.getFullYear() === year && due.getMonth() === month) {
         deadlineDays[due.getDate()] = true;
+      }
+    });
+    (schoolData.registeredEvents || []).forEach(function (event) {
+      var start = new Date(event.startAt);
+      if (!isNaN(start.getTime()) && start.getFullYear() === year && start.getMonth() === month) {
+        eventDays[start.getDate()] = true;
       }
     });
 
@@ -221,26 +288,36 @@
     var isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
     for (var dayNumber = 1; dayNumber <= lastDay.getDate(); dayNumber += 1) {
       var date = new Date(year, month, dayNumber);
-      var day = document.createElement('span');
-      var dayOfWeek = (date.getDay() + 6) % 7 + 1;
+      var day = document.createElement('button');
       var hasClass = schoolData.classes.some(function (item) {
-        return item.dayOfWeek === dayOfWeek;
+        return classOccursOn(item, date);
       });
+      day.type = 'button';
       day.className = 'cal-day';
       day.textContent = String(dayNumber);
       day.setAttribute('aria-label', date.toLocaleDateString(undefined, {
         weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
       }));
+      day.setAttribute('aria-pressed', localDateKey(date) === localDateKey(selectedDate) ? 'true' : 'false');
+      if (localDateKey(date) === localDateKey(selectedDate)) day.classList.add('cal-selected');
       if (isCurrentMonth && dayNumber === today.getDate()) day.classList.add('cal-today');
       if (deadlineDays[dayNumber]) day.classList.add('cal-deadline');
+      if (eventDays[dayNumber]) day.classList.add('cal-event');
       if (hasClass) day.classList.add('cal-class');
-      if (deadlineDays[dayNumber] || hasClass) {
+      if (deadlineDays[dayNumber] || hasClass || eventDays[dayNumber]) {
         var details = [];
         if (deadlineDays[dayNumber]) details.push('Deadline');
         if (hasClass) details.push('Class scheduled');
+        if (eventDays[dayNumber]) details.push('RSVP event');
         day.title = details.join(' and ');
         day.setAttribute('aria-label', day.getAttribute('aria-label') + ': ' + details.join(', '));
       }
+      day.addEventListener('click', (function (dateValue) {
+        return function () {
+          selectedDate = dateValue;
+          renderCalendar();
+        };
+      })(new Date(year, month, dayNumber)));
       grid.appendChild(day);
     }
     var totalCells = offset + lastDay.getDate();
@@ -250,6 +327,81 @@
       trailingEmpty.setAttribute('aria-hidden', 'true');
       grid.appendChild(trailingEmpty);
     }
+    renderSelectedDay();
+  }
+
+  function renderSelectedDay() {
+    var heading = document.getElementById('selected-day-heading');
+    heading.textContent = selectedDate.toLocaleDateString(undefined, {
+      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+    });
+    selectedDayList.textContent = '';
+    var entries = [];
+    schoolData.classes.forEach(function (item) {
+      if (classOccursOn(item, selectedDate)) {
+        entries.push({
+          type: 'class',
+          item: item,
+          label: item.courseName + ' · ' + item.startTime + '–' + item.endTime +
+            (item.location ? ' · ' + item.location : '')
+        });
+      }
+    });
+    var assignments = getTrackerAssignments();
+    assignments.concat(schoolData.administrativeDeadlines).forEach(function (item) {
+      if (item.dueAt && localDateKey(new Date(item.dueAt)) === localDateKey(selectedDate)) {
+        entries.push({
+          type: assignments.indexOf(item) !== -1 ? 'assignment' : 'admin',
+          item: item,
+          label: item.title + (item.completed ? ' · Completed' : ' · Deadline')
+        });
+      }
+    });
+    (schoolData.registeredEvents || []).forEach(function (event) {
+      var start = new Date(event.startAt);
+      if (!isNaN(start.getTime()) && localDateKey(start) === localDateKey(selectedDate)) {
+        var end = new Date(event.endAt);
+        var eventTime = start.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+        if (!isNaN(end.getTime()) && localDateKey(end) === localDateKey(start)) {
+          eventTime += '–' + end.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+        }
+        entries.push({
+          type: 'event',
+          item: event,
+          label: 'RSVP · ' + event.title + ' · ' + eventTime +
+            (event.location ? ' · ' + event.location : '')
+        });
+      }
+    });
+    entries.sort(function (left, right) {
+      if (left.type === 'class' && right.type === 'class') {
+        return left.item.startTime.localeCompare(right.item.startTime);
+      }
+      if (left.type === 'class') return -1;
+      if (right.type === 'class') return 1;
+      var leftTime = left.type === 'event' ? left.item.startAt : left.item.dueAt;
+      var rightTime = right.type === 'event' ? right.item.startAt : right.item.dueAt;
+      return new Date(leftTime) - new Date(rightTime);
+    });
+    if (!entries.length) {
+      var empty = document.createElement('li');
+      empty.className = 'school-empty';
+      empty.textContent = 'Nothing scheduled for this day.';
+      selectedDayList.appendChild(empty);
+      return;
+    }
+    entries.forEach(function (entry) {
+      var row = document.createElement('li');
+      var label = document.createElement('span');
+      label.textContent = entry.label;
+      row.appendChild(label);
+      if (entry.type === 'assignment' || entry.type === 'admin') {
+        row.appendChild(createAction('Edit', '', function () {
+          openEditor(entry.type, entry.item);
+        }));
+      }
+      selectedDayList.appendChild(row);
+    });
   }
 
   function render() {
@@ -295,6 +447,9 @@
       form.elements.startTime.value = item.startTime;
       form.elements.endTime.value = item.endTime;
       form.elements.location.value = item.location || '';
+      form.elements.startDate.value = item.startDate || '';
+      form.elements.endDate.value = item.endDate || '';
+      form.elements.holidays.value = (item.holidays || []).join('\n');
     } else if (item) {
       form.elements.title.value = item.title;
       form.elements.dueAt.value = localDateTimeValue(item.dueAt);
@@ -319,7 +474,12 @@
         dayOfWeek: Number(form.elements.dayOfWeek.value),
         startTime: form.elements.startTime.value,
         endTime: form.elements.endTime.value,
-        location: form.elements.location.value.trim()
+        location: form.elements.location.value.trim(),
+        startDate: form.elements.startDate.value,
+        endDate: form.elements.endDate.value,
+        holidays: form.elements.holidays.value.split(/[\n,]+/)
+          .map(function (date) { return date.trim(); })
+          .filter(Boolean)
       };
     }
     return {
@@ -374,13 +534,155 @@
   }
 
   function deleteItem(item, type) {
-    if (!window.confirm('Delete "' + (item.courseName || item.title) + '"? This cannot be undone.')) return;
-    window.LandedAuth.deleteSchoolItem(typeCollections[type], item.id).then(function () {
+    requestConfirmation(
+      'Delete "' + (item.courseName || item.title) + '"? This cannot be undone.',
+      'Delete',
+      function () {
+        window.LandedAuth.deleteSchoolItem(typeCollections[type], item.id).then(function () {
+          return refreshData();
+        }).then(function () {
+          showStatus('Item deleted.');
+        }).catch(function (error) {
+          showStatus(error.message || 'Could not delete this item. Please try again.', true);
+        });
+      },
+      true
+    );
+  }
+
+  function confirmImport(backup) {
+    requestConfirmation(
+      'Importing this backup replaces all current school tracker items. This cannot be undone.',
+      'Replace data',
+      function () {
+        window.LandedAuth.replaceSchoolData(backup).then(function () {
+          return refreshData();
+        }).then(function () {
+          showStatus('School tracker backup imported.');
+        }).catch(function (error) {
+          showStatus(error.message || 'Could not import this backup file.', true);
+        });
+      }
+    );
+  }
+
+  function addTimetablePreviewRow(item) {
+    var row = document.createElement('tr');
+    var includeCell = document.createElement('td');
+    var nameCell = document.createElement('td');
+    var dayCell = document.createElement('td');
+    var startCell = document.createElement('td');
+    var endCell = document.createElement('td');
+    var locationCell = document.createElement('td');
+    var include = document.createElement('input');
+    var name = document.createElement('input');
+    var day = document.createElement('select');
+    var start = document.createElement('input');
+    var end = document.createElement('input');
+    var location = document.createElement('input');
+
+    include.type = 'checkbox';
+    include.checked = true;
+    include.setAttribute('aria-label', 'Import ' + item.courseName);
+    name.type = 'text';
+    name.className = 'school-import-name';
+    name.value = item.courseName;
+    name.maxLength = 100;
+    name.setAttribute('aria-label', 'Class name');
+    weekdayNames.forEach(function (weekday, index) {
+      var option = document.createElement('option');
+      option.value = String(index + 1);
+      option.textContent = weekday;
+      day.appendChild(option);
+    });
+    day.value = String(item.dayOfWeek);
+    day.setAttribute('aria-label', 'Day of week');
+    start.type = 'time';
+    start.value = item.startTime;
+    start.setAttribute('aria-label', 'Start time');
+    end.type = 'time';
+    end.value = item.endTime;
+    end.setAttribute('aria-label', 'End time');
+    location.type = 'text';
+    location.value = item.location || '';
+    location.maxLength = 100;
+    location.setAttribute('aria-label', 'Location');
+    row.dataset.startDate = item.startDate || '';
+    row.dataset.endDate = item.endDate || '';
+    row.dataset.holidays = (item.holidays || []).join(',');
+    includeCell.appendChild(include);
+    nameCell.appendChild(name);
+    dayCell.appendChild(day);
+    startCell.appendChild(start);
+    endCell.appendChild(end);
+    locationCell.appendChild(location);
+    row.append(includeCell, nameCell, dayCell, startCell, endCell, locationCell);
+    timetableRows.appendChild(row);
+  }
+
+  function importTimetableFile(event) {
+    var file = event.target.files && event.target.files[0];
+    event.target.value = '';
+    if (!file) return;
+    var importButton = document.getElementById('import-timetable');
+    importButton.disabled = true;
+    showStatus('Reading the timetable locally in this browser…');
+    window.LandedTimetableImport.read(file, function (message) {
+      showStatus(message);
+    }).then(function (entries) {
+      if (!entries.length) {
+        throw new Error('No recurring classes were detected. Try a clearer timetable or add classes manually.');
+      }
+      timetableRows.textContent = '';
+      entries.forEach(addTimetablePreviewRow);
+      timetableProgress.textContent = 'Check the detected details, then import the selected recurring classes.';
+      timetableError.textContent = '';
+      timetableError.hidden = true;
+      showStatus('');
+      timetableDialog.showModal();
+    }).catch(function (error) {
+      showStatus(error.message || 'Could not read this timetable.', true);
+    }).finally(function () {
+      importButton.disabled = false;
+    });
+  }
+
+  function submitTimetableImport(event) {
+    event.preventDefault();
+    var selectedRows = Array.from(timetableRows.querySelectorAll('tr')).filter(function (row) {
+      return row.querySelector('input[type="checkbox"]').checked;
+    });
+    var classes = selectedRows.map(function (row) {
+      var inputs = row.querySelectorAll('input');
+      return {
+        courseName: inputs[1].value.trim(),
+        dayOfWeek: Number(row.querySelector('select').value),
+        startTime: inputs[2].value,
+        endTime: inputs[3].value,
+        location: inputs[4].value.trim(),
+        startDate: row.dataset.startDate,
+        endDate: row.dataset.endDate,
+        holidays: row.dataset.holidays ? row.dataset.holidays.split(',') : []
+      };
+    });
+    if (!classes.length) {
+      timetableError.textContent = 'Select at least one class to import.';
+      timetableError.hidden = false;
+      return;
+    }
+    var saveButton = document.getElementById('save-timetable-import');
+    saveButton.disabled = true;
+    timetableError.hidden = true;
+    window.LandedAuth.importSchoolClasses(classes).then(function () {
       return refreshData();
     }).then(function () {
-      showStatus('Item deleted.');
+      timetableDialog.close();
+      showStatus(classes.length + (classes.length === 1 ? ' recurring class imported.' : ' recurring classes imported.'));
     }).catch(function (error) {
-      showStatus(error.message || 'Could not delete this item. Please try again.', true);
+      timetableError.textContent = error.message || 'Could not import these classes.';
+      timetableError.hidden = false;
+    }).finally(function () {
+      saveButton.disabled = false;
     });
   }
 
@@ -401,9 +703,159 @@
     });
   }
 
+  function reminderPreferenceKey() {
+    return 'landed.schoolReminders.' + currentUser.email;
+  }
+
+  function reminderSentKey() {
+    return reminderPreferenceKey() + '.sent';
+  }
+
+  function updateReminderButton() {
+    document.getElementById('enable-reminders').textContent =
+      remindersEnabled ? 'Disable deadline reminders' : 'Enable deadline reminders';
+  }
+
+  function checkDeadlineReminders() {
+    if (!remindersEnabled || !schoolData || !window.Notification ||
+        window.Notification.permission !== 'granted') return;
+
+    try {
+      var notified = JSON.parse(window.localStorage.getItem(reminderSentKey()) || '{}');
+      var now = Date.now();
+      getTrackerAssignments().concat(schoolData.administrativeDeadlines).forEach(function (item) {
+        if (item.completed || !item.dueAt) return;
+        var dueAt = new Date(item.dueAt).getTime();
+        var remaining = dueAt - now;
+        var notificationId = item.id + ':' + item.dueAt;
+        if (remaining < 0 || remaining > 86400000 || notified[notificationId]) return;
+
+        var notification = new window.Notification('Deadline coming up', {
+          body: item.title + ' is due ' + formatDate(item.dueAt, {
+            weekday: 'short', month: 'short', day: 'numeric'
+          }) + ' at ' + new Date(item.dueAt).toLocaleTimeString(undefined, {
+            hour: '2-digit', minute: '2-digit'
+          }) + '.'
+        });
+        notification.onclick = function () {
+          window.focus();
+          notification.close();
+        };
+        notified[notificationId] = now;
+      });
+      window.localStorage.setItem(reminderSentKey(), JSON.stringify(notified));
+    } catch (error) {
+      showStatus('Could not save reminder settings in this browser.', true);
+    }
+  }
+
+  function setDeadlineReminders() {
+    if (remindersEnabled) {
+      remindersEnabled = false;
+      window.clearInterval(reminderTimer);
+      reminderTimer = null;
+      try {
+        window.localStorage.removeItem(reminderPreferenceKey());
+      } catch (error) {
+        showStatus('Could not update reminder settings in this browser.', true);
+      }
+      updateReminderButton();
+      showStatus('Deadline reminders disabled.');
+      return;
+    }
+
+    if (!window.Notification) {
+      showStatus('This browser does not support desktop notifications.', true);
+      return;
+    }
+    var permission = window.Notification.permission === 'granted'
+      ? Promise.resolve('granted')
+      : window.Notification.requestPermission();
+    permission.then(function (result) {
+      if (result !== 'granted') {
+        showStatus('Notifications were not enabled. You can change this in your browser settings.', true);
+        return;
+      }
+      try {
+        window.localStorage.setItem(reminderPreferenceKey(), 'enabled');
+      } catch (error) {
+        showStatus('Could not save reminder settings in this browser.', true);
+        return;
+      }
+      remindersEnabled = true;
+      updateReminderButton();
+      checkDeadlineReminders();
+      reminderTimer = window.setInterval(checkDeadlineReminders, 60000);
+      showStatus('Deadline reminders enabled while this page is open.');
+    }).catch(function () {
+      showStatus('Could not enable notifications. Check your browser settings.', true);
+    });
+  }
+
+  function exportSchoolBackup() {
+    if (!schoolData) return;
+    var backup = {
+      format: 'landed-school-tracker',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      classes: schoolData.classes,
+      assignments: schoolData.assignments,
+      administrativeDeadlines: schoolData.administrativeDeadlines
+    };
+    var url = window.URL.createObjectURL(new Blob(
+      [JSON.stringify(backup, null, 2)],
+      { type: 'application/json' }
+    ));
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = 'landed-school-tracker-backup-' + localDateKey(new Date()) + '.json';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(function () { window.URL.revokeObjectURL(url); }, 1000);
+    showStatus('School tracker backup exported.');
+  }
+
+  function importSchoolBackup(event) {
+    var file = event.target.files && event.target.files[0];
+    if (!file) return;
+    event.target.value = '';
+    if (file.size > 1048576) {
+      showStatus('Backup file is too large. Choose a file smaller than 1 MB.', true);
+      return;
+    }
+    file.text().then(function (text) {
+      var backup = JSON.parse(text);
+      if (!backup || backup.format !== 'landed-school-tracker' || backup.version !== 1) {
+        throw new Error('This is not a supported School Tracker backup file.');
+      }
+      confirmImport(backup);
+    }).catch(function (error) {
+      showStatus(error.message || 'Could not import this backup file.', true);
+    });
+  }
+
   document.getElementById('add-school-item').addEventListener('click', function () {
     openEditor('class');
   });
+  document.getElementById('deadline-status-filter').addEventListener('change', function (event) {
+    deadlineStatusFilter = event.target.value;
+    renderDeadlines();
+  });
+  document.getElementById('enable-reminders').addEventListener('click', setDeadlineReminders);
+  document.getElementById('export-school-data').addEventListener('click', exportSchoolBackup);
+  document.getElementById('import-school-data').addEventListener('click', function () {
+    document.getElementById('school-import-file').click();
+  });
+  document.getElementById('school-import-file').addEventListener('change', importSchoolBackup);
+  document.getElementById('import-timetable').addEventListener('click', function () {
+    document.getElementById('timetable-file').click();
+  });
+  document.getElementById('timetable-file').addEventListener('change', importTimetableFile);
+  document.getElementById('cancel-timetable-import').addEventListener('click', function () {
+    timetableDialog.close();
+  });
+  document.getElementById('timetable-import-form').addEventListener('submit', submitTimetableImport);
   document.querySelectorAll('[data-add-type]').forEach(function (button) {
     button.addEventListener('click', function () { openEditor(button.dataset.addType); });
   });
@@ -424,13 +876,33 @@
     dialog.close();
     editingItem = null;
   });
+  document.getElementById('school-confirm-action').addEventListener('click', function () {
+    var action = pendingConfirmation;
+    pendingConfirmation = null;
+    confirmDialog.close();
+    if (action) action();
+  });
+  confirmDialog.addEventListener('close', function () {
+    pendingConfirmation = null;
+  });
+  confirmDialog.addEventListener('click', function (event) {
+    if (event.target === confirmDialog) confirmDialog.close();
+  });
   document.getElementById('calendar-prev').addEventListener('click', function () {
     calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1);
+    selectedDate = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1);
     if (schoolData) renderCalendar();
   });
   document.getElementById('calendar-next').addEventListener('click', function () {
     calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1);
+    selectedDate = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1);
     if (schoolData) renderCalendar();
+  });
+  window.addEventListener('storage', function (event) {
+    if (event.key !== 'landed-demo-state-v1') return;
+    window.LandedAuth.refreshState().then(refreshData).catch(function (error) {
+      showStatus(error.message || 'Could not refresh RSVP events.', true);
+    });
   });
   dialog.addEventListener('click', function (event) {
     if (event.target === dialog) {
@@ -439,11 +911,31 @@
     }
   });
 
-  refreshData().catch(function (error) {
+  Promise.all([
+    window.LandedAuth.getCurrentUser(),
+    refreshData()
+  ]).then(function (results) {
+    currentUser = results[0];
+    if (!currentUser) throw new Error('Please log in to use the School Tracker.');
+    try {
+      remindersEnabled = window.localStorage.getItem(reminderPreferenceKey()) === 'enabled' &&
+        Boolean(window.Notification) && window.Notification.permission === 'granted';
+    } catch (error) {
+      showStatus('Could not load reminder settings from this browser.', true);
+    }
+    updateReminderButton();
+    if (remindersEnabled) {
+      checkDeadlineReminders();
+      reminderTimer = window.setInterval(checkDeadlineReminders, 60000);
+    }
+  }).catch(function (error) {
     showStatus(error.message || 'Could not load school data.', true);
     document.getElementById('add-school-item').disabled = true;
     document.querySelectorAll('[data-add-type]').forEach(function (button) {
       button.disabled = true;
     });
+    document.getElementById('enable-reminders').disabled = true;
+    document.getElementById('import-school-data').disabled = true;
+    document.getElementById('export-school-data').disabled = true;
   });
 })();

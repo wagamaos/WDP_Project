@@ -61,11 +61,19 @@
   padding: .3rem 0;
 }
 .cal-day {
+  display: grid;
+  width: 100%;
+  min-height: 34px;
+  place-items: center;
+  border: 1px solid transparent;
   font-size: .88rem; font-weight: 500; color: var(--navy);
   padding: .4rem .2rem; border-radius: 7px;
-  cursor: default;
+  cursor: pointer;
   transition: background .15s;
 }
+.cal-day:not(.empty):hover { background: var(--pale-blue-1); }
+.cal-day:focus-visible { outline: 2px solid var(--mid-blue-1); outline-offset: 1px; }
+.cal-day.cal-selected { border-color: var(--royal); font-weight: 800; }
 .cal-day.empty { opacity: 0; pointer-events: none; }
 .cal-day.cal-today {
   background: var(--royal); color: var(--white); font-weight: 800;
@@ -83,6 +91,26 @@
 .cal-legend-dot {
   width: 12px; height: 12px; border-radius: 3px; flex: none;
 }
+.school-selected-day {
+  margin-top: 1rem;
+  padding-top: .9rem;
+  border-top: 1px solid var(--line);
+}
+.school-selected-day h3 {
+  margin-bottom: .55rem;
+  color: var(--navy);
+  font-size: .9rem;
+}
+.school-selected-day ul { display: grid; gap: .4rem; }
+.school-selected-day li {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: .5rem;
+  color: var(--mid-blue-2);
+  font-size: .82rem;
+}
+.school-selected-day .school-action-button { flex: none; padding: .1rem .35rem; }
 
 .school-status {
   margin: 0 0 1rem;
@@ -99,6 +127,35 @@
 .school-status[hidden],
 .school-layout .card[hidden],
 .school-dialog [hidden] { display: none; }
+.school-tools {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+  margin: 0 0 1.15rem;
+}
+.school-tools-note {
+  color: var(--mid-blue-2);
+  font-size: .8rem;
+}
+.school-deadline-filter {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin: -.35rem 0 .85rem;
+  color: var(--mid-blue-2);
+  font-size: .85rem;
+  font-weight: 600;
+}
+.school-deadline-filter select {
+  min-height: 34px;
+  padding: .3rem 1.8rem .3rem .6rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  background: var(--white);
+  color: var(--navy);
+  font: inherit;
+}
 .school-card-add {
   margin-left: auto;
   color: var(--royal);
@@ -166,9 +223,12 @@
 }
 .school-month-nav:hover { background: var(--pale-blue-1); }
 .cal-day.cal-class { box-shadow: inset 0 -3px var(--mint); }
+.cal-day.cal-event { box-shadow: inset 0 -3px #8b5cf6; }
+.cal-day.cal-class.cal-event { box-shadow: inset 0 -3px var(--mint), inset 0 3px #8b5cf6; }
 .cal-day.cal-today { outline: 2px solid var(--royal); outline-offset: -2px; }
 .cal-day.cal-deadline.cal-today { background: var(--gold); color: var(--gold-text); }
 .cal-day.cal-class.cal-today { box-shadow: inset 0 -3px var(--mint); }
+.school-event-legend { background: #8b5cf6; }
 
 .school-dialog {
   width: min(100% - 2rem, 480px);
@@ -187,7 +247,8 @@
 .school-dialog h2 { margin-bottom: .35rem; font-size: 1.2rem; }
 .school-dialog label { display: block; font-size: .88rem; font-weight: 600; }
 .school-dialog input,
-.school-dialog select {
+.school-dialog select,
+.school-dialog textarea {
   width: 100%;
   min-height: 42px;
   padding: .55rem .7rem;
@@ -197,8 +258,10 @@
   color: var(--navy);
   font: inherit;
 }
+.school-dialog textarea { resize: vertical; }
 .school-dialog input:focus,
-.school-dialog select:focus {
+.school-dialog select:focus,
+.school-dialog textarea:focus {
   outline: 2px solid var(--mid-blue-1);
   outline-offset: 1px;
 }
@@ -223,6 +286,15 @@
   font-size: .9rem;
 }
 .school-dialog-error[hidden] { display: none; }
+.school-confirm-dialog p {
+  color: var(--mid-blue-2);
+  font-size: .92rem;
+}
+.school-confirm-dialog .btn.is-danger {
+  background: #B91C1C;
+  color: var(--white);
+}
+.school-confirm-dialog .btn.is-danger:hover { background: #991B1B; }
 .school-dialog-actions {
   display: flex;
   justify-content: flex-end;
@@ -230,9 +302,22 @@
   margin-top: .75rem;
 }
 .school-dialog button:disabled { cursor: wait; opacity: .7; }
+.school-timetable-dialog { width: min(100% - 2rem, 1000px); }
+.school-import-progress { color: var(--mid-blue-2); font-size: .9rem; }
+.school-import-table-wrap { overflow-x: auto; }
+.school-import-table { width: 100%; min-width: 720px; border-collapse: collapse; }
+.school-import-table th,
+.school-import-table td { padding: .45rem; border-bottom: 1px solid var(--line); text-align: left; }
+.school-import-table th { color: var(--mid-blue-2); font-size: .78rem; }
+.school-import-table input,
+.school-import-table select { min-width: 90px; }
+.school-import-table input[type="checkbox"] { width: 1rem; min-width: 1rem; min-height: 1rem; }
+.school-import-table .school-import-name { min-width: 170px; }
 
 @media (max-width: 640px) {
   .page-header > .btn { width: 100%; }
+  .school-tools > .btn { flex: 1 1 calc(50% - .6rem); }
+  .school-tools-note { flex-basis: 100%; }
   .school-deadline-item { flex-wrap: wrap; }
   .school-deadline-info { flex-basis: calc(100% - 56px); }
   .school-deadline-item .school-item-actions { margin-left: 0; }
