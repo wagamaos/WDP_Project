@@ -50,8 +50,88 @@
     });
   });
 
+  // Convert "dd/mm/yyyy" to "yyyy-mm-dd" (the format stored in the database).
+  // Returns '' when the text is not a real calendar date.
+  function parseDisplayDate(text) {
+    var match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(text.trim());
+    if (!match) return '';
+    var day = Number(match[1]);
+    var month = Number(match[2]);
+    var year = Number(match[3]);
+    var date = new Date(year, month - 1, day);
+    if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return '';
+    return match[3] + '-' + match[2] + '-' + match[1];
+  }
+
+  var startDateInput = document.getElementById('signup-start-date');
+
+  // Insert the slashes automatically while the user types digits.
+  startDateInput.addEventListener('input', function () {
+    var digits = startDateInput.value.replace(/\D/g, '').slice(0, 8);
+    var formatted = digits.slice(0, 2);
+    if (digits.length > 2) formatted += '/' + digits.slice(2, 4);
+    if (digits.length > 4) formatted += '/' + digits.slice(4);
+    startDateInput.value = formatted;
+    startDateInput.setCustomValidity('');
+  });
+
+  // Calendar button: open the browser's date picker, then show the chosen date as dd/mm/yyyy.
+  var startDatePicker = document.getElementById('signup-start-date-picker');
+  var today = new Date();
+  startDatePicker.max = today.getFullYear() + '-' +
+    String(today.getMonth() + 1).padStart(2, '0') + '-' +
+    String(today.getDate()).padStart(2, '0');
+
+  document.getElementById('signup-start-date-btn').addEventListener('click', function () {
+    // Start the calendar on whatever date is already typed in.
+    startDatePicker.value = parseDisplayDate(startDateInput.value) || '';
+    try {
+      if (typeof startDatePicker.showPicker === 'function') {
+        startDatePicker.showPicker();
+        return;
+      }
+    } catch (error) { /* fall through to the older approach */ }
+    startDatePicker.focus();
+    startDatePicker.click();
+  });
+
+  startDatePicker.addEventListener('change', function () {
+    var parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(startDatePicker.value);
+    if (!parts) return;
+    startDateInput.value = parts[3] + '/' + parts[2] + '/' + parts[1];
+    startDateInput.setCustomValidity('');
+    startDateInput.focus();
+  });
+
+  // Confirm password: show a message as soon as the two passwords differ.
+  var passwordInput = document.getElementById('signup-password');
+  var confirmInput = document.getElementById('signup-password-confirm');
+  var confirmError = document.getElementById('signup-password-confirm-error');
+
+  function checkPasswordsMatch(showWhileEmpty) {
+    var mismatch = (confirmInput.value || showWhileEmpty) && confirmInput.value !== passwordInput.value;
+    confirmInput.setCustomValidity(mismatch ? 'Passwords do not match.' : '');
+    confirmError.hidden = !mismatch;
+    confirmInput.closest('.field-input-wrap').classList.toggle('has-mismatch', Boolean(mismatch));
+    confirmInput.setAttribute('aria-invalid', String(Boolean(mismatch)));
+    return !mismatch;
+  }
+
+  passwordInput.addEventListener('input', function () { checkPasswordsMatch(false); });
+  confirmInput.addEventListener('input', function () { checkPasswordsMatch(false); });
+
   document.getElementById('signup-form').addEventListener('submit', function (event) {
     event.preventDefault();
+    checkPasswordsMatch(true);
+
+    var isoStartDate = parseDisplayDate(startDateInput.value);
+    if (!isoStartDate) {
+      startDateInput.setCustomValidity('Please enter a valid date in the format dd/mm/yyyy.');
+    } else if (new Date(isoStartDate + 'T00:00:00') > new Date()) {
+      startDateInput.setCustomValidity('Your study start date cannot be in the future.');
+    } else {
+      startDateInput.setCustomValidity('');
+    }
     if (!this.reportValidity()) return;
 
     var form = this;
@@ -66,7 +146,13 @@
       password: form.elements.password.value,
       university: form.elements.university.value,
       studentType: form.elements.studentType.value,
-      studyStartDate: form.elements.studyStartDate.value
+      studyStartDate: isoStartDate
+    }).then(function (user) {
+      showMessage('Account created! Sending your welcome email...', false);
+      // Never block sign-up on the email: go to the home page either way.
+      return window.LandedWelcomeEmail.send(user).catch(function (error) {
+        console.warn('Welcome email was not sent:', error);
+      });
     }).then(function () {
       window.location.href = 'index.html';
     }).catch(function (error) {

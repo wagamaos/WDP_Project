@@ -171,6 +171,23 @@
   background: var(--pale-blue-1); color: var(--royal);
   font: inherit; font-size: .85rem; font-weight: 600; cursor: pointer;
 }
+.auth-field-help.auth-field-error { color: #C62828; font-weight: 600; }
+.field-input-wrap.has-mismatch { border-color: #C62828; }
+
+/* Study start date: text box shows dd/mm/yyyy, calendar button opens the native picker */
+.date-picker-wrap { position: relative; }
+.date-picker-btn {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  margin: -.4rem -.5rem -.4rem 0; padding: .4rem; border: 0; border-radius: var(--radius-xs);
+  background: transparent; cursor: pointer;
+}
+.date-picker-btn:hover { background: var(--pale-blue-1); }
+.date-picker-btn:hover svg, .date-picker-btn:focus-visible svg { stroke: var(--royal); }
+.date-picker-btn:focus-visible { outline: 2px solid var(--royal); outline-offset: 1px; }
+.form-field input[type="date"].date-picker-native {
+  position: absolute; right: 0; bottom: 0; width: 1px; height: 1px;
+  padding: 0; border: 0; opacity: 0; pointer-events: none;
+}
 .auth-field-help { display: block; margin-top: .35rem; color: var(--mid-blue-2); font-size: .78rem; line-height: 1.4; }
 
 .form-forgot {
