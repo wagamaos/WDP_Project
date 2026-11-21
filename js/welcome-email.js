@@ -18,9 +18,9 @@
    * While the values are blank, sign-up still works; the email is just skipped.
    */
   var CONFIG = {
-    publicKey: '',
+    publicKey: 'TERyXz7hOociddefA',
     serviceId: 'service_6rujp0j',
-    templateId: '',
+    templateId: 'template_clb9nte',
     siteUrl: window.location.origin + window.location.pathname.replace(/[^/]*$/, '')
   };
 
