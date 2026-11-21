@@ -13,9 +13,9 @@
        loaded without blocking rendering -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=optional" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=optional"></noscript>
-  <link rel="stylesheet" href="css/common.css">
-  <link rel="stylesheet" href="css/forum.css">
-  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="Css/common.css">
+  <link rel="stylesheet" href="Css/forum.css">
+  <link rel="stylesheet" href="Css/responsive.css">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -64,11 +64,15 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           <span>Arrival Checklist</span>
         </a>
+        <a href="login.html" class="logout-link" aria-label="Log out" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Log out</span>
+        </a>
       </div>
     </nav>
 
     <!-- ===== MAIN CANVAS ===== -->
-    <main class="main-canvas" id="main">
+    <main class="main-canvas" id="main" tabindex="-1">
 
       <!-- Page header -->
       <div class="page-header">

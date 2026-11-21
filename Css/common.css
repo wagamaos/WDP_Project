@@ -11,7 +11,7 @@
   /* Blues */
   --royal:       #1B44B8;  /* sidebar, dark cards, primary btns, earned badges */
   --mid-blue-1:  #3A63D0;
-  --mid-blue-2:  #5B82E0;
+  --mid-blue-2:  #3A63D0;
   --mid-blue-3:  #9DB5EE;
   --pale-blue-1: #E3ECFF;
   --pale-blue-2: #DCE5F8;
@@ -49,6 +49,7 @@
 /* ---------- Reset ---------- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
+html.auth-pending body { visibility: hidden; }
 body {
   font-family: var(--font);
   background: var(--page-bg);
@@ -115,7 +116,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   letter-spacing: -.03em;
 }
 
-.sidebar-nav { flex: 1; padding: .5rem 0; }
+.sidebar-nav { display: flex; flex: 1; flex-direction: column; padding: .5rem 0; }
 .sidebar-nav a {
   display: flex;
   align-items: center;
@@ -133,6 +134,11 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
 }
 .sidebar-nav a:hover { background: rgba(255,255,255,.08); color: var(--white); }
+.sidebar-nav a.logout-link[hidden] { display: none; }
+.sidebar-nav .logout-link {
+  margin-top: auto;
+  border-top: 1px solid rgba(255,255,255,.18);
+}
 .sidebar-nav a.active {
   background: rgba(255,255,255,.15);
   color: var(--white);
@@ -179,15 +185,26 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
    BADGES
    ========================================================== */
 .badges-grid {
-  display: flex; flex-wrap: wrap; gap: 1.2rem;
-  justify-content: flex-start;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: .85rem;
 }
 .badge-item {
-  display: flex; flex-direction: column;
-  align-items: center; gap: .5rem; width: 72px;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: .8rem;
+  row-gap: .15rem;
+  min-width: 0;
+  padding: .8rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--white);
 }
 .badge-hex {
-  width: 60px; height: 60px;
+  grid-row: 1 / span 2;
+  width: 52px; height: 52px;
   clip-path: polygon(50% 0%,93.3% 25%,93.3% 75%,50% 100%,6.7% 75%,6.7% 25%);
   display: grid; place-items: center;
   transition: transform .2s;
@@ -199,10 +216,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .badge-hex svg { width: 26px; height: 26px; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .badge-hex.earned svg      { stroke: var(--white); fill: none; }
 .badge-hex.earned-gold svg { stroke: var(--gold-text); fill: none; }
-.badge-hex.locked svg      { stroke: var(--mid-blue-3); fill: none; }
-.badge-label { font-size: .78rem; font-weight: 600; color: var(--navy); text-align: center; }
-.badge-label.locked-lbl { color: var(--mid-blue-3); }
-.badge-detail { display: block; color: var(--mid-blue-1); font-size: .7rem; line-height: 1.3; text-align: center; max-width: 150px; }
+.badge-hex.locked svg      { stroke: var(--mid-blue-1); fill: none; }
+.badge-label { font-size: .88rem; font-weight: 700; color: var(--navy); text-align: left; }
+.badge-label.locked-lbl { color: var(--mid-blue-2); }
+.badge-detail { display: block; color: var(--mid-blue-1); font-size: .76rem; line-height: 1.4; text-align: left; }
 .badge-detail.earned-detail { color: var(--mint-text); font-weight: 700; }
 
 /* ==========================================================

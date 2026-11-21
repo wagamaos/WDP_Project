@@ -37,7 +37,7 @@
 .onboard-hex.locked-hex { background: var(--pale-blue-2); }
 .onboard-hex.done-hex svg { stroke: var(--gold-text); }
 .onboard-hex.pending-hex svg { stroke: var(--white); }
-.onboard-hex.locked-hex svg { stroke: var(--mid-blue-3); }
+.onboard-hex.locked-hex svg { stroke: var(--mid-blue-1); }
 .onboard-hex svg { width: 28px; height: 28px; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .onboard-step-label { font-size: .78rem; font-weight: 600; color: var(--navy); text-align: center; }
 .onboard-step-pts { font-size: .75rem; font-weight: 700; color: var(--mid-blue-2); }
@@ -90,4 +90,3 @@
   font-size: .88rem; font-weight: 800;
   position: relative; z-index: 1;
 }
-

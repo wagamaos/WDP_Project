@@ -34,7 +34,7 @@
       var reward = rewards.find(function (item) { return item.id === button.dataset.rewardId; });
       var cost = reward.cost;
       var affordable = (currentUser.points || 0) >= cost;
-      var available = reward.stock > 0;
+      var available = reward.stock === null || reward.stock > 0;
       button.disabled = !affordable || !available;
       button.textContent = !available ? 'Out of stock' :
         (affordable ? 'Redeem' : 'Need ' + (cost - (currentUser.points || 0)) + ' pts');
@@ -93,7 +93,8 @@
     meta.querySelector('.reward-donor').textContent = reward.donatedBy || 'Landed community';
     meta.querySelector('.reward-date').textContent = formatRewardDate(reward.donatedAt);
     meta.querySelector('.reward-points').textContent = reward.cost + ' points';
-    meta.querySelector('.reward-availability').textContent = reward.stock + ' available';
+    meta.querySelector('.reward-availability').textContent =
+      reward.stock === null ? 'Unlimited' : reward.stock + ' available';
     collection.className = 'reward-details-collection';
     collection.textContent = reward.collectionDetails;
     rewardDetailsContent.appendChild(heading);
@@ -107,7 +108,8 @@
     rewardDetailsContent.appendChild(description);
     rewardDetailsContent.appendChild(meta);
     rewardDetailsContent.appendChild(collection);
-    var affordable = (currentUser.points || 0) >= reward.cost && reward.stock > 0;
+    var affordable = (currentUser.points || 0) >= reward.cost &&
+      (reward.stock === null || reward.stock > 0);
     detailsRedeemButton.disabled = !affordable;
     detailsRedeemButton.textContent = reward.stock < 1 ? 'Out of stock' :
       (affordable ? 'Redeem for ' + reward.cost + ' points' : 'Need ' + (reward.cost - currentUser.points) + ' more points');
@@ -126,7 +128,9 @@
     window.LandedAuth.redeemReward(button.dataset.rewardId).then(function (result) {
       currentUser = result.user;
       rewards = rewards.map(function (reward) {
-        return reward.id === result.redemption.rewardId ? Object.assign({}, reward, { stock: reward.stock - 1 }) : reward;
+        return reward.id === result.redemption.rewardId && reward.stock !== null
+          ? Object.assign({}, reward, { stock: reward.stock - 1 })
+          : reward;
       });
       renderPoints(currentUser);
       renderBadges(currentUser);

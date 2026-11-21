@@ -10,7 +10,15 @@
 @media (max-width: 900px) {
   :root { --sidebar-w: 72px; }
   .sidebar-logo-name { display: none; }
-  .sidebar-nav a span { display: none; }
+  .sidebar-nav a span {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
   .sidebar-nav a { justify-content: center; padding: .8rem; }
   .main-canvas { padding: 1.5rem 1.2rem 2rem; }
   .auth-shell { grid-template-columns: 1fr; }
@@ -34,7 +42,16 @@
   .sidebar-logo { padding: .8rem 1rem; }
   .sidebar-nav { display: flex; flex-direction: row; overflow-x: auto; padding: 0 .5rem; }
   .sidebar-nav a { flex-direction: column; gap: .2rem; padding: .6rem .8rem; font-size: .7rem; }
-  .sidebar-nav a span { display: block; }
+  .sidebar-nav a span {
+    display: block;
+    position: static;
+    width: auto; height: auto;
+    margin: 0; padding: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+  .sidebar-nav .logout-link { margin: 0 0 0 auto; border-top: 0; }
   .main-canvas { padding: 1rem; }
 }
 

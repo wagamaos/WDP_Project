@@ -89,10 +89,5 @@
       });
     });
 
-    document.getElementById('logout-link').addEventListener('click', function (event) {
-      event.preventDefault();
-      window.LandedAuth.logout();
-      window.location.href = 'login.html';
-    });
   }).catch(showError);
 })();

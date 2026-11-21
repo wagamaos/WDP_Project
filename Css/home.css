@@ -47,7 +47,7 @@
   background: var(--gold); border-radius: 99px;
   animation: xpFill 1.2s ease-out both;
 }
-.xp-card-sub { font-size: .8rem; color: rgba(255,255,255,.6); }
+.xp-card-sub { font-size: .8rem; color: var(--white); }
 
 /* ==========================================================
    STAT CARDS ROW
