@@ -58,7 +58,9 @@
 .field-input-wrap svg { width: 18px; height: 18px; stroke: var(--mid-blue-1); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .field-input-wrap input { border: none; outline: none; background: transparent; font-family: inherit; font-size: .97rem; color: var(--navy); width: 100%; }
 /* Hint text is light grey so it never looks like a filled-in answer */
-.field-input-wrap input::placeholder { color: var(--mid-blue-3); opacity: 1; }
+.field-input-wrap input::placeholder { color: var(--mid-blue-3); opacity: 1; transition: color .15s; }
+/* Hide the hint as soon as the box is clicked, so it never looks like editable text */
+.field-input-wrap input:focus::placeholder { color: transparent; }
 .field-input-wrap.has-error { border-color: #e74c3c; }
 
 .form-field select,
