@@ -97,6 +97,13 @@ export default function LoginApp() {
   const [signupErrors, setSignupErrors] = useState({});
   const pickerRef = useRef(null);
 
+  // A link to login.html#signup while already on this page only changes the hash: follow it.
+  useEffect(() => {
+    const onHash = () => setTab(window.location.hash === '#signup' ? 'signup' : 'login');
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
   // Already signed in? Go straight to the home page.
   useEffect(() => {
     api().getCurrentUser().then((user) => {

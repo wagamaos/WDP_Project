@@ -1,9 +1,25 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
+import { cpSync } from 'fs'
+
+// Pages that still use plain <script src="js/..."> tags (home, profile, school, budget, admin, events)
+// are not bundled by Vite, so copy the js/ folder into the build as-is.
+function copyPlainScripts() {
+  return {
+    name: 'copy-plain-scripts',
+    apply: 'build',
+    closeBundle() {
+      cpSync(resolve(__dirname, 'js'), resolve(__dirname, 'dist/js'), { recursive: true })
+    }
+  }
+}
 
 export default defineConfig({
-  plugins: [react()],
+  // Relative paths so the built site works on GitHub Pages (served from /WDP_Project/).
+  base: './',
+
+  plugins: [react(), copyPlainScripts()],
 
   build: {
     rollupOptions: {
