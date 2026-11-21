@@ -72,6 +72,10 @@
 .form-field input[type="date"]::-webkit-datetime-edit { color: var(--mid-blue-1); }
 .form-field input[type="date"]:valid::-webkit-datetime-edit { color: var(--navy); }
 
+/* Hide Edge's built-in password eye; the form has its own show/hide button */
+.field-input-wrap input::-ms-reveal { display: none; }
+.field-input-wrap input::-ms-clear { display: none; }
+
 /* Study start date: text box shows dd/mm/yyyy, calendar button opens the native picker */
 .date-picker-wrap { position: relative; }
 .date-picker-btn { display: inline-flex; align-items: center; justify-content: center; flex: none; margin: -.4rem -.5rem -.4rem 0; padding: .4rem; border: 0; border-radius: var(--radius-xs); background: transparent; cursor: pointer; }

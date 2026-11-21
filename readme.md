@@ -12,6 +12,6 @@ Open the project with a local server (for example VS Code **Live Server**) and g
 
 New users get a welcome email after signing up. It is sent through [EmailJS](https://www.emailjs.com) from **welcome.landed@gmail.com**.
 
-- EmailJS keys and setup steps: [js/welcome-email.js](js/welcome-email.js)
+- EmailJS keys: [src/shared/welcomeEmail.js](src/shared/welcomeEmail.js)
 - Email template to paste into EmailJS: [docs/email/welcome-template.html](docs/email/welcome-template.html)
 - The Gmail login is **not** stored in this repository. Ask a team member for the private `CREDENTIALS.local.md` file and keep it in the project root (it is ignored by git).
