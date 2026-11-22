@@ -64,9 +64,11 @@
   }
 
   // Demo forum content. Authors use @landed.demo addresses, so no real account owns them
-  // (only an admin can delete them). Bump FORUM_SEED_VERSION when adding posts so existing
-  // browsers receive the new ones once; posts an admin already deleted are not brought back.
-  var FORUM_SEED_VERSION = 2;
+  // (only an admin can delete them). Bump FORUM_SEED_VERSION when changing the seed posts so
+  // existing browsers update once; posts an admin already deleted are not brought back.
+  var FORUM_SEED_VERSION = 3;
+  // Seed posts from earlier versions that are no longer part of the demo content.
+  var RETIRED_SEED_POSTS = ['seed-visa-arc', 'seed-money-bank', 'seed-food-halal'];
 
   function seedForumPosts() {
     var ago = function (days, hours) {
@@ -87,68 +89,17 @@
         author: 'Landed Community',
         authorEmail: '',
         createdAt: ago(2),
-        likes: ['minji@landed.demo', 'arjun@landed.demo'],
+        likes: ['minji@landed.demo', 'arjun@landed.demo', 'sofia@landed.demo', 'tomas@landed.demo', 'lena@landed.demo'],
         comments: [
           comment('seed-c-housing-1', 'Minji Park', 'minji',
             'Look around Bokjeong-dong, it is a 5 minute walk from the main gate. Try the Zigbang and Dabang apps for one-room listings, and ask for the deposit to be under 5 million won.',
-            ago(1, 20), ['arjun@landed.demo', 'sofia@landed.demo']),
+            ago(1, 20), ['arjun@landed.demo', 'sofia@landed.demo', 'lena@landed.demo']),
           comment('seed-c-housing-2', 'Arjun Mehta', 'arjun',
             'If you are only here for one semester, the dorm is much easier than a private lease. Applications open about two months before the semester starts.',
-            ago(1, 6))
-        ],
-        reports: []
-      },
-      {
-        id: 'seed-visa-arc',
-        category: 'Visas',
-        title: 'How long did your ARC (residence card) take?',
-        body: 'I booked my Alien Registration Card appointment at the immigration office through HiKorea. How long did it take for everyone to receive the card, and can I travel before it arrives?',
-        author: 'Sofia Rossi',
-        authorEmail: 'sofia@landed.demo',
-        createdAt: ago(4),
-        likes: ['tomas@landed.demo'],
-        comments: [
-          comment('seed-c-visa-1', 'Tomás García', 'tomas',
-            'Mine took about 3 weeks. Keep the receipt they give you, it works as proof while you wait. I would not leave the country before the card arrives though.',
-            ago(3, 18), ['sofia@landed.demo', 'minji@landed.demo'], ['sofia@landed.demo']),
-          comment('seed-c-visa-2', 'Minji Park', 'minji',
-            'Bring a printed copy of your enrolment certificate and housing contract. They turned a friend away for only having it on their phone.',
-            ago(3, 2))
-        ],
-        reports: []
-      },
-      {
-        id: 'seed-money-bank',
-        category: 'Money',
-        title: 'Best bank account for international students?',
-        body: 'Which bank was easiest to open an account with before getting the ARC? I want a card that works for transport and online shopping. Also, how are people tracking spending in won versus their home currency?',
-        author: 'Arjun Mehta',
-        authorEmail: 'arjun@landed.demo',
-        createdAt: ago(6),
-        likes: ['sofia@landed.demo', 'lena@landed.demo', 'tomas@landed.demo'],
-        comments: [
-          comment('seed-c-money-1', 'Lena Schmidt', 'lena',
-            'Go to a branch near campus that is used to students, they usually have someone who speaks English. Some will open a basic account with your passport, then raise the limits once the ARC arrives.',
-            ago(5, 20), ['arjun@landed.demo'], ['arjun@landed.demo']),
-          comment('seed-c-money-2', 'Sofia Rossi', 'sofia',
-            'For tracking I use the Budget page here. Set your home currency in the settings and log expenses in won as you go.',
-            ago(5, 4), ['lena@landed.demo'])
-        ],
-        reports: []
-      },
-      {
-        id: 'seed-food-halal',
-        category: 'Food',
-        title: 'Halal and vegetarian food near Gachon?',
-        body: 'Does anyone know good halal or vegetarian places near campus? The cafeteria menu changes every day and it is hard to tell what is inside some of the dishes.',
-        author: 'Aisha Rahman',
-        authorEmail: 'aisha@landed.demo',
-        createdAt: ago(1, 5),
-        likes: ['minji@landed.demo'],
-        comments: [
-          comment('seed-c-food-1', 'Minji Park', 'minji',
-            'Search "할랄" (halal) in Naver Map and you will find a few places a short subway ride away. For vegetarian, ask for dishes "gogi ppaego" (without meat).',
-            ago(0, 20), ['aisha@landed.demo'])
+            ago(1, 6), ['tomas@landed.demo']),
+          comment('seed-c-housing-3', 'Sofia Rossi', 'sofia',
+            'Always visit the room before paying anything, and check the water pressure and heating. Ask whether the management fee includes internet.',
+            ago(0, 14))
         ],
         reports: []
       },
@@ -193,6 +144,9 @@
       loaded.eventPointAwards = loaded.eventPointAwards || {};
       loaded.forumPosts = loaded.forumPosts || [];
       if ((loaded.forumSeedVersion || 1) < FORUM_SEED_VERSION) {
+        loaded.forumPosts = loaded.forumPosts.filter(function (post) {
+          return RETIRED_SEED_POSTS.indexOf(post.id) === -1;
+        });
         seedForumPosts().forEach(function (post) {
           var exists = loaded.forumPosts.some(function (item) { return item.id === post.id; });
           if (!exists) loaded.forumPosts.push(post);
