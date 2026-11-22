@@ -602,6 +602,7 @@
       row.querySelector('button').addEventListener('click', function () {
         if (!confirm('Delete this comment by ' + comment.author + '? This cannot be undone.')) return;
         window.LandedAuth.adminDeleteForumComment(post.id, comment.id).then(function (updated) {
+          if (emailer()) emailer().moderation.commentRemoved(post, comment);
           renderForumDialog(updated);
           showAdminMsg('forum-dialog-message', 'Comment deleted.', 'success');
           renderForum();
@@ -623,7 +624,7 @@
   function adminDeletePost(postId, title, fromDialog) {
     var label = title ? '"' + title + '"' : 'this post';
     if (!confirm('Permanently delete ' + label + ' and all its comments? This cannot be undone.')) return;
-    window.LandedAuth.adminDeleteForumPost(postId).then(function () {
+    deletePostAndNotify(postId).then(function () {
       if (fromDialog) closeForumDialog();
       showAdminMsg('forum-message', (title ? label : 'The post') + ' has been deleted.', 'success');
       renderForum();
@@ -752,13 +753,25 @@
     if (!confirm('Permanently delete ' + label + '? This cannot be undone.')) return;
     var btn = fromDialog ? document.getElementById('delete-post-btn') : null;
     if (btn) btn.disabled = true;
-    window.LandedAuth.adminDeleteForumPost(postId).then(function () {
+    deletePostAndNotify(postId).then(function () {
       if (fromDialog) document.getElementById('report-dialog').close();
       showAdminMsg('reports-message', label + ' has been deleted.', 'success');
       renderReports();
     }).catch(function (err) {
       showAdminMsg('reports-message', err.message, 'error');
       if (btn) btn.disabled = false;
+    });
+  }
+
+  /* ── Emails (window.LandedEmail comes from react-dist/email.js; missing = emails off) ── */
+  function emailer() { return window.LandedEmail || null; }
+
+  // Deletes a post and emails its author (with the report reasons, if any).
+  function deletePostAndNotify(postId) {
+    return window.LandedAuth.getForumPost(postId).then(function (post) {
+      return window.LandedAuth.adminDeleteForumPost(postId).then(function () {
+        if (post && emailer()) emailer().moderation.postRemoved(post);
+      });
     });
   }
 
