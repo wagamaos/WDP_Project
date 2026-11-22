@@ -28,10 +28,13 @@
     nextLevelElement.textContent = level.remaining + ' XP to your next level';
     progressBar.setAttribute('aria-valuenow', String(progressPercent));
     progressBar.style.width = progressPercent + '%';
+    window.LandedAuth.getContributionStats().then(function (stats) {
+      document.getElementById('home-events').textContent =
+        String(stats.eventsAttended);
+    });
 
     document.getElementById('home-streak').textContent = '0';
     document.getElementById('home-rank').textContent = '—';
-    document.getElementById('home-events').textContent = '0';
 
     var completed = user.completedQuests || [];
     document.querySelectorAll('[data-quest-id]').forEach(function (button) {
@@ -55,6 +58,94 @@
     bonusItem.querySelector('.pts-tag').textContent = bonusEarned ? 'Earned +25 pts' : '+25 pts';
   }
 
+
+  function renderUpcomingEvents() {
+    var container = document.getElementById('home-upcoming-events');
+
+    if (!container) return;
+
+    container.textContent = 'Loading events...';
+
+    window.LandedAuth.listEvents()
+      .then(function (events) {
+        var upcoming = events
+          .filter(function (event) {
+            var endDate = new Date(event.endAt || event.startAt);
+            return !isNaN(endDate.getTime()) && endDate.getTime() >= Date.now();
+          })
+          .sort(function (a, b) {
+            return new Date(a.startAt) - new Date(b.startAt);
+          })
+          .slice(0, 3);
+
+        container.replaceChildren();
+
+        if (upcoming.length === 0) {
+          container.textContent = 'No upcoming events right now.';
+          return;
+        }
+
+        upcoming.forEach(function (event) {
+          var item = document.createElement('div');
+          item.className = 'event-item';
+
+          var iconWrap = document.createElement('div');
+          iconWrap.className = 'event-icon-wrap';
+          iconWrap.setAttribute('aria-hidden', 'true');
+
+          iconWrap.innerHTML =
+            '<svg viewBox="0 0 24 24">' +
+            '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>' +
+            '<circle cx="12" cy="10" r="3"/>' +
+            '</svg>';
+
+          var info = document.createElement('div');
+          info.className = 'event-info';
+
+          var name = document.createElement('div');
+          name.className = 'event-name';
+          name.textContent = event.title;
+
+          var meta = document.createElement('div');
+          meta.className = 'event-meta';
+
+          var date = new Date(event.startAt).toLocaleDateString(
+            undefined,
+            { day: 'numeric', month: 'short' }
+          );
+
+          meta.textContent = [
+            date,
+            event.location,
+            event.organiserType
+          ].filter(Boolean).join(' · ');
+
+          info.appendChild(name);
+          info.appendChild(meta);
+
+          item.appendChild(iconWrap);
+          item.appendChild(info);
+
+          if (Number(event.pointsAwarded) > 0) {
+            var points = document.createElement('span');
+            points.className = 'event-pts';
+            points.textContent = '+' + event.pointsAwarded;
+            points.setAttribute(
+              'aria-label',
+              'Earn ' + event.pointsAwarded + ' points'
+            );
+            item.appendChild(points);
+          }
+
+          container.appendChild(item);
+        });
+      })
+      .catch(function () {
+        container.textContent = 'Unable to load upcoming events.';
+      });
+  }
+
+
   function showError(error) {
     window.alert(error.message || 'Could not load your account.');
   }
@@ -66,6 +157,8 @@
     }
 
     renderProgress(user);
+    renderUpcomingEvents();
+
     document.querySelectorAll('[data-quest-id]').forEach(function (button) {
       button.addEventListener('click', function () {
         var current = button.disabled;

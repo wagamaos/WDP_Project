@@ -77,6 +77,13 @@
 
       <p class="school-status" id="school-status" role="status" aria-live="polite" hidden></p>
 
+      <div class="school-tools" aria-label="School tracker tools">
+        <button class="btn btn-outline btn-sm" id="import-timetable" type="button">Import timetable photo/PDF</button>
+        <input id="timetable-file" type="file" accept="image/*,.pdf,application/pdf" hidden>
+        <button class="btn btn-outline btn-sm" id="enable-reminders" type="button">Enable deadline reminders</button>
+        <span class="school-tools-note">Timetables are processed in this browser; reminders work while this page is open.</span>
+      </div>
+
       <!-- Filter tabs -->
       <div class="forum-filter-tabs" role="tablist" aria-label="Tracker filter">
         <button class="forum-tab active" id="school-tab-all" role="tab" aria-selected="true" data-school-filter="all">All</button>
@@ -98,6 +105,15 @@
               <button class="school-card-add" type="button" data-add-type="assignment">Add assignment</button>
               <button class="school-card-add" type="button" data-add-type="admin">Add admin deadline</button>
             </div>
+            <label class="school-deadline-filter" for="deadline-status-filter">
+              Show
+              <select id="deadline-status-filter">
+                <option value="all">All deadlines</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="overdue">Overdue</option>
+                <option value="completed">Completed</option>
+              </select>
+            </label>
 
             <ul class="school-deadline-list" id="deadline-list" aria-label="Upcoming deadlines">
             </ul>
@@ -141,7 +157,15 @@
                 <span class="cal-legend-dot" style="background:var(--mint);"></span>
                 Class
               </div>
+              <div class="cal-legend-item">
+                <span class="cal-legend-dot school-event-legend"></span>
+                RSVP event
+              </div>
             </div>
+            <section class="school-selected-day" aria-labelledby="selected-day-heading">
+              <h3 id="selected-day-heading"></h3>
+              <ul id="selected-day-list" aria-live="polite"></ul>
+            </section>
           </div>
         </div>
 
@@ -185,6 +209,18 @@
         </div>
         <label for="school-location">Location</label>
         <input id="school-location" name="location" type="text" maxlength="100" placeholder="e.g. Lecture Hall 3">
+        <div class="school-time-fields">
+          <div>
+            <label for="school-start-date">Semester starts (optional)</label>
+            <input id="school-start-date" name="startDate" type="date">
+          </div>
+          <div>
+            <label for="school-end-date">Semester ends (optional)</label>
+            <input id="school-end-date" name="endDate" type="date">
+          </div>
+        </div>
+        <label for="school-holidays">Skip class dates (optional)</label>
+        <textarea id="school-holidays" name="holidays" rows="2" placeholder="One date per line, e.g. 2026-12-25"></textarea>
       </div>
 
       <div id="school-deadline-fields" hidden>
@@ -204,7 +240,40 @@
     </form>
   </dialog>
 
+  <dialog class="school-dialog school-confirm-dialog" id="school-confirm-dialog" aria-labelledby="school-confirm-title">
+    <form method="dialog">
+      <h2 id="school-confirm-title">Confirm action</h2>
+      <p id="school-confirm-message"></p>
+      <div class="school-dialog-actions">
+        <button type="submit" class="btn btn-outline" value="cancel">Cancel</button>
+        <button type="button" class="btn btn-gold" id="school-confirm-action">Confirm</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="school-dialog school-timetable-dialog" id="timetable-import-dialog" aria-labelledby="timetable-import-title">
+    <form id="timetable-import-form">
+      <h2 id="timetable-import-title">Review detected classes</h2>
+      <p class="school-tools-note">OCR can make mistakes. Check and edit every detected class before importing. First use needs internet to load OCR tools; your file stays in this browser and is not uploaded.</p>
+      <p id="timetable-import-progress" class="school-import-progress" role="status" aria-live="polite"></p>
+      <div class="school-import-table-wrap">
+        <table class="school-import-table">
+          <thead>
+            <tr><th scope="col">Add</th><th scope="col">Class</th><th scope="col">Day</th><th scope="col">Start</th><th scope="col">End</th><th scope="col">Location</th></tr>
+          </thead>
+          <tbody id="timetable-import-rows"></tbody>
+        </table>
+      </div>
+      <p id="timetable-import-error" class="school-dialog-error" role="alert" hidden></p>
+      <div class="school-dialog-actions">
+        <button type="button" class="btn btn-outline" id="cancel-timetable-import">Cancel</button>
+        <button type="submit" class="btn btn-gold" id="save-timetable-import">Import selected</button>
+      </div>
+    </form>
+  </dialog>
+
   <script src="js/auth.js"></script>
+  <script src="js/timetable-import.js"></script>
   <script src="js/school.js"></script>
   <script src="js/session-nav.js"></script>
 </body>
