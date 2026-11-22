@@ -161,14 +161,67 @@
         '" and all its data will be permanently deleted.')) return;
 
       var confirmButton = document.getElementById('confirm-delete-account');
+      var leavingUser = currentUser;
       confirmButton.disabled = true;
+      confirmButton.textContent = 'Deleting…';
       window.LandedAuth.deleteCurrentAccount(deletePassword.value).then(function () {
+        // Wait for the goodbye email (it gives up after a few seconds) before leaving the page.
+        return window.LandedEmail ? window.LandedEmail.account.deleted(leavingUser) : false;
+      }).then(function (emailed) {
         deleteDialog.close();
-        window.alert('Your account has been deleted. We are sorry to see you go.');
+        window.alert('Your account has been deleted. We are sorry to see you go.' +
+          (emailed ? ' A confirmation was sent to ' + leavingUser.email + '.' : ''));
         window.location.replace('login.html');
       }).catch(function (error) {
         showDeleteError(error.message || 'Could not delete your account.');
         confirmButton.disabled = false;
+        confirmButton.textContent = 'Delete account';
+      });
+    });
+
+    var feedbackDialog = document.getElementById('feedback-dialog');
+    var feedbackForm = document.getElementById('feedback-form');
+    var feedbackMessage = document.getElementById('feedback-message');
+
+    function showFeedbackMessage(text, isError) {
+      feedbackMessage.textContent = text;
+      feedbackMessage.classList.toggle('is-error', Boolean(isError));
+      feedbackMessage.hidden = !text;
+    }
+
+    document.getElementById('feedback-btn').addEventListener('click', function () {
+      feedbackForm.reset();
+      showFeedbackMessage('');
+      document.getElementById('send-feedback-btn').disabled = false;
+      feedbackDialog.showModal();
+    });
+
+    document.getElementById('cancel-feedback').addEventListener('click', function () {
+      feedbackDialog.close();
+    });
+
+    feedbackForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+      var topic = feedbackForm.elements.topic.value;
+      var text = feedbackForm.elements.message.value.trim();
+      if (!topic || text.length < 10) {
+        showFeedbackMessage('Choose a topic and write at least 10 characters.', true);
+        return;
+      }
+      if (!window.LandedEmail || !window.LandedEmail.isOn()) {
+        showFeedbackMessage('Email is not set up yet, so your message could not be sent.', true);
+        return;
+      }
+      var sendButton = document.getElementById('send-feedback-btn');
+      sendButton.disabled = true;
+      showFeedbackMessage('Sending…');
+      window.LandedEmail.account.feedback(currentUser, topic, text).then(function (sent) {
+        if (sent) {
+          showFeedbackMessage('Thanks! Your message was sent. The team will reply to ' + currentUser.email + '.');
+        } else {
+          showFeedbackMessage('Your message could not be sent. Please try again later.', true);
+          sendButton.disabled = false;
+        }
       });
     });
 

@@ -118,6 +118,22 @@
   border-color: #FECACA;
 }
 .danger-text { flex: 1; min-width: 0; }
+.contact-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+  margin-top: 1.5rem;
+  padding: 1.4rem 1.6rem;
+}
+.contact-card .danger-text h2 { color: var(--navy); }
+.contact-card .btn { flex: none; }
+.profile-dialog select {
+  width: 100%;
+  padding: .65rem .75rem;
+  border: 1px solid var(--pale-blue-2);
+  border-radius: var(--radius-xs);
+  color: var(--navy);
+  background: var(--white);
+  font: inherit;
+}
 .danger-text h2 { font-size: 1rem; color: #B91C1C; margin-bottom: .25rem; }
 .danger-text p { font-size: .88rem; color: var(--mid-blue-2); margin: 0; }
 .btn-danger-outline { flex: none; background: transparent; color: #B91C1C; border-color: #FECACA; }
@@ -130,5 +146,5 @@
   background: #fff0ef; color: #9c2520;
 }
 @media (max-width: 600px) {
-  .danger-card { flex-direction: column; align-items: flex-start; }
+  .danger-card, .contact-card { flex-direction: column; align-items: flex-start; }
 }

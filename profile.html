@@ -180,6 +180,15 @@
         <div class="badges-grid" id="profile-badges-grid" aria-label="Your badges"></div>
       </div><!-- /.badges card -->
 
+      <!-- Contact the team -->
+      <div class="card contact-card" aria-labelledby="contact-heading">
+        <div class="danger-text">
+          <h2 id="contact-heading">Contact the Landed team</h2>
+          <p>Questions, ideas or a problem with the app? Send us a message and we will reply by email.</p>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline" id="feedback-btn">Send feedback</button>
+      </div>
+
       <!-- Delete account -->
       <div class="card danger-card" aria-labelledby="danger-heading">
         <div class="danger-text">
@@ -190,6 +199,27 @@
       </div>
 
     </main>
+    <dialog class="profile-dialog" id="feedback-dialog" aria-labelledby="feedback-title">
+      <form id="feedback-form" novalidate>
+        <h2 id="feedback-title">Send feedback</h2>
+        <p id="feedback-message" class="auth-message" role="status" aria-live="polite" hidden></p>
+        <label for="feedback-topic">Topic</label>
+        <select id="feedback-topic" name="topic" required>
+          <option value="">Choose a topic</option>
+          <option>Question</option>
+          <option>Idea or suggestion</option>
+          <option>Something is not working</option>
+          <option>Other</option>
+        </select>
+        <label for="feedback-text">Message</label>
+        <textarea id="feedback-text" name="message" rows="5" maxlength="1000" required
+          placeholder="Tell us what is on your mind (at least 10 characters)."></textarea>
+        <div class="profile-dialog-actions">
+          <button type="button" class="btn btn-outline" id="cancel-feedback">Close</button>
+          <button type="submit" class="btn btn-gold" id="send-feedback-btn">Send message</button>
+        </div>
+      </form>
+    </dialog>
     <dialog class="profile-dialog" id="delete-account-dialog" aria-labelledby="delete-account-title">
       <form id="delete-account-form" novalidate>
         <h2 id="delete-account-title">Delete your account?</h2>
@@ -224,6 +254,7 @@
   </div><!-- /.app-shell -->
 
   <script src="js/auth.js"></script>
+  <script type="module" src="react-dist/email.js"></script>
   <script src="js/profile.js"></script>
   <script src="js/session-nav.js"></script>
 </body>
