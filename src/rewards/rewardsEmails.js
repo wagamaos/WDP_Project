@@ -32,43 +32,23 @@ export function emailRedemptionReceipt(user, reward, result) {
   });
 }
 
-// Thank-you with the drop-off details the student entered.
+// Thank-you with a record of where and when the student left the item.
 export function emailDonationThanks(user, details, result) {
   return sendNotification({
     to: user.email,
     toName: user.name,
     subject: `Thank you for donating ${details.name}`,
     heading: `Thank you, ${firstName(user.name)}! 💛`,
-    intro: 'Your donation is now listed for other students. Please drop the item off at the school office on the date below.',
+    intro: 'Your donation is now listed for other students to redeem. Keep this email as your record of the item you left with the school office.',
     rows: [
       ['Item', details.name],
-      ['Drop off at', details.schoolOffice],
-      ['Drop-off date', longDate(details.collectionDate)],
+      ['Left at', details.schoolOffice],
+      ['Date left', longDate(details.collectionDate)],
       ['Points earned', '+' + pts(result.donation.points)],
       ['New balance', pts(result.user.points)]
     ],
     buttonLabel: 'View rewards',
     buttonPage: 'rewards.html',
     footer: 'You are receiving this because you donated a reward on Landed.'
-  });
-}
-
-// Celebrates badges that were not earned before the action but are now.
-export function emailNewBadges(user, badgesBefore, badgesAfter) {
-  const before = new Set(badgesBefore.filter((badge) => badge.earned).map((badge) => badge.name));
-  const unlocked = badgesAfter.filter((badge) => badge.earned && !before.has(badge.name));
-  if (!unlocked.length) return Promise.resolve(false);
-
-  const one = unlocked.length === 1;
-  return sendNotification({
-    to: user.email,
-    toName: user.name,
-    subject: one ? `You unlocked the ${unlocked[0].name} badge! 🏅` : `You unlocked ${unlocked.length} new badges! 🏅`,
-    heading: `New badge${one ? '' : 's'}, ${firstName(user.name)}!`,
-    intro: `You now have ${badgesAfter.filter((badge) => badge.earned).length} of ${badgesAfter.length} badges. Keep going!`,
-    rows: unlocked.map((badge) => [badge.name, badge.detail]),
-    buttonLabel: 'See your badges',
-    buttonPage: 'rewards.html',
-    footer: 'You are receiving this because you earned a badge on Landed.'
   });
 }

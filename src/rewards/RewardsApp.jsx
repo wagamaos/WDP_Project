@@ -3,7 +3,7 @@ import { api } from '../shared/landed.js';
 import { useDialog } from '../shared/useDialog.js';
 import { longDate } from '../shared/dates.js';
 import DonateDialog from './DonateDialog.jsx';
-import { emailDonationThanks, emailNewBadges, emailRedemptionReceipt } from './rewardsEmails.js';
+import { emailDonationThanks, emailRedemptionReceipt } from './rewardsEmails.js';
 import {
   BadgeIcon, GIFT_ICON, milestoneProgress, redeemState, stockLabel
 } from './rewardsUtils.jsx';
@@ -122,7 +122,6 @@ export default function RewardsApp() {
 
   function donate(details) {
     const donor = user;
-    const badgesBefore = api().getBadgeCatalog(donor);
     return api().donateReward(details).then((result) => {
       setDonateOpen(false);
       const title = 'Donation recorded';
@@ -131,8 +130,7 @@ export default function RewardsApp() {
         message: `Thank you! ${result.donation.points} points were added to your balance, and your reward is now listed for other students.`
       });
       noteEmailed(title, emailDonationThanks(donor, details, result),
-        `The drop-off details were emailed to ${donor.email}.`);
-      emailNewBadges(donor, badgesBefore, api().getBadgeCatalog(result.user));
+        `A record of your donation was emailed to ${donor.email}.`);
       return refresh();
     });
   }
