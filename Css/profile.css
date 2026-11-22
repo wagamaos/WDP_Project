@@ -112,9 +112,12 @@
 
 /* Delete account */
 .danger-card {
-  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+  margin-top: 1.5rem;
+  padding: 1.4rem 1.6rem;
   border-color: #FECACA;
 }
+.danger-text { flex: 1; min-width: 0; }
 .danger-text h2 { font-size: 1rem; color: #B91C1C; margin-bottom: .25rem; }
 .danger-text p { font-size: .88rem; color: var(--mid-blue-2); margin: 0; }
 .btn-danger-outline { flex: none; background: transparent; color: #B91C1C; border-color: #FECACA; }
