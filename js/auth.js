@@ -122,6 +122,13 @@
     return Promise.resolve(user);
   }
 
+  function requireAdmin() {
+    if (window.localStorage.getItem(ADMIN_KEY) !== '1') {
+      return Promise.reject(new Error('Admin access required. Please sign in to the admin panel again.'));
+    }
+    return Promise.resolve();
+  }
+
   function getUserSchool(user) {
     state.schoolByUser = state.schoolByUser || {};
     if (!state.schoolByUser[user.email]) {
@@ -602,41 +609,75 @@
       return window.localStorage.getItem(ADMIN_KEY) === '1';
     },
     adminListReportedPosts: function () {
-      return Promise.resolve(clone(state.forumPosts.filter(function (post) {
-        return post.reports && post.reports.length;
-      })));
+      return requireAdmin().then(function () {
+        return clone(state.forumPosts.filter(function (post) {
+          return post.reports && post.reports.length;
+        }));
+      });
+    },
+    adminListForumPosts: function () {
+      return requireAdmin().then(function () {
+        return clone(state.forumPosts).sort(function (a, b) {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+      });
     },
     adminDismissReports: function (postId) {
-      var post = state.forumPosts.find(function (item) { return item.id === postId; });
-      if (post) post.reports = [];
-      save();
-      return Promise.resolve();
+      return requireAdmin().then(function () {
+        var post = state.forumPosts.find(function (item) { return item.id === postId; });
+        if (!post) throw new Error('Post not found.');
+        post.reports = [];
+        save();
+      });
     },
     adminDeleteForumPost: function (postId) {
-      state.forumPosts = state.forumPosts.filter(function (post) { return post.id !== postId; });
-      save();
-      return Promise.resolve();
+      return requireAdmin().then(function () {
+        state.forumPosts = state.forumPosts.filter(function (post) { return post.id !== postId; });
+        save();
+      });
+    },
+    adminDeleteForumComment: function (postId, commentId) {
+      return requireAdmin().then(function () {
+        var post = state.forumPosts.find(function (item) { return item.id === postId; });
+        var comment = post && post.comments.find(function (item) { return item.id === commentId; });
+        if (!post || !comment) throw new Error('Comment not found.');
+        var author = findUser(comment.authorEmail);
+        var helpfulCount = (comment.helpfulBy || []).length;
+        if (author && helpfulCount) author.helpfulAnswers = Math.max(0, (author.helpfulAnswers || 0) - helpfulCount);
+        post.comments = post.comments.filter(function (item) { return item.id !== commentId; });
+        save();
+        return clone(post);
+      });
+    },
+    // Unlike listRewards, this includes out-of-stock rewards so admins can restock them.
+    adminListRewards: function () {
+      return requireAdmin().then(function () { return clone(state.rewards); });
     },
     adminAddReward: function (details) {
-      var reward = rewardRequest(details);
-      reward.id = uid('reward');
-      reward.donatedAt = todayIso();
-      reward.image = null;
-      state.rewards.push(reward);
-      save();
-      return Promise.resolve(clone(reward));
+      return requireAdmin().then(function () {
+        var reward = rewardRequest(details);
+        reward.id = uid('reward');
+        reward.donatedAt = todayIso();
+        reward.image = null;
+        state.rewards.push(reward);
+        save();
+        return clone(reward);
+      });
     },
     adminDeleteReward: function (rewardId) {
-      state.rewards = state.rewards.filter(function (reward) { return reward.id !== rewardId; });
-      save();
-      return Promise.resolve();
+      return requireAdmin().then(function () {
+        state.rewards = state.rewards.filter(function (reward) { return reward.id !== rewardId; });
+        save();
+      });
     },
     adminUpdateReward: function (rewardId, changes) {
-      var reward = state.rewards.find(function (item) { return item.id === rewardId; });
-      if (!reward) return Promise.reject(new Error('Reward not found.'));
-      Object.assign(reward, rewardRequest(changes));
-      save();
-      return Promise.resolve(clone(reward));
+      return requireAdmin().then(function () {
+        var reward = state.rewards.find(function (item) { return item.id === rewardId; });
+        if (!reward) throw new Error('Reward not found.');
+        Object.assign(reward, rewardRequest(changes));
+        save();
+        return clone(reward);
+      });
     }
   };
 

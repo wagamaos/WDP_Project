@@ -319,3 +319,17 @@
 .admin-empty   { text-align: center; padding: 3rem 1rem; color: var(--mid-blue-2); }
 .admin-empty svg { width: 40px; height: 40px; stroke: var(--mid-blue-1); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; display: block; margin: 0 auto .8rem; }
 .admin-empty p { font-size: .92rem; }
+
+/* ── Forum moderation ── */
+.report-card-icon.forum-icon { background: var(--pale-blue-1); }
+.report-card-icon.forum-icon svg { stroke: var(--royal); }
+.report-flag { color: #9c2520; }
+#forum-dialog .admin-message { margin: 1rem 1.5rem 0; }
+.admin-comment { display: flex; align-items: flex-start; gap: .75rem; }
+.admin-comment-text { flex: 1; min-width: 0; }
+.admin-comment-body { font-size: .88rem; color: var(--navy); line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.admin-comment-delete {
+  flex: none; padding: .3rem .75rem; border-radius: var(--radius-xs);
+  font-family: inherit; font-size: .78rem; font-weight: 600; cursor: pointer; border: 1.5px solid;
+}
+.admin-comment-empty { font-size: .85rem; color: var(--mid-blue-2); }

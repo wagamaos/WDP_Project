@@ -51,6 +51,10 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/></svg>
           Rewards Catalogue
         </button>
+        <button class="admin-nav-item" id="nav-forum" data-section="forum">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Forum Posts
+        </button>
         <button class="admin-nav-item" id="nav-reports" data-section="reports">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           Forum Reports
@@ -84,6 +88,26 @@
 
         <div class="rewards-grid" id="rewards-grid">
           <div class="admin-loading">Loading rewards…</div>
+        </div>
+      </section>
+
+      <!-- ── FORUM SECTION ── -->
+      <section class="admin-section" id="section-forum">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Forum Posts</h2>
+            <p class="section-sub">Moderate every post and comment, reported or not.</p>
+          </div>
+          <button class="btn-admin-secondary" id="refresh-forum-btn">
+            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+
+        <div class="admin-message" id="forum-message" role="alert" hidden></div>
+
+        <div id="forum-list">
+          <div class="admin-loading">Loading posts…</div>
         </div>
       </section>
 
@@ -168,6 +192,22 @@
       <div class="dialog-actions">
         <button type="button" class="btn-admin-ghost"    id="dismiss-reports-btn">Dismiss all reports</button>
         <button type="button" class="btn-admin-danger"   id="delete-post-btn">Delete post</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ===== MODERATE POST DIALOG ===== -->
+  <dialog class="admin-dialog admin-dialog-wide" id="forum-dialog" aria-labelledby="forum-dialog-title">
+    <div>
+      <div class="dialog-header">
+        <h2 id="forum-dialog-title">Moderate Post</h2>
+        <button type="button" class="dialog-close" id="close-forum-dialog" aria-label="Close">×</button>
+      </div>
+      <div class="admin-message" id="forum-dialog-message" role="alert" hidden></div>
+      <div id="forum-dialog-body"></div>
+      <div class="dialog-actions">
+        <button type="button" class="btn-admin-ghost"  id="cancel-forum-dialog">Close</button>
+        <button type="button" class="btn-admin-danger" id="forum-dialog-delete-btn">Delete post</button>
       </div>
     </div>
   </dialog>

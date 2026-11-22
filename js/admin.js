@@ -110,6 +110,7 @@
       s.classList.toggle('active', s.id === 'section-' + name);
     });
     if (name === 'rewards') renderRewards();
+    if (name === 'forum') renderForum();
     if (name === 'reports') renderReports();
   }
 
@@ -140,7 +141,7 @@
     grid.innerHTML = '<div class="admin-loading">Loading…</div>';
     showAdminMsg('rewards-message', '', '');
 
-    window.LandedAuth.listRewards().then(function (rewards) {
+    window.LandedAuth.adminListRewards().then(function (rewards) {
       if (!rewards.length) {
         grid.innerHTML = '<div class="admin-empty"><svg viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/></svg><p>No rewards yet. Add one above.</p></div>';
         return;
@@ -282,6 +283,127 @@
       var er = document.getElementById(id + '-error');
       if (el) el.classList.remove('has-error');
       if (er) er.textContent = '';
+    });
+  }
+
+  /* ═══════════════════════════════════════════
+     FORUM (all posts and comments)
+     ═══════════════════════════════════════════ */
+  var moderatingPostId = null;
+  var forumDialog = document.getElementById('forum-dialog');
+
+  function plural(count, word) {
+    return count + ' ' + word + (count === 1 ? '' : 's');
+  }
+
+  function renderForum() {
+    var list = document.getElementById('forum-list');
+    list.innerHTML = '<div class="admin-loading">Loading…</div>';
+
+    window.LandedAuth.adminListForumPosts().then(function (posts) {
+      if (!posts.length) {
+        list.innerHTML = '<div class="admin-empty"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>No forum posts yet.</p></div>';
+        return;
+      }
+      list.innerHTML = '';
+      posts.forEach(function (post) { list.appendChild(buildForumCard(post)); });
+    }).catch(function (err) {
+      list.innerHTML = '';
+      showAdminMsg('forum-message', err.message, 'error');
+    });
+  }
+
+  document.getElementById('refresh-forum-btn').addEventListener('click', function () {
+    showAdminMsg('forum-message', '', '');
+    renderForum();
+  });
+
+  function buildForumCard(post) {
+    var reports = (post.reports || []).length;
+    var card = document.createElement('div');
+    card.className = 'report-card';
+    card.innerHTML =
+      '<div class="report-card-head">' +
+      '<div class="report-card-icon forum-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>' +
+      '<div class="report-card-info">' +
+      '<div class="report-card-title">' + esc(post.title) + '</div>' +
+      '<div class="report-card-meta">' + esc(post.category) + ' · by ' + esc(post.author) + ' · ' + formatDate(post.createdAt) +
+      ' · ' + plural(post.comments.length, 'comment') + ' · ' + plural((post.likes || []).length, 'like') +
+      (reports ? ' · <strong class="report-flag">' + plural(reports, 'report') + '</strong>' : '') + '</div>' +
+      '</div>' +
+      '</div>' +
+      '<div class="report-card-actions">' +
+      '<button class="btn-admin-ghost moderate-btn" style="flex:1">View &amp; moderate comments</button>' +
+      '<button class="btn-admin-danger delete-btn">Delete post</button>' +
+      '</div>';
+
+    card.querySelector('.moderate-btn').addEventListener('click', function () {
+      openForumDialog(post);
+    });
+    card.querySelector('.delete-btn').addEventListener('click', function () {
+      adminDeletePost(post.id, post.title, false);
+    });
+    return card;
+  }
+
+  function openForumDialog(post) {
+    moderatingPostId = post.id;
+    showAdminMsg('forum-dialog-message', '', '');
+    renderForumDialog(post);
+    if (!forumDialog.open) forumDialog.showModal();
+  }
+
+  function renderForumDialog(post) {
+    var body = document.getElementById('forum-dialog-body');
+    body.innerHTML =
+      '<div class="report-post-view">' +
+      '<div class="report-post-title">' + esc(post.title) + '</div>' +
+      '<div class="report-post-meta">' + esc(post.category) + ' · by ' + esc(post.author) + ' · ' + formatDate(post.createdAt) + '</div>' +
+      '<div class="report-post-body">' + esc(post.body) + '</div>' +
+      '<div class="report-list-title">' + plural(post.comments.length, 'Comment') + '</div>' +
+      (post.comments.length ? '' : '<p class="admin-comment-empty">No comments on this post.</p>') +
+      '</div>';
+
+    var view = body.querySelector('.report-post-view');
+    post.comments.forEach(function (comment) {
+      var row = document.createElement('div');
+      row.className = 'report-entry admin-comment';
+      row.innerHTML =
+        '<div class="admin-comment-text">' +
+        '<div class="admin-comment-body">' + esc(comment.body) + '</div>' +
+        '<div class="report-entry-by">' + esc(comment.author) + ' · ' + formatDate(comment.createdAt) + '</div>' +
+        '</div>' +
+        '<button type="button" class="reward-delete-btn admin-comment-delete">Delete</button>';
+      row.querySelector('button').addEventListener('click', function () {
+        if (!confirm('Delete this comment by ' + comment.author + '? This cannot be undone.')) return;
+        window.LandedAuth.adminDeleteForumComment(post.id, comment.id).then(function (updated) {
+          renderForumDialog(updated);
+          showAdminMsg('forum-dialog-message', 'Comment deleted.', 'success');
+          renderForum();
+        }).catch(function (err) {
+          showAdminMsg('forum-dialog-message', err.message, 'error');
+        });
+      });
+      view.appendChild(row);
+    });
+  }
+
+  function closeForumDialog() { forumDialog.close(); }
+  document.getElementById('close-forum-dialog').addEventListener('click', closeForumDialog);
+  document.getElementById('cancel-forum-dialog').addEventListener('click', closeForumDialog);
+  document.getElementById('forum-dialog-delete-btn').addEventListener('click', function () {
+    if (moderatingPostId) adminDeletePost(moderatingPostId, null, true);
+  });
+
+  function adminDeletePost(postId, title, fromDialog) {
+    var label = title ? '"' + title + '"' : 'this post';
+    if (!confirm('Permanently delete ' + label + ' and all its comments? This cannot be undone.')) return;
+    window.LandedAuth.adminDeleteForumPost(postId).then(function () {
+      if (fromDialog) closeForumDialog();
+      showAdminMsg('forum-message', (title ? label : 'The post') + ' has been deleted.', 'success');
+      renderForum();
+    }).catch(function (err) {
+      showAdminMsg(fromDialog ? 'forum-dialog-message' : 'forum-message', err.message, 'error');
     });
   }
 
