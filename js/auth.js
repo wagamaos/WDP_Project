@@ -41,6 +41,8 @@
       redemptions: [],
       donations: [],
       eventRegistrations: {},
+      eventAttendance: {},
+      eventPointAwards: {},
       events: [
         { id: 'orientation', title: 'International Student Orientation', startAt: future(7), endAt: future(7), location: 'Gachon University Hall', eventType: 'Orientation', capacity: 120, registeredCount: 34, pointsAwarded: 20 },
         { id: 'language', title: 'Korean Language Exchange', startAt: future(12), endAt: future(12), location: 'Student Lounge', eventType: 'Social', capacity: 40, registeredCount: 18, pointsAwarded: 20 },
@@ -79,6 +81,8 @@
       var loaded = value ? JSON.parse(value) : seedState();
       loaded.currencies = loaded.currencies || {};
       loaded.eventRegistrations = loaded.eventRegistrations || {};
+      loaded.eventAttendance = loaded.eventAttendance || {};
+      loaded.eventPointAwards = loaded.eventPointAwards || {};
       loaded.forumPosts = loaded.forumPosts || [];
       loaded.users = loaded.users || [];
       loaded.school = loaded.school || seedState().school;
@@ -92,6 +96,43 @@
   }
 
   var state = readState();
+
+  var eventDetails = {
+    orientation: {
+      organiserType: 'Student Union',
+      price: 0
+    },
+    language: {
+      organiserType: 'Student Run',
+      price: 5000
+    },
+    career: {
+      organiserType: 'Student Union',
+      price: 8000
+    }
+  };
+
+  var updated = false;
+
+  state.events.forEach(function (event) {
+    var details = eventDetails[event.id];
+
+    if (details) {
+      if (event.organiserType == null) {
+        event.organiserType = details.organiserType;
+        updated = true;
+      }
+
+      if (event.price == null) {
+        event.price = details.price;
+        updated = true;
+      }
+    }
+  });
+
+  if (updated) {
+    save();
+  }
 
   function save() {
     window.localStorage.setItem(STATE_KEY, JSON.stringify(state));
@@ -507,6 +548,102 @@
       save();
       return Promise.resolve({ registered: index < 0 });
     },
+    createEvent: function (details) {
+      var email = window.localStorage.getItem(SESSION_KEY);
+
+      if (!email) {
+        return Promise.reject(new Error('Please log in first.'));
+      }
+
+      if (!details.title || !details.startAt || !details.location) {
+        return Promise.reject(new Error('Please fill in the required event details.'));
+      }
+
+      var event = {
+        id: uid('event'),
+        title: details.title,
+        startAt: details.startAt,
+        endAt: details.endAt || details.startAt,
+        location: details.location,
+        eventType: details.eventType || 'Social',
+        organiserType: 'Student Run',
+        createdBy: email,
+        price: Math.max(0, Number(details.price) || 0),
+        capacity: details.capacity === '' || details.capacity == null
+          ? null
+          : Math.max(1, Number(details.capacity)),
+        registeredCount: 0,
+        pointsAwarded: 0
+      };
+
+      state.events.push(event);
+      save();
+
+      return Promise.resolve(clone(event));
+    },
+
+    updateEvent: function (eventId, details) {
+      var email = window.localStorage.getItem(SESSION_KEY);
+      var event = state.events.find(function (item) {
+        return item.id === eventId;
+      });
+
+      if (!email) return Promise.reject(new Error('Please log in first.'));
+      if (!event) return Promise.reject(new Error('Event not found.'));
+      if (event.createdBy !== email) {
+        return Promise.reject(new Error('You can only edit your own events.'));
+      }
+
+      if (!details.title || !details.startAt || !details.location) {
+        return Promise.reject(new Error('Please fill in the required event details.'));
+      }
+
+      event.title = details.title;
+      event.startAt = details.startAt;
+      event.endAt = details.endAt || details.startAt;
+      event.location = details.location;
+      event.eventType = details.eventType || 'Social';
+      event.price = Math.max(0, Number(details.price) || 0);
+      event.capacity = details.capacity === '' || details.capacity == null
+        ? null
+        : Math.max(1, Number(details.capacity));
+
+      save();
+      return Promise.resolve(clone(event));
+    },
+
+    deleteEvent: function (eventId) {
+      var email = window.localStorage.getItem(SESSION_KEY);
+      var event = state.events.find(function (item) {
+        return item.id === eventId;
+      });
+
+      if (!email) return Promise.reject(new Error('Please log in first.'));
+      if (!event) return Promise.reject(new Error('Event not found.'));
+      if (event.createdBy !== email) {
+        return Promise.reject(new Error('You can only delete your own events.'));
+      }
+
+      state.events = state.events.filter(function (item) {
+        return item.id !== eventId;
+      });
+
+      delete state.eventRegistrations[eventId];
+
+      save();
+      return Promise.resolve();
+    },
+
+    listMyEvents: function () {
+      var email = window.localStorage.getItem(SESSION_KEY);
+
+      if (!email) return Promise.reject(new Error('Please log in first.'));
+
+      return Promise.resolve(clone(state.events.filter(function (event) {
+        return event.createdBy === email;
+      })));
+    },
+    
     getSchoolData: function () {
       return requireUser().then(function (user) {
         var school = getUserSchool(user);
@@ -610,7 +747,7 @@
         });
       });
       var eventsAttended = state.events.filter(function (event) {
-        return (state.eventRegistrations[event.id] || []).indexOf(email) !== -1;
+        return (state.eventAttendance[event.id] || []).indexOf(email) !== -1;
       }).length;
       return Promise.resolve({
         forumPosts: forumPosts,
@@ -712,6 +849,202 @@
     adminIsLoggedIn: function () {
       return window.localStorage.getItem(ADMIN_KEY) === '1';
     },
+
+    adminListEvents: function () {
+      if (window.localStorage.getItem(ADMIN_KEY) !== '1') {
+        return Promise.reject(new Error('Admin access required.'));
+      }
+
+      var events = state.events.map(function (event) {
+        var copy = clone(event);
+        var registeredEmails = state.eventRegistrations[event.id] || [];
+        var attendanceEmails = state.eventAttendance[event.id] || [];
+
+        copy.registeredStudents = registeredEmails.map(function (email) {
+          var student = findUser(email);
+
+          return {
+            email: email,
+            name: student ? student.name : email,
+            attended: attendanceEmails.indexOf(email) !== -1
+          };
+        });
+
+        return copy;
+      });
+
+      return Promise.resolve(events);
+    },
+
+    adminAddEvent: function (details) {
+      if (window.localStorage.getItem(ADMIN_KEY) !== '1') {
+        return Promise.reject(new Error('Admin access required.'));
+      }
+
+      details = details || {};
+
+      if (!details.title || !details.startAt || !details.location) {
+        return Promise.reject(new Error('Please fill in the required event details.'));
+      }
+
+      var event = {
+        id: uid('event'),
+        title: details.title,
+        startAt: details.startAt,
+        endAt: details.endAt || details.startAt,
+        location: details.location,
+        eventType: details.eventType || 'Social',
+        organiserType: 'Student Union',
+        createdBy: 'admin',
+        price: Math.max(0, Number(details.price) || 0),
+        capacity: details.capacity === '' || details.capacity == null
+          ? null
+          : Math.max(1, Number(details.capacity)),
+        registeredCount: 0,
+        pointsAwarded: Math.max(0, Number(details.pointsAwarded) || 0)
+      };
+
+      state.events.push(event);
+      save();
+
+      return Promise.resolve(clone(event));
+    },
+
+    adminUpdateEvent: function (eventId, details) {
+      if (window.localStorage.getItem(ADMIN_KEY) !== '1') {
+        return Promise.reject(new Error('Admin access required.'));
+      }
+
+      details = details || {};
+
+      var event = state.events.find(function (item) {
+        return item.id === eventId;
+      });
+
+      if (!event) return Promise.reject(new Error('Event not found.'));
+      if (event.organiserType !== 'Student Union') {
+        return Promise.reject(new Error('Admins can only edit Student Union events.'));
+      }
+
+      if (!details.title || !details.startAt || !details.location) {
+        return Promise.reject(new Error('Please fill in the required event details.'));
+      }
+
+      event.title = details.title;
+      event.startAt = details.startAt;
+      event.endAt = details.endAt || details.startAt;
+      event.location = details.location;
+      event.eventType = details.eventType || 'Social';
+      event.price = Math.max(0, Number(details.price) || 0);
+      event.capacity = details.capacity === '' || details.capacity == null
+        ? null
+        : Math.max(1, Number(details.capacity));
+      event.pointsAwarded = Math.max(0, Number(details.pointsAwarded) || 0);
+
+      save();
+
+      return Promise.resolve(clone(event));
+    },
+
+    adminDeleteEvent: function (eventId) {
+      if (window.localStorage.getItem(ADMIN_KEY) !== '1') {
+        return Promise.reject(new Error('Admin access required.'));
+      }
+
+      var event = state.events.find(function (item) {
+        return item.id === eventId;
+      });
+
+      if (!event) return Promise.reject(new Error('Event not found.'));
+      if (event.organiserType !== 'Student Union') {
+        return Promise.reject(new Error('Admins can only delete Student Union events.'));
+      }
+
+      state.events = state.events.filter(function (item) {
+        return item.id !== eventId;
+      });
+
+      delete state.eventRegistrations[eventId];
+      delete state.eventAttendance[eventId];
+      delete state.eventPointAwards[eventId];
+
+      save();
+
+      return Promise.resolve();
+    },
+
+    adminMarkAttendance: function (eventId, studentEmail, attended) {
+      if (window.localStorage.getItem(ADMIN_KEY) !== '1') {
+        return Promise.reject(new Error('Admin access required.'));
+      }
+
+      var event = state.events.find(function (item) {
+        return item.id === eventId;
+      });
+
+      if (!event) {
+        return Promise.reject(new Error('Event not found.'));
+      }
+
+      if (event.organiserType !== 'Student Union') {
+        return Promise.reject(new Error('Attendance can only be managed for Student Union events.'));
+      }
+
+      var registered = state.eventRegistrations[eventId] || [];
+
+      if (registered.indexOf(studentEmail) === -1) {
+        return Promise.reject(new Error('This student is not registered for the event.'));
+      }
+
+      state.eventAttendance[eventId] = state.eventAttendance[eventId] || [];
+      state.eventPointAwards[eventId] = state.eventPointAwards[eventId] || {};
+
+      var attendance = state.eventAttendance[eventId];
+      var alreadyAttended = attendance.indexOf(studentEmail) !== -1;
+
+      if (attended && !alreadyAttended) {
+        var student = findUser(studentEmail);
+
+        if (!student) {
+          return Promise.reject(new Error('Student account not found.'));
+        }
+
+        var award = Math.max(0, Number(event.pointsAwarded) || 0);
+
+        attendance.push(studentEmail);
+        state.eventPointAwards[eventId][studentEmail] = award;
+        student.points = (Number(student.points) || 0) + award;
+
+      } else if (!attended && alreadyAttended) {
+        attendance.splice(attendance.indexOf(studentEmail), 1);
+
+        var studentToReverse = findUser(studentEmail);
+
+        var previousAward = Object.prototype.hasOwnProperty.call(
+          state.eventPointAwards[eventId],
+          studentEmail
+        )
+          ? Number(state.eventPointAwards[eventId][studentEmail]) || 0
+          : Number(event.pointsAwarded) || 0;
+
+        if (studentToReverse) {
+          studentToReverse.points = Math.max(
+            0,
+            (Number(studentToReverse.points) || 0) - previousAward
+          );
+        }
+
+        delete state.eventPointAwards[eventId][studentEmail];
+      }
+
+      save();
+
+      return Promise.resolve({
+        attended: attended,
+        pointsAwarded: attended ? (Number(event.pointsAwarded) || 0) : 0
+      });
+    },
+
     adminListReportedPosts: function () {
       return Promise.resolve(clone(state.forumPosts.filter(function (post) {
         return post.reports && post.reports.length;

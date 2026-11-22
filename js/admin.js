@@ -111,6 +111,7 @@
     });
     if (name === 'rewards') renderRewards();
     if (name === 'reports') renderReports();
+    if (name === 'events') renderEvents();
   }
 
   /* ═══════════════════════════════════════════
@@ -199,6 +200,230 @@
     });
     return card;
   }
+
+
+  /* ── EVENTS MANAGEMENT ── */
+  var editingEventId = null;
+
+  function renderEvents() {
+    var grid = document.getElementById('events-grid');
+    grid.innerHTML = '<div class="admin-loading">Loading events...</div>';
+    showAdminMsg('events-message', '', '');
+
+    window.LandedAuth.adminListEvents().then(function (events) {
+      var unionEvents = events.filter(function (event) {
+        return event.organiserType === 'Student Union';
+      });
+
+      if (!unionEvents.length) {
+        grid.innerHTML =
+          '<div class="admin-empty"><p>No Student Union events yet. Add one above.</p></div>';
+        return;
+      }
+
+      grid.innerHTML = '';
+      unionEvents.forEach(function (event) {
+        grid.appendChild(buildEventCard(event));
+      });
+    }).catch(function (err) {
+      showAdminMsg('events-message', err.message, 'error');
+      grid.innerHTML = '<div class="admin-empty"><p>Unable to load events.</p></div>';
+    });
+  }
+
+  function buildEventCard(event) {
+    var card = document.createElement('div');
+    card.className = 'reward-card';
+
+    var priceLabel = Number(event.price) > 0
+      ? '₩' + Number(event.price).toLocaleString()
+      : 'Free';
+
+    var capacityLabel = event.capacity == null
+      ? 'Unlimited capacity'
+      : event.registeredCount + ' / ' + event.capacity + ' registered';
+
+    card.innerHTML =
+      '<div class="reward-card-name">' + esc(event.title) + '</div>' +
+      '<div class="reward-card-meta">Student Union · ' + esc(event.eventType || 'Social') + '</div>' +
+      '<div class="reward-card-desc">' +
+        '📅 ' + esc(formatDate(event.startAt)) +
+        '<br>📍 ' + esc(event.location) +
+        '<br>💰 ' + priceLabel +
+        '<br>👥 ' + capacityLabel +
+      '</div>' +
+      '<div class="event-attendance">' +
+      '<strong>Registered Students (' + (event.registeredStudents || []).length + ')</strong>' +
+      '<div class="event-attendance-list">' +
+        (event.registeredStudents || []).map(function (student) {
+          return '<label class="event-attendance-row">' +
+            '<span>' + esc(student.name) + '</span>' +
+            '<span>' +
+              '<input type="checkbox" class="attendance-checkbox" ' +
+              'data-email="' + esc(student.email) + '" ' +
+              (student.attended ? 'checked' : '') + '>' +
+              ' Attended' +
+            '</span>' +
+          '</label>';
+        }).join('') +
+      '</div>' +
+    '</div>' +
+    '<div class="reward-card-actions">' +
+      '<button class="event-edit-btn">Edit</button>' +
+      '<button class="event-delete-btn">Delete</button>' +
+    '</div>';
+
+    card.querySelector('.event-edit-btn').addEventListener('click', function () {
+      openEventDialog(event);
+    });
+
+    card.querySelector('.event-delete-btn').addEventListener('click', function () {
+      if (!confirm('Delete "' + event.title + '"? This cannot be undone.')) return;
+
+      window.LandedAuth.adminDeleteEvent(event.id).then(function () {
+        showAdminMsg('events-message', 'Event deleted successfully.', 'success');
+        renderEvents();
+      }).catch(function (err) {
+        showAdminMsg('events-message', err.message, 'error');
+      });
+    });
+
+    card.querySelectorAll('.attendance-checkbox').forEach(function (checkbox) {
+      checkbox.addEventListener('change', function () {
+        checkbox.disabled = true;
+
+        window.LandedAuth.adminMarkAttendance(
+          event.id,
+          checkbox.dataset.email,
+          checkbox.checked
+        ).then(function (result) {
+          showAdminMsg(
+            'events-message',
+            result.attended
+              ? 'Attendance confirmed. ' + result.pointsAwarded + ' points awarded.'
+              : 'Attendance removed and points reversed.',
+            'success'
+          );
+
+          renderEvents();
+        }).catch(function (err) {
+          checkbox.checked = !checkbox.checked;
+          checkbox.disabled = false;
+          showAdminMsg('events-message', err.message, 'error');
+        });
+      });
+    });
+
+    return card;
+  }
+
+  document.getElementById('add-event-btn').addEventListener('click', function () {
+    openEventDialog(null);
+  });
+
+  function openEventDialog(event) {
+    editingEventId = event ? event.id : null;
+
+    document.getElementById('event-dialog-title').textContent =
+      event ? 'Edit Student Union Event' : 'Add Student Union Event';
+
+    document.getElementById('save-event-btn').textContent =
+      event ? 'Save Changes' : 'Save Event';
+
+    showAdminMsg('event-form-message', '', '');
+
+    document.getElementById('e-title').value = event ? event.title : '';
+    function toLocalDateTime(value) {
+      if (!value) return '';
+
+      var date = new Date(value);
+      if (isNaN(date.getTime())) return '';
+
+      var offset = date.getTimezoneOffset() * 60000;
+      return new Date(date.getTime() - offset).toISOString().slice(0, 16);
+    }
+
+    document.getElementById('e-start').value = event ? toLocalDateTime(event.startAt) : '';
+    document.getElementById('e-end').value = event ? toLocalDateTime(event.endAt || '') : '';
+    document.getElementById('e-location').value = event ? event.location : '';
+    document.getElementById('e-type').value = event ? (event.eventType || 'Social') : 'Social';
+    document.getElementById('e-price').value = event ? event.price : 0;
+    document.getElementById('e-capacity').value =
+      event && event.capacity != null ? event.capacity : '';
+    document.getElementById('e-points').value =
+      event ? (event.pointsAwarded || 0) : 0;
+
+    document.getElementById('event-dialog').showModal();
+  }
+
+  document.getElementById('close-event-dialog').addEventListener('click', function () {
+    document.getElementById('event-dialog').close();
+  });
+
+  document.getElementById('cancel-event-btn').addEventListener('click', function () {
+    document.getElementById('event-dialog').close();
+  });
+
+  document.getElementById('event-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    var title = document.getElementById('e-title').value.trim();
+    var startAt = document.getElementById('e-start').value;
+    var endAt = document.getElementById('e-end').value;
+    var location = document.getElementById('e-location').value.trim();
+    var eventType = document.getElementById('e-type').value;
+    var price = document.getElementById('e-price').value;
+    var capacity = document.getElementById('e-capacity').value;
+    var pointsAwarded = document.getElementById('e-points').value;
+
+    if (!title || !startAt || !location) {
+      showAdminMsg('event-form-message', 'Please fill in the required fields.', 'error');
+      return;
+    }
+
+    if (endAt && new Date(endAt) < new Date(startAt)) {
+      showAdminMsg('event-form-message', 'End time cannot be earlier than start time.', 'error');
+      return;
+    }
+
+    if (Number(price) < 0 || (capacity !== '' && Number(capacity) < 1)) {
+      showAdminMsg('event-form-message', 'Please enter a valid price and capacity.', 'error');
+      return;
+    }
+
+    var details = {
+      title: title,
+      startAt: new Date(startAt).toISOString(),
+      endAt: endAt ? new Date(endAt).toISOString() : new Date(startAt).toISOString(),
+      location: location,
+      eventType: eventType,
+      price: price,
+      capacity: capacity,
+      pointsAwarded: pointsAwarded,
+    };
+
+    var btn = document.getElementById('save-event-btn');
+    btn.disabled = true;
+
+    var promise = editingEventId
+      ? window.LandedAuth.adminUpdateEvent(editingEventId, details)
+      : window.LandedAuth.adminAddEvent(details);
+
+    promise.then(function () {
+      document.getElementById('event-dialog').close();
+      showAdminMsg(
+        'events-message',
+        editingEventId ? 'Event updated successfully.' : 'Event published successfully.',
+        'success'
+      );
+      renderEvents();
+    }).catch(function (err) {
+      showAdminMsg('event-form-message', err.message, 'error');
+    }).finally(function () {
+      btn.disabled = false;
+    });
+  });
+
 
   /* Add reward button */
   document.getElementById('add-reward-btn').addEventListener('click', function () {
