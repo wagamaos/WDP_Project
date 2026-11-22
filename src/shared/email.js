@@ -14,7 +14,8 @@ export const EMAIL_CONFIG = {
   publicKey: 'TERyXz7hOociddefA',
   serviceId: 'service_6rujp0j',
   welcomeTemplateId: 'template_clb9nte',
-  notifyTemplateId: 'template_2tutwaf'
+  notifyTemplateId: 'template_2tutwaf',
+  teamEmail: 'welcome.landed@gmail.com' // where the profile page's feedback form is sent
 };
 
 const SEND_GAP_MS = 1100;   // EmailJS rejects bursts, so sends are spaced out
@@ -100,7 +101,7 @@ function detailsHtml({ rows = [], quote = '' }) {
 
 /**
  * Sends the general notification template.
- * email: { to, toName, subject, heading, intro, rows, quote, buttonLabel, buttonPage, footer }
+ * email: { to, toName, subject, heading, intro, rows, quote, buttonLabel, buttonPage, footer, replyTo }
  */
 export function sendNotification(email) {
   return sendTemplate(EMAIL_CONFIG.notifyTemplateId, {
@@ -113,6 +114,7 @@ export function sendNotification(email) {
     button_label: email.buttonLabel || 'Open Landed',
     button_url: siteUrl(email.buttonPage || 'index.html'),
     footer_note: email.footer || 'You are receiving this because you have a Landed account.',
+    reply_to: email.replyTo || '',
     site_url: siteUrl('index.html')
   });
 }
