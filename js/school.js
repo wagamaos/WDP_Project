@@ -550,22 +550,6 @@
     );
   }
 
-  function confirmImport(backup) {
-    requestConfirmation(
-      'Importing this backup replaces all current school tracker items. This cannot be undone.',
-      'Replace data',
-      function () {
-        window.LandedAuth.replaceSchoolData(backup).then(function () {
-          return refreshData();
-        }).then(function () {
-          showStatus('School tracker backup imported.');
-        }).catch(function (error) {
-          showStatus(error.message || 'Could not import this backup file.', true);
-        });
-      }
-    );
-  }
-
   function addTimetablePreviewRow(item) {
     var row = document.createElement('tr');
     var includeCell = document.createElement('td');
@@ -792,49 +776,6 @@
     });
   }
 
-  function exportSchoolBackup() {
-    if (!schoolData) return;
-    var backup = {
-      format: 'landed-school-tracker',
-      version: 1,
-      exportedAt: new Date().toISOString(),
-      classes: schoolData.classes,
-      assignments: schoolData.assignments,
-      administrativeDeadlines: schoolData.administrativeDeadlines
-    };
-    var url = window.URL.createObjectURL(new Blob(
-      [JSON.stringify(backup, null, 2)],
-      { type: 'application/json' }
-    ));
-    var link = document.createElement('a');
-    link.href = url;
-    link.download = 'landed-school-tracker-backup-' + localDateKey(new Date()) + '.json';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.setTimeout(function () { window.URL.revokeObjectURL(url); }, 1000);
-    showStatus('School tracker backup exported.');
-  }
-
-  function importSchoolBackup(event) {
-    var file = event.target.files && event.target.files[0];
-    if (!file) return;
-    event.target.value = '';
-    if (file.size > 1048576) {
-      showStatus('Backup file is too large. Choose a file smaller than 1 MB.', true);
-      return;
-    }
-    file.text().then(function (text) {
-      var backup = JSON.parse(text);
-      if (!backup || backup.format !== 'landed-school-tracker' || backup.version !== 1) {
-        throw new Error('This is not a supported School Tracker backup file.');
-      }
-      confirmImport(backup);
-    }).catch(function (error) {
-      showStatus(error.message || 'Could not import this backup file.', true);
-    });
-  }
-
   document.getElementById('add-school-item').addEventListener('click', function () {
     openEditor('class');
   });
@@ -843,11 +784,6 @@
     renderDeadlines();
   });
   document.getElementById('enable-reminders').addEventListener('click', setDeadlineReminders);
-  document.getElementById('export-school-data').addEventListener('click', exportSchoolBackup);
-  document.getElementById('import-school-data').addEventListener('click', function () {
-    document.getElementById('school-import-file').click();
-  });
-  document.getElementById('school-import-file').addEventListener('change', importSchoolBackup);
   document.getElementById('import-timetable').addEventListener('click', function () {
     document.getElementById('timetable-file').click();
   });
@@ -935,7 +871,5 @@
       button.disabled = true;
     });
     document.getElementById('enable-reminders').disabled = true;
-    document.getElementById('import-school-data').disabled = true;
-    document.getElementById('export-school-data').disabled = true;
   });
 })();

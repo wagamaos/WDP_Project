@@ -279,32 +279,6 @@
     }
   }
 
-  function validateSchoolData(data) {
-    var collections = ['classes', 'assignments', 'administrativeDeadlines'];
-    if (!data || collections.some(function (collection) {
-      return !Array.isArray(data[collection]);
-    })) {
-      throw new Error('The backup file is missing required school tracker data.');
-    }
-    var result = {};
-    collections.forEach(function (collection) {
-      result[collection] = data[collection].map(function (item) {
-        var type = collection === 'classes' ? 'classes' : collection;
-        var validated = validateSchoolItem(type, item);
-        validated.id = typeof item.id === 'string' && item.id ? item.id : uid('school');
-        return validated;
-      });
-      var ids = result[collection].map(function (item) { return item.id; });
-      if (new Set(ids).size !== ids.length) {
-        throw new Error('The backup file contains duplicate school item IDs.');
-      }
-    });
-    result.classes.forEach(function (item, index) {
-      ensureNoClassConflict(result.classes.slice(0, index), item, item.id);
-    });
-    return result;
-  }
-
   function getBadgeStatus(user) {
     var start = user.studyStartDate ? new Date(user.studyStartDate + 'T00:00:00') : null;
     var now = new Date();
@@ -618,15 +592,6 @@
         if (index === -1) throw new Error('School item not found.');
         school[collection].splice(index, 1);
         save();
-      });
-    },
-    replaceSchoolData: function (data) {
-      return requireUser().then(function (user) {
-        var validated = validateSchoolData(data);
-        state.schoolByUser = state.schoolByUser || {};
-        state.schoolByUser[user.email] = validated;
-        save();
-        return clone(validated);
       });
     },
     getBadgeCatalog: getBadgeCatalog,
