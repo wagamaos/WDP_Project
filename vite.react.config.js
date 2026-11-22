@@ -21,7 +21,9 @@ export default defineConfig({
         login: resolve(__dirname, 'src/login/main.jsx'),
         forum: resolve(__dirname, 'src/forum/main.jsx'),
         rewards: resolve(__dirname, 'src/rewards/main.jsx'),
-        events: resolve(__dirname, 'src/events/main.jsx')
+        events: resolve(__dirname, 'src/events/main.jsx'),
+        // window.LandedEmail for the plain-script pages (home, profile, school, budget, admin)
+        email: resolve(__dirname, 'src/email-global.js')
       },
       // Stable file names so the HTML can point at them.
       output: {
