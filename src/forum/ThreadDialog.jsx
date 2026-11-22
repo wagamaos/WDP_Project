@@ -5,7 +5,8 @@ import LikeButton from './LikeButton.jsx';
 import { FieldError, FormMessage, fieldProps, validateField } from './forumUtils.jsx';
 
 export default function ThreadDialog({
-  post, user, draft, onDraftChange, notice, onNotice, onClose, onComment, onHelpful, onReport
+  post, user, draft, onDraftChange, notice, onNotice, onClose, onComment, onHelpful, onReport,
+  onDeletePost, onDeleteComment
 }) {
   const [commentError, setCommentError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -31,6 +32,7 @@ export default function ThreadDialog({
   }
 
   const showError = (text) => onNotice({ text, isError: true });
+  const isOwnPost = Boolean(user && post && user.email === post.authorEmail);
 
   return (
     <dialog className="forum-dialog forum-thread-dialog" id="thread-dialog" aria-labelledby="thread-dialog-title" ref={ref}>
@@ -56,7 +58,12 @@ export default function ThreadDialog({
 
           <div className="forum-comments-heading">
             <h3>Comments</h3>
-            <button type="button" className="btn btn-outline btn-sm" id="report-post-btn" onClick={onReport}>Report post</button>
+            {isOwnPost ? (
+              <button type="button" className="btn btn-outline btn-sm forum-delete-post-btn" id="delete-post-btn"
+                onClick={onDeletePost}>Delete post</button>
+            ) : (
+              <button type="button" className="btn btn-outline btn-sm" id="report-post-btn" onClick={onReport}>Report post</button>
+            )}
           </div>
 
           <div className="forum-comments" id="thread-comments">
@@ -71,14 +78,22 @@ export default function ThreadDialog({
                     <span>{timeAgo(comment.createdAt)}</span>
                   </div>
                   <p>{comment.body}</p>
-                  <LikeButton key={`like-${comment.id}`} postId={post.id} commentId={comment.id}
-                    likes={comment.likes} user={user} onError={showError} />
-                  {canMarkHelpful && (
-                    <button type="button" className="forum-helpful-btn" disabled={marked}
-                      onClick={() => onHelpful(comment.id)}>
-                      {marked ? 'Helpful ✓' : 'Mark helpful'}
-                    </button>
-                  )}
+                  <div className="forum-comment-actions">
+                    <LikeButton key={`like-${comment.id}`} postId={post.id} commentId={comment.id}
+                      likes={comment.likes} user={user} onError={showError} />
+                    {canMarkHelpful && (
+                      <button type="button" className="forum-helpful-btn" disabled={marked}
+                        onClick={() => onHelpful(comment.id)}>
+                        {marked ? 'Helpful ✓' : 'Mark helpful'}
+                      </button>
+                    )}
+                    {user && user.email === comment.authorEmail && (
+                      <button type="button" className="forum-delete-btn" aria-label="Delete your comment"
+                        onClick={() => onDeleteComment(comment.id)}>
+                        Delete
+                      </button>
+                    )}
+                  </div>
                 </article>
               );
             })}

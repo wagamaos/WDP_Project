@@ -89,6 +89,31 @@ export default function ForumApp() {
       .catch((error) => setThreadNotice({ text: error.message, isError: true }));
   }
 
+  function deletePost() {
+    if (!window.confirm(`Delete "${thread.title}"? This removes the post and all its comments. This cannot be undone.`)) return;
+    const postId = thread.id;
+    api().deleteForumPost(postId).then(() => {
+      setDrafts((current) => {
+        const next = { ...current };
+        delete next[postId];
+        return next;
+      });
+      setThread(null);
+      setThreadNotice(null);
+      setPageMessage({ text: 'Your post was deleted.', isError: false });
+      refreshPosts();
+    }).catch((error) => setThreadNotice({ text: error.message, isError: true }));
+  }
+
+  function deleteComment(commentId) {
+    if (!window.confirm('Delete your comment? This cannot be undone.')) return;
+    api().deleteForumComment(thread.id, commentId).then((post) => {
+      setThread(post);
+      setThreadNotice({ text: 'Your comment was deleted.', isError: false });
+      refreshPosts();
+    }).catch((error) => setThreadNotice({ text: error.message, isError: true }));
+  }
+
   function openReport() {
     if (!requireLogin()) return;
     if ((thread.reports || []).some((report) => report.email === user.email)) {
@@ -222,6 +247,8 @@ export default function ForumApp() {
         onComment={addComment}
         onHelpful={markHelpful}
         onReport={openReport}
+        onDeletePost={deletePost}
+        onDeleteComment={deleteComment}
       />
 
       <ReportDialog open={reportOpen} onClose={() => setReportOpen(false)} onSubmit={submitReport} />

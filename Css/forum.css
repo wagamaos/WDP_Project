@@ -185,6 +185,16 @@
     .forum-thread-meta { color: var(--mid-blue-1); font-size: .84rem; margin: 0; }
     .forum-thread-body { line-height: 1.65; white-space: pre-wrap; margin: 1rem 0; }
     .forum-thread-actions { display: flex; justify-content: flex-end; }
+    .forum-comment-actions { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+    .forum-delete-btn {
+      margin-left: auto;
+      border: 0; background: transparent; color: #B91C1C;
+      cursor: pointer; font: inherit; font-size: .78rem; font-weight: 700; padding: .3rem .6rem;
+      border-radius: 99px;
+    }
+    .forum-delete-btn:hover { background: #FEE2E2; }
+    .forum-delete-post-btn { color: #B91C1C; border-color: #FECACA; }
+    .forum-delete-post-btn:hover { color: #B91C1C; border-color: #B91C1C; background: #FEE2E2; }
     .forum-like-btn {
       border: 1px solid var(--pale-blue-2); border-radius: 99px; padding: .3rem .7rem;
       background: #fff; color: var(--mid-blue-1); cursor: pointer; font: inherit; font-size: .82rem;

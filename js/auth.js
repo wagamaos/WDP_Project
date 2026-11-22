@@ -527,6 +527,29 @@
         return clone(post);
       });
     },
+    deleteForumPost: function (postId) {
+      return requireUser().then(function (user) {
+        var post = state.forumPosts.find(function (item) { return item.id === postId; });
+        if (!post) throw new Error('Post not found.');
+        if (post.authorEmail !== user.email) throw new Error('You can only delete your own posts.');
+        state.forumPosts = state.forumPosts.filter(function (item) { return item.id !== postId; });
+        save();
+      });
+    },
+    deleteForumComment: function (postId, commentId) {
+      return requireUser().then(function (user) {
+        var post = state.forumPosts.find(function (item) { return item.id === postId; });
+        var comment = post && post.comments.find(function (item) { return item.id === commentId; });
+        if (!post || !comment) throw new Error('Comment not found.');
+        if (comment.authorEmail !== user.email) throw new Error('You can only delete your own comments.');
+        // A deleted answer no longer counts toward the author's helpful-answer badges.
+        var helpfulCount = (comment.helpfulBy || []).length;
+        if (helpfulCount) user.helpfulAnswers = Math.max(0, (user.helpfulAnswers || 0) - helpfulCount);
+        post.comments = post.comments.filter(function (item) { return item.id !== commentId; });
+        save();
+        return clone(post);
+      });
+    },
     toggleForumLike: function (postId, commentId) {
       var email = window.localStorage.getItem(SESSION_KEY);
       if (!email) return Promise.reject(new Error('Please log in first.'));
