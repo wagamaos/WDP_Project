@@ -3,6 +3,7 @@ import { api } from '../shared/landed.js';
 import { useDialog } from '../shared/useDialog.js';
 import { longDate } from '../shared/dates.js';
 import DonateDialog from './DonateDialog.jsx';
+import { emailDonationThanks, emailNewBadges, emailRedemptionReceipt } from './rewardsEmails.js';
 import {
   BadgeIcon, GIFT_ICON, milestoneProgress, redeemState, stockLabel
 } from './rewardsUtils.jsx';
@@ -90,28 +91,48 @@ export default function RewardsApp() {
     refresh().catch((error) => setLoadError(error.message || 'Could not load rewards.'));
   }, []);
 
+  // Adds a line to the open success message once its email has actually been sent.
+  function noteEmailed(title, sending, text) {
+    sending.then((sent) => {
+      if (!sent) return;
+      setSuccess((current) => (current && current.title === title
+        ? { ...current, message: `${current.message} ${text}` }
+        : current));
+    });
+  }
+
   function redeem(reward) {
+    const redeemer = user;
     setRedeeming(true);
     setRedeemError('');
     api().redeemReward(reward.id).then((result) => {
       setSelected(null);
+      const title = 'Successfully redeemed';
       setSuccess({
-        title: 'Successfully redeemed',
+        title,
         message: `Your ${result.redemption.rewardName} will be ready for collection at your school office from ` +
           `${longDate(result.redemption.collectionDate)}. Show this confirmation and your student ID when you collect it.`
       });
+      noteEmailed(title, emailRedemptionReceipt(redeemer, reward, result),
+        `We also emailed a receipt to ${redeemer.email}.`);
       return refresh();
     }).catch((error) => setRedeemError(error.message || 'Could not redeem this reward.'))
       .finally(() => setRedeeming(false));
   }
 
   function donate(details) {
+    const donor = user;
+    const badgesBefore = api().getBadgeCatalog(donor);
     return api().donateReward(details).then((result) => {
       setDonateOpen(false);
+      const title = 'Donation recorded';
       setSuccess({
-        title: 'Donation recorded',
+        title,
         message: `Thank you! ${result.donation.points} points were added to your balance, and your reward is now listed for other students.`
       });
+      noteEmailed(title, emailDonationThanks(donor, details, result),
+        `The drop-off details were emailed to ${donor.email}.`);
+      emailNewBadges(donor, badgesBefore, api().getBadgeCatalog(result.user));
       return refresh();
     });
   }

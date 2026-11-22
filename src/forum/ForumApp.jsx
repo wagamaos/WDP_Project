@@ -5,6 +5,7 @@ import { CATEGORIES, CategoryIcon, FormMessage } from './forumUtils.jsx';
 import NewPostDialog from './NewPostDialog.jsx';
 import ReportDialog from './ReportDialog.jsx';
 import ThreadDialog from './ThreadDialog.jsx';
+import { emailHelpfulAnswer, emailReplyToAuthor, emailReportReceived } from './forumEmails.js';
 
 function sortNewestFirst(posts) {
   return [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -72,6 +73,7 @@ export default function ForumApp() {
   function addComment(text) {
     const postId = thread.id;
     return api().addForumComment(postId, text).then((post) => {
+      emailReplyToAuthor(post, user, text);
       setDrafts((current) => {
         const next = { ...current };
         delete next[postId];
@@ -84,8 +86,15 @@ export default function ForumApp() {
   }
 
   function markHelpful(commentId) {
+    const before = thread.comments.find((comment) => comment.id === commentId);
+    const alreadyMarked = Boolean(before && (before.helpfulBy || []).includes(user.email));
     api().markForumCommentHelpful(thread.id, commentId)
-      .then((post) => setThread(post))
+      .then((post) => {
+        setThread(post);
+        if (!alreadyMarked) {
+          emailHelpfulAnswer(post, post.comments.find((comment) => comment.id === commentId), user);
+        }
+      })
       .catch((error) => setThreadNotice({ text: error.message, isError: true }));
   }
 
@@ -125,9 +134,16 @@ export default function ForumApp() {
 
   function submitReport(reason, details) {
     const postId = thread.id;
+    const reported = thread;
     return api().reportForumPost(postId, reason, details).then(() => {
       setReportOpen(false);
       setThreadNotice({ text: 'Thanks. Your report was sent to the moderators.', isError: false });
+      emailReportReceived(reported, user, reason, details).then((sent) => {
+        if (!sent) return;
+        setThreadNotice((current) => (current && current.text.startsWith('Thanks. Your report')
+          ? { ...current, text: `${current.text} A confirmation was emailed to ${user.email}.` }
+          : current));
+      });
       return api().getForumPost(postId).then((post) => { if (post) setThread(post); });
     });
   }
