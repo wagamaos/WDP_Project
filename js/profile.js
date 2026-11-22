@@ -128,5 +128,49 @@
       });
     });
 
+    var deleteDialog = document.getElementById('delete-account-dialog');
+    var deleteForm = document.getElementById('delete-account-form');
+    var deleteMessage = document.getElementById('delete-account-message');
+    var deletePassword = document.getElementById('delete-password');
+
+    function showDeleteError(text) {
+      deleteMessage.textContent = text;
+      deleteMessage.hidden = false;
+      deletePassword.setAttribute('aria-invalid', 'true');
+      deletePassword.focus();
+    }
+
+    document.getElementById('delete-account-btn').addEventListener('click', function () {
+      deleteForm.reset();
+      deleteMessage.hidden = true;
+      deletePassword.removeAttribute('aria-invalid');
+      deleteDialog.showModal();
+    });
+
+    document.getElementById('cancel-delete-account').addEventListener('click', function () {
+      deleteDialog.close();
+    });
+
+    deleteForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (!deletePassword.value) {
+        showDeleteError('Please enter your password.');
+        return;
+      }
+      if (!window.confirm('Are you absolutely sure? Your account "' + currentUser.email +
+        '" and all its data will be permanently deleted.')) return;
+
+      var confirmButton = document.getElementById('confirm-delete-account');
+      confirmButton.disabled = true;
+      window.LandedAuth.deleteCurrentAccount(deletePassword.value).then(function () {
+        deleteDialog.close();
+        window.alert('Your account has been deleted. We are sorry to see you go.');
+        window.location.replace('login.html');
+      }).catch(function (error) {
+        showDeleteError(error.message || 'Could not delete your account.');
+        confirmButton.disabled = false;
+      });
+    });
+
   }).catch(showError);
 })();

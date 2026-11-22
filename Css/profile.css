@@ -109,3 +109,23 @@
 }
 .profile-dialog-actions { display: flex; justify-content: flex-end; gap: .6rem; margin-top: .75rem; }
 .profile-dialog button:disabled { cursor: wait; opacity: .7; }
+
+/* Delete account */
+.danger-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  border-color: #FECACA;
+}
+.danger-text h2 { font-size: 1rem; color: #B91C1C; margin-bottom: .25rem; }
+.danger-text p { font-size: .88rem; color: var(--mid-blue-2); margin: 0; }
+.btn-danger-outline { flex: none; background: transparent; color: #B91C1C; border-color: #FECACA; }
+.btn-danger-outline:hover { background: #FEE2E2; border-color: #B91C1C; }
+.btn-danger { background: #DC2626; color: #fff; }
+.btn-danger:hover { background: #B91C1C; }
+.danger-warning {
+  font-size: .9rem; line-height: 1.5; margin: 0 0 .4rem;
+  padding: .7rem .85rem; border-radius: var(--radius-xs);
+  background: #fff0ef; color: #9c2520;
+}
+@media (max-width: 600px) {
+  .danger-card { flex-direction: column; align-items: flex-start; }
+}

@@ -180,7 +180,29 @@
         <div class="badges-grid" id="profile-badges-grid" aria-label="Your badges"></div>
       </div><!-- /.badges card -->
 
+      <!-- Delete account -->
+      <div class="card danger-card" aria-labelledby="danger-heading">
+        <div class="danger-text">
+          <h2 id="danger-heading">Delete account</h2>
+          <p>Permanently remove your account, posts, comments, budget and school data. This cannot be undone.</p>
+        </div>
+        <button type="button" class="btn btn-sm btn-danger-outline" id="delete-account-btn">Delete account</button>
+      </div>
+
     </main>
+    <dialog class="profile-dialog" id="delete-account-dialog" aria-labelledby="delete-account-title">
+      <form id="delete-account-form" novalidate>
+        <h2 id="delete-account-title">Delete your account?</h2>
+        <p class="danger-warning">This permanently deletes your profile, points, badges, forum posts and comments, budget entries, school tracker and event sign-ups. You will be signed out.</p>
+        <p id="delete-account-message" class="auth-message is-error" role="alert" hidden></p>
+        <label for="delete-password">Enter your password to confirm</label>
+        <input id="delete-password" name="password" type="password" autocomplete="current-password" required>
+        <div class="profile-dialog-actions">
+          <button type="button" class="btn btn-outline" id="cancel-delete-account">Cancel</button>
+          <button type="submit" class="btn btn-danger" id="confirm-delete-account">Delete account</button>
+        </div>
+      </form>
+    </dialog>
     <dialog class="profile-dialog" id="profile-dialog" aria-labelledby="profile-dialog-title">
       <form id="profile-edit-form">
         <h2 id="profile-dialog-title">Edit profile</h2>

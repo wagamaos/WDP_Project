@@ -129,6 +129,39 @@
     return Promise.resolve();
   }
 
+  function withoutEmail(list, email) {
+    return (list || []).filter(function (item) { return item !== email; });
+  }
+
+  // Removes everything stored for one account: the user record, their own data,
+  // their forum posts and comments, and their likes, reports and event sign-ups.
+  function removeUserData(email) {
+    state.users = state.users.filter(function (user) { return user.email !== email; });
+    ['budgetEntries', 'monthlyBudgets', 'currencies', 'schoolByUser'].forEach(function (key) {
+      if (state[key]) delete state[key][email];
+    });
+    state.redemptions = (state.redemptions || []).filter(function (item) { return item.email !== email; });
+
+    (state.events || []).forEach(function (event) {
+      var list = state.eventRegistrations[event.id] || [];
+      if (list.indexOf(email) !== -1) {
+        state.eventRegistrations[event.id] = withoutEmail(list, email);
+        event.registeredCount = Math.max(0, (event.registeredCount || 0) - 1);
+      }
+    });
+
+    state.forumPosts = state.forumPosts.filter(function (post) { return post.authorEmail !== email; });
+    state.forumPosts.forEach(function (post) {
+      post.likes = withoutEmail(post.likes, email);
+      post.reports = (post.reports || []).filter(function (report) { return report.email !== email; });
+      post.comments = (post.comments || []).filter(function (comment) { return comment.authorEmail !== email; });
+      post.comments.forEach(function (comment) {
+        comment.likes = withoutEmail(comment.likes, email);
+        comment.helpfulBy = withoutEmail(comment.helpfulBy, email);
+      });
+    });
+  }
+
   function getUserSchool(user) {
     state.schoolByUser = state.schoolByUser || {};
     if (!state.schoolByUser[user.email]) {
@@ -287,6 +320,14 @@
       window.localStorage.removeItem(SESSION_KEY);
       window.localStorage.removeItem(ADMIN_KEY);
       return Promise.resolve();
+    },
+    deleteCurrentAccount: function (password) {
+      return requireUser().then(function (user) {
+        if (!password || user.password !== password) throw new Error('That password is incorrect.');
+        removeUserData(user.email);
+        save();
+        window.localStorage.removeItem(SESSION_KEY);
+      });
     },
     updateCurrentUser: function (changes) {
       return requireUser().then(function (user) {
